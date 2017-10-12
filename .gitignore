@@ -76,3 +76,6 @@ src/**/*.js
 src/**/*.js.map
 src/**/*.d.ts
 !redditFormat.d.ts
+
+*~
+dist/

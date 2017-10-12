@@ -4,10 +4,11 @@
     "noImplicitReturns": true,
     "target": "es5",
     "sourceMap": true,
-    "declaration": true,
+    "declaration": false,
     "module": "es2015",
     "moduleResolution": "node",
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": ["node_modules/@types"],
+    "outDir": "./dist/out-tsc"
   },
   "exclude": ["node_modules", "dist"]
 }

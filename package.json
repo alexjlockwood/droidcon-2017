@@ -22,7 +22,11 @@
   },
   "homepage": "https://github.com/Ledragon/d3v4-ts-demo#readme",
   "dependencies": {
-    "d3": "^4.11.0"
+    "@types/d3-selection-multi": "^1.0.6",
+    "@types/lodash-es": "^4.14.7",
+    "d3": "^4.11.0",
+    "d3-selection-multi": "^1.0.1",
+    "lodash-es": "^4.17.4"
   },
   "devDependencies": {
     "@types/d3": "^4.11.0",
@@ -30,6 +34,7 @@
     "npm-run-all": "^4.1.1",
     "rollup": "^0.50.0",
     "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-typescript": "^0.8.1",
     "rollup-watch": "^4.3.1",
     "typescript": "^2.5.3"
   }
