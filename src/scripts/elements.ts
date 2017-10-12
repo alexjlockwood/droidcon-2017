@@ -1,11 +1,9 @@
-import 'd3-selection-multi';
-
 import * as _ from 'lodash-es';
 import * as d3 from 'd3';
 
-export function newViewport(options?: Options) {
-  options = options || { size: 960, viewportWidth: 24, viewportHeight: 12 };
+import { Point } from './types';
 
+export function newViewport(options: Options) {
   const { size, viewportWidth, viewportHeight } = options;
   const width = viewportWidth >= viewportHeight ? size : size * viewportWidth / viewportHeight;
   const height = viewportWidth >= viewportHeight ? size * viewportHeight / viewportWidth : size;
@@ -19,14 +17,12 @@ export function newViewport(options?: Options) {
       width: width + margin.left + margin.right,
       height: height + margin.top + margin.bottom,
     })
-    .append('g')
+    .append('g.viewport')
     .attrs({
-      class: 'viewport',
       transform: `translate(${margin.left}, ${margin.top}) scale(${scale.x}, ${scale.y})`,
     });
 
-  viewport.append('rect').attrs({
-    class: 'background',
+  viewport.append('rect.background').attrs({
     x1: 0,
     y1: 0,
     width: viewportWidth,
@@ -42,9 +38,8 @@ export function newViewport(options?: Options) {
         ..._.range(viewportHeight + 1).map(y => [[0, y], [viewportWidth, y]] as [Point, Point]),
       ])
       .enter()
-      .append('line')
+      .append('line.grid')
       .attrs({
-        class: 'grid',
         x1: d => d[0][0],
         y1: d => d[0][1],
         x2: d => d[1][0],
@@ -60,5 +55,3 @@ interface Options {
   readonly viewportWidth: number;
   readonly viewportHeight: number;
 }
-
-type Point = [number, number];

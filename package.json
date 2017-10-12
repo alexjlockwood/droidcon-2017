@@ -1,35 +1,27 @@
 {
-  "name": "d3v4ts",
+  "name": "shape-shifter-demos",
   "version": "1.0.0",
-  "description": "d3v4ts",
-  "main": "index.js",
+  "description": "Shape Shifter demos.",
   "scripts": {
     "prestart": "tsc && rollup -c",
     "start": "npm-run-all --parallel serve tsc:w rollup:w",
-    "serve": "live-server src --watch=src/**/*.html,src/bundle.js,src/**/*.css",
+    "serve": "live-server src src/demos --watch=src/**/*.html,src/bundle.js,src/**/*.css",
     "tsc:w": "tsc -w",
     "rollup:w": "rollup -c -w"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/alexjlockwood"
   },
   "keywords": [],
   "author": "Alex Lockwood",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Ledragon/d3v4-ts-demo/issues"
-  },
-  "homepage": "https://github.com/Ledragon/d3v4-ts-demo#readme",
   "dependencies": {
-    "@types/d3-selection-multi": "^1.0.6",
-    "@types/lodash-es": "^4.14.7",
     "d3": "^4.11.0",
+    "d3-jetpack": "^2.0.13",
     "d3-selection-multi": "^1.0.1",
     "lodash-es": "^4.17.4"
   },
   "devDependencies": {
     "@types/d3": "^4.11.0",
+    "@types/d3-selection-multi": "^1.0.6",
+    "@types/lodash-es": "^4.14.7",
     "live-server": "^1.2.0",
     "npm-run-all": "^4.1.1",
     "rollup": "^0.50.0",
