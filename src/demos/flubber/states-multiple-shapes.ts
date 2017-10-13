@@ -245,8 +245,7 @@ export function run() {
   function wind(ring, vs) {
     var len = ring.length,
       min = Infinity,
-      bestOffset,
-      sum;
+      bestOffset;
 
     for (var offset = 0; offset < len; offset++) {
       var sum = sumFn(
@@ -277,11 +276,8 @@ export function run() {
         });
       });
 
-    function permute(arr, order, sum) {
-      var cur,
-        distance,
-        order = order || [],
-        sum = sum || 0;
+    function permute(arr, order = [], sum = 0) {
+      var cur, distance;
 
       for (var i = 0; i < arr.length; i++) {
         cur = arr.splice(i, 1);

@@ -91,7 +91,6 @@ export class Command {
         const type = i === numSplits && this.type === 'Z' ? 'Z' : 'L';
         cmds.push(new Command(type, [s, e], i !== numSplits));
       }
-      console.log(numSplits, cmds.length);
       return cmds;
     }
     if (this.type === 'Q' || this.type === 'C') {
@@ -103,7 +102,7 @@ export class Command {
       for (let i = 0; i < splitTimes.length - 1; i++) {
         splitBeziers.push(this.bezier.split(splitTimes[i], splitTimes[i + 1]));
       }
-      const cmds = splitBeziers.map((bez, i) => {
+      return splitBeziers.map((bez, i) => {
         const points = bez.points as Array<{ x: number; y: number }>;
         return new Command(
           this.type,
@@ -112,8 +111,6 @@ export class Command {
           bez,
         );
       });
-      console.log(numSplits, cmds.length);
-      return cmds;
     }
     throw new Error(`Cannot split type ${this.type}`);
   }

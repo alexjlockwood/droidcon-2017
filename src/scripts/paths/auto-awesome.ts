@@ -89,8 +89,6 @@ function align({ from, to }: { from: Path; to: Path }) {
   const fromCmdInfos = processAlignmentsFn(alignmentInfo.alignment.from);
   const toCmdInfos = processAlignmentsFn(alignmentInfo.alignment.to);
 
-  console.log(fromCmdInfos, toCmdInfos);
-
   // Process each list of alignments. Each streak of gaps represents a series
   // of one or more splits we'll perform on the path.
   const createGapStreaksFn = (cmdInfos: ReadonlyArray<CmdInfo>) => {
@@ -110,8 +108,6 @@ function align({ from, to }: { from: Path; to: Path }) {
   const fromGapGroups = createGapStreaksFn(fromCmdInfos);
   const toGapGroups = createGapStreaksFn(toCmdInfos);
 
-  console.log(fromGapGroups, toGapGroups);
-
   // Fill in the gaps by applying linear subdivide batch splits.
   const applySplitsFn = (path: Path, gapGroups: CmdInfo[][]) => {
     const splitOps = new Map<number, number>();
@@ -123,7 +119,6 @@ function align({ from, to }: { from: Path; to: Path }) {
       const cmdIdx = _.clamp(_.last(gapGroup).nextCmdIdx, 1, path.length - 1);
       splitOps.set(cmdIdx, gapGroup.length + (splitOps.has(cmdIdx) ? splitOps.get(cmdIdx) : 0));
     }
-    console.log(path.length);
     return _.flatMap(path, (cmd, cmdIdx) => {
       return splitOps.has(cmdIdx) ? cmd.split(splitOps.get(cmdIdx)) : cmd;
     });
@@ -131,12 +126,6 @@ function align({ from, to }: { from: Path; to: Path }) {
 
   const fromPathResult = applySplitsFn(alignmentInfo.generatedFromPath, fromGapGroups);
   const toPathResult = applySplitsFn(to, toGapGroups);
-
-  console.log(fromPathResult, toPathResult);
-
-  if (fromPathResult.length !== toPathResult.length) {
-    throw new Error('lengths are not equal ' + fromPathResult.length + ' ' + toPathResult.length);
-  }
 
   // Finally, convert the commands before returning the result.
   return convert({ from: fromPathResult, to: toPathResult });

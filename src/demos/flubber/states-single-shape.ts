@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import * as topojson from 'topojson';
 
-import { DataSelection, Point } from '../scripts/types';
+import { DataSelection, Point } from '../../scripts/types';
 
 import { sum as sumFn } from 'd3-array';
 

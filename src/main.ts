@@ -2,18 +2,18 @@
 import 'd3-jetpack';
 import 'd3-selection-multi';
 
-import { run as runDemo1 } from './demos/demo1';
-import { run as runDemo2 } from './demos/demo2';
-import { run as runDemo3 } from './demos/demo3';
-import { run as runMultipleTriangulationDemo } from './demos/triangulation/multiple';
-import { run as runSingleTriangulationDemo } from './demos/triangulation/single';
+import { run as runDemo1 } from './demos/intro-to-path-morphing/demo1';
+import { run as runDemo2 } from './demos/needleman-wunsch/demo2';
+import { run as runFlubberStatesMultipleShapes } from './demos/flubber/states-multiple-shapes';
+import { run as runFlubberStatesSingleShape } from './demos/flubber/states-single-shape';
+import { run as runFlubberTexasToHawaii } from './demos/flubber/texas-to-hawaii';
 
 const demoMap = new Map<string, () => void>([
-  ['/demos/demo1.html', runDemo1],
-  ['/demos/demo2.html', runDemo2],
-  ['/demos/demo3.html', runDemo3],
-  ['/demos/triangulation/single.html', runSingleTriangulationDemo],
-  ['/demos/triangulation/multiple.html', runMultipleTriangulationDemo],
+  ['/demos/intro-to-path-morphing/demo1.html', runDemo1],
+  ['/demos/needleman-wunsch/demo2.html', runDemo2],
+  ['/demos/flubber/states-single-shape.html', runFlubberStatesSingleShape],
+  ['/demos/flubber/states-multiple-shapes.html', runFlubberStatesMultipleShapes],
+  ['/demos/flubber/texas-to-hawaii.html', runFlubberTexasToHawaii],
 ]);
 
 if (demoMap.has(window.location.pathname)) {
