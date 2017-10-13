@@ -9,7 +9,8 @@
     "moduleResolution": "node",
     "typeRoots": ["node_modules/@types"],
     "outDir": "./dist/out-tsc",
-    "lib": ["es2017", "dom"]
+    "lib": ["es2017", "dom"],
+    "allowJs": true
   },
   "exclude": ["node_modules", "dist"]
 }

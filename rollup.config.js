@@ -1,7 +1,7 @@
 import resolve from 'rollup-plugin-node-resolve';
 
 export default {
-  input: 'dist/out-tsc/main.js',
+  input: 'dist/out-tsc/src/main.js',
   output: {
     file: 'src/bundle.js',
     format: 'umd',

@@ -16,7 +16,8 @@
     "d3": "^4.11.0",
     "d3-jetpack": "^2.0.13",
     "d3-selection-multi": "^1.0.1",
-    "lodash-es": "^4.17.4"
+    "lodash-es": "^4.17.4",
+    "topojson": "^3.0.2"
   },
   "devDependencies": {
     "@types/d3": "^4.11.0",
