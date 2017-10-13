@@ -5,11 +5,17 @@ import 'd3-selection-multi';
 import { run as runDemo1 } from './demos/demo1';
 import { run as runDemo2 } from './demos/demo2';
 import { run as runDemo3 } from './demos/demo3';
+import { run as runMultipleTriangulationDemo } from './demos/triangulation/multiple';
+import { run as runSingleTriangulationDemo } from './demos/triangulation/single';
 
-if (window.location.href.includes('demo1')) {
-  runDemo1();
-} else if (window.location.href.includes('demo2')) {
-  runDemo2();
-} else if (window.location.href.includes('demo3')) {
-  runDemo3();
+const demoMap = new Map<string, () => void>([
+  ['/demos/demo1.html', runDemo1],
+  ['/demos/demo2.html', runDemo2],
+  ['/demos/demo3.html', runDemo3],
+  ['/demos/triangulation/single.html', runSingleTriangulationDemo],
+  ['/demos/triangulation/multiple.html', runMultipleTriangulationDemo],
+]);
+
+if (demoMap.has(window.location.pathname)) {
+  demoMap.get(window.location.pathname)();
 }

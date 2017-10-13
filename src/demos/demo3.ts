@@ -3,6 +3,8 @@ import * as topojson from 'topojson';
 
 import { DataSelection, Point } from '../scripts/types';
 
+import { sum as sumFn } from 'd3-array';
+
 export function run() {
   const svg = d3
     .select('body')
@@ -122,7 +124,7 @@ function wind(ring: Point[], vs: Point[]) {
   let bestOffset: number;
 
   for (let offset = 0; offset < len; offset++) {
-    const s = d3.sum(vs.map((p, i) => Math.pow(distanceBetween(ring[(offset + i) % len], p), 2)));
+    const s = sumFn(vs.map((p, i) => Math.pow(distanceBetween(ring[(offset + i) % len], p), 2)));
     if (s < min) {
       min = s;
       bestOffset = offset;
