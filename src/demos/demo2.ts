@@ -28,31 +28,29 @@ function showSegments(
   to: DataSelection,
   toCmds: ReadonlyArray<Command>,
 ) {
+  const t = d3.transition(undefined).duration(1000);
+
   const fromPathData = Command.toPathData(fromCmds);
   const toPathData = Command.toPathData(toCmds);
   from.append('path.from').attrs({ d: fromPathData });
   to.append('path.to').attrs({ d: toPathData });
 
   const minNumCmds = Math.min(fromCmds.length, toCmds.length);
-
-  const info = [[from, fromCmds], [to, toCmds]] as [DataSelection, Command[]][];
-  for (const [container, points] of info) {
+  const commandInfo = [[from, fromCmds], [to, toCmds]] as [DataSelection, Command[]][];
+  for (const [container, cmds] of commandInfo) {
     // JOIN new data with old elements.
-    const segments = container.selectAll('circle.segment').data(points);
+    const segments = container.selectAll('circle.segment').data(cmds);
 
     // EXIT old elements not present in new data.
     segments.exit().remove();
+
+    const interpolateColor = (i: number) => d3.interpolateCool(i / cmds.length * 0.7 + 0.15);
 
     // UPDATE old elements present in new data.
     segments.attrs({
       cx: d => d.end[0],
       cy: d => d.end[1],
-      fill: (d, i) => {
-        if (d.isSplit) {
-          return '#E64A19';
-        }
-        return i < minNumCmds ? d3.interpolateCool(i / points.length * 0.7 + 0.15) : '#D32F2F';
-      },
+      fill: (d, i) => (d.isSplit ? '#E64A19' : i >= minNumCmds ? '#D32F2F' : interpolateColor(i)),
     });
 
     // ENTER new elements present in new data.
@@ -62,14 +60,11 @@ function showSegments(
       .attrs({
         cx: d => d.end[0],
         cy: d => d.end[1],
-        r: () => 5,
-        fill: (d, i) => {
-          if (d.isSplit) {
-            return '#E64A19';
-          }
-          return i < minNumCmds ? d3.interpolateCool(i / points.length * 0.7 + 0.15) : '#D32F2F';
-        },
-      });
+        r: d => (d.isSplit ? 0 : 5),
+        fill: (d, i) => (d.isSplit ? '#E64A19' : i >= minNumCmds ? '#D32F2F' : interpolateColor(i)),
+      })
+      .transition(t)
+      .attrs({ r: (d, i) => 5 });
   }
 }
 
