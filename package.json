@@ -7,7 +7,8 @@
     "start": "npm-run-all --parallel serve tsc:w rollup:w",
     "serve": "live-server src src/demos --watch=src/**/*.html,src/bundle.js,src/**/*.css",
     "tsc:w": "tsc -w",
-    "rollup:w": "rollup -c -w"
+    "rollup:w": "rollup -c -w",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [],
   "author": "Alex Lockwood",
@@ -43,6 +44,7 @@
     "@types/d3-timer": "^1.0.0",
     "@types/d3-transition": "^1.0.0",
     "@types/lodash-es": "^4.14.7",
+    "gh-pages": "^1.0.0",
     "live-server": "^1.2.0",
     "npm-run-all": "^4.1.1",
     "rollup": "^0.50.0",
