@@ -3,7 +3,7 @@ import * as Elements from 'scripts/elements';
 import * as _ from 'lodash-es';
 import * as d3 from 'lib/d3';
 
-import { AutoAwesome, Command } from './paths';
+import { AutoAwesome, Command } from './util';
 import { DataSelection, Point } from 'scripts/types';
 
 const options = { size: 1440, viewportWidth: 1600, viewportHeight: 800 };
