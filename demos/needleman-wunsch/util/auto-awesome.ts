@@ -5,7 +5,7 @@ import { distance, samePoint } from 'scripts/math';
 
 import { Command } from 'scripts/paths/command';
 
-type Path = ReadonlyArray<Command>;
+type Path = Command[];
 
 /**
  * Takes two arbitrary paths, calculates a best-estimate alignment of the two,
@@ -273,11 +273,11 @@ function isClosed(cmds: Path) {
 }
 
 function isClockwise(cmds: Path) {
-  let sum = 0;
+  const closed = isClosed(cmds);
+  let area = 0;
   for (let i = 0; i < cmds.length; i++) {
-    const { end: [x0, y0] } = cmds[i];
-    const { end: [x1, y1] } = cmds[(i + 1) % cmds.length];
-    sum += (x1 - x0) * (y1 - y0);
+    const last = i + 1 === cmds.length;
+    area += cmds[i].area();
   }
-  return sum >= 0;
+  return area >= 0;
 }
