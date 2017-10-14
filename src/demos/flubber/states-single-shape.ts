@@ -1,7 +1,10 @@
+import * as Path from 'svgpath';
 import * as d3 from 'lib/d3';
-import * as topojson from 'topojson';
+import * as topojson from 'topojson-client';
 
-import { DataSelection, Point } from '../../scripts/types';
+import { Point, Ring } from 'scripts/math';
+
+import { DataSelection } from 'scripts/types';
 
 export function run() {
   const svg = d3
@@ -21,8 +24,8 @@ export function run() {
     draw();
 
     function draw() {
-      let a = states[0].slice(0);
-      const b = states[1].slice(0);
+      let a = states[0].slice(0) as Ring;
+      const b = states[1].slice(0) as Ring;
 
       // Same number of points on each ring.
       if (a.length < b.length) {

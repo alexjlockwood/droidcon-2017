@@ -30,7 +30,8 @@
     "d3-transition": "^1.1.0",
     "earcut": "^2.1.1",
     "lodash-es": "^4.17.4",
-    "topojson": "^3.0.2"
+    "svgpath": "^2.2.1",
+    "topojson-client": "^3.0.0"
   },
   "devDependencies": {
     "@types/d3-array": "^1.0.0",

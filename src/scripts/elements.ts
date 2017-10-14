@@ -1,7 +1,7 @@
 import * as _ from 'lodash-es';
 import * as d3 from '../lib/d3';
 
-import { Point } from './types';
+import { Point } from './math';
 
 export function newViewport(options: Options) {
   const { size, viewportWidth, viewportHeight } = options;

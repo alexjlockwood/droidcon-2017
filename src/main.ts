@@ -3,6 +3,7 @@ import 'd3-jetpack';
 import 'd3-selection-multi';
 
 import {
+  runFlubberAnimalsSingleShape,
   runFlubberStatesMultipleShapes,
   runFlubberStatesSingleShape,
   runFlubberTexasToHawaii,
@@ -27,6 +28,7 @@ const demoMap = new Map<string, () => void>([
   ['/demos/flubber/states-single-shape.html', runFlubberStatesSingleShape],
   ['/demos/flubber/states-multiple-shapes.html', runFlubberStatesMultipleShapes],
   ['/demos/flubber/texas-to-hawaii.html', runFlubberTexasToHawaii],
+  ['/demos/flubber/animals-single-shape.html', runFlubberAnimalsSingleShape],
 ]);
 
 const demoPath = window.location.pathname.slice(window.location.pathname.indexOf('/demos'));

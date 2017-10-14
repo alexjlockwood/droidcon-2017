@@ -9,8 +9,6 @@ type Selection<GElement extends BaseType, Datum, PElement extends BaseType, PDat
   PDatum
 >;
 
-export type Point = [number, number];
-
 type DefaultSelection<
   GElement extends BaseType = BaseType,
   Datum = any,

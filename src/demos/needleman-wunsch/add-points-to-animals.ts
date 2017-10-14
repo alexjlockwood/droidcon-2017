@@ -3,8 +3,10 @@ import * as Elements from 'scripts/elements';
 import * as _ from 'lodash-es';
 import * as d3 from 'lib/d3';
 
-import { AutoAwesome, Command } from './util';
-import { DataSelection, Point } from 'scripts/types';
+import { AutoAwesome } from './util';
+import { Command } from 'scripts/paths';
+import { DataSelection } from 'scripts/types';
+import { Point } from 'scripts/math';
 
 const options = { size: 1440, viewportWidth: 1600, viewportHeight: 800 };
 const pixelRatio = options.size / Math.max(options.viewportWidth, options.viewportHeight);

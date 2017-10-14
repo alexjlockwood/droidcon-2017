@@ -4,7 +4,8 @@ import * as Elements from 'scripts/elements';
 import * as _ from 'lodash-es';
 import * as d3 from 'lib/d3';
 
-import { DataSelection, Point } from '../../scripts/types';
+import { DataSelection } from 'scripts/types';
+import { Point } from 'scripts/math';
 
 const options = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
 const pixelRatio = options.size / Math.max(options.viewportWidth, options.viewportHeight);

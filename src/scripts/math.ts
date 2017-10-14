@@ -1,4 +1,5 @@
-import { Point } from './types';
+export type Point = [number, number];
+export type Ring = Point[];
 
 /** Linearly interpolate between a and b using time t. */
 export function lerp(a: number, b: number, t: number) {
@@ -11,6 +12,11 @@ export function distance(p1: Point, p2: Point) {
 }
 
 /** Returns true if the two points are equal. */
-export function arePointsEqual(p1: Point, p2: Point) {
+export function samePoint(p1: Point, p2: Point) {
   return p1 && p2 && distance(p1, p2) < 1e-9;
+}
+
+/** Returns true iff the given argument is a finite number. */
+export function isFiniteNumber(num: any) {
+  return typeof num === 'number' && isFinite(num);
 }

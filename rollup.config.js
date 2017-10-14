@@ -11,7 +11,7 @@ export default {
   },
   plugins: [
     commonjs({
-      include: ['node_modules/earcut/**', 'node_modules/bezier-js/**'],
+      include: ['node_modules/earcut/**', 'node_modules/bezier-js/**', 'node_modules/svgpath/**'],
     }),
     resolve({
       jsnext: true,

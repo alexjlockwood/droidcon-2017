@@ -1,5 +1,5 @@
 import * as d3 from 'lib/d3';
-import * as topojson from 'topojson';
+import * as topojson from 'topojson-client';
 
 import { bisector as bisectorFn, sum as sumFn } from 'd3-array';
 
