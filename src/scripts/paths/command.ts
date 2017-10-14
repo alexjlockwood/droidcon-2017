@@ -61,7 +61,7 @@ export class Command {
     return _.last(this.points);
   }
 
-  length() {
+  length(): number {
     switch (this.type) {
       case 'M':
         return 0;
@@ -71,6 +71,47 @@ export class Command {
       case 'Q':
       case 'C':
         return this.bezier.length();
+    }
+  }
+
+  area() {
+    if (this.type === 'M') {
+      return 0;
+    }
+    const [x0, y0] = this.start;
+    const [x3, y3] = this.end;
+    switch (this.type) {
+      case 'L':
+      case 'Z':
+        return (x3 - x0) * (y3 - y0);
+      case 'Q':
+      case 'C':
+        let x1: number;
+        let y1: number;
+        let x2: number;
+        let y2: number;
+        if (this.type === 'Q') {
+          const cp = this.points[1];
+          x1 = x0 + 2 / 3 * (cp[0] - x0);
+          y1 = y0 + 2 / 3 * (cp[1] - y0);
+          x2 = x3 + 2 / 3 * (cp[0] - x3);
+          y2 = y3 + 2 / 3 * (cp[1] - y3);
+        } else {
+          x1 = this.points[1][0];
+          y1 = this.points[1][1];
+          x2 = this.points[2][0];
+          y2 = this.points[2][1];
+        }
+        return (
+          3 *
+          ((y3 - y0) * (x1 + x2) -
+            (x3 - x0) * (y1 + y2) +
+            y1 * (x0 - x2) -
+            x1 * (y0 - y2) +
+            y3 * (x2 + x0 / 3) -
+            x3 * (y2 + y0 / 3)) /
+          20
+        );
     }
   }
 

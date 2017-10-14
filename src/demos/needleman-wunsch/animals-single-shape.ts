@@ -1,10 +1,9 @@
 import * as d3 from 'lib/d3';
 
-import { Point, Ring } from 'scripts/math';
-import { addPoints, join, wind } from './util/common';
-
+import { AutoAwesome } from './util';
+import { Command } from 'scripts/paths';
 import { DataSelection } from 'scripts/types';
-import { pathStringToRing } from './util/svg';
+import { Point } from 'scripts/math';
 
 const hippo = `
 M13.833,231.876c4.154-55.746,24.442-104.83,60.85-147.292
@@ -102,25 +101,18 @@ export function run() {
   const path = svg.append('path');
   const circles = svg.append('g');
 
-  const shapes = [hippo, elephant, buffalo, circle, star].map(d => pathStringToRing(d).ring);
+  const shapes = [hippo, elephant, buffalo, circle, star].map(d => Command.fromPathData(d));
 
   d3.shuffle(shapes);
 
   (function draw() {
     let a = shapes[0].slice(0);
-    const b = shapes[1].slice(0);
+    let b = shapes[1].slice(0);
+    const fixResult = AutoAwesome.fix({ from: a, to: b });
+    a = fixResult.from;
+    b = fixResult.to;
 
-    // Same number of points on each ring.
-    if (a.length < b.length) {
-      addPoints(a, b.length - a.length);
-    } else if (b.length < a.length) {
-      addPoints(b, a.length - b.length);
-    }
-
-    // Pick optimal winding.
-    a = wind(a, b);
-
-    path.attrs({ d: join(a) });
+    path.attrs({ d: Command.toPathData(a) });
 
     // Redraw points.
     circles.datum(a).call(updateCircles);
@@ -134,17 +126,20 @@ export function run() {
         shapes.push(shapes.shift());
         setTimeout(draw, 100);
       })
-      .attrs({ d: join(b) });
+      .attrs({ d: Command.toPathData(fixResult.to) });
 
     circles
       .selectAll('circle')
       .data(b)
       .transition(t)
-      .attrs({ cx: (d: Point) => d[0], cy: (d: Point) => d[1] });
+      .attrs({
+        cx: d => d.end[0],
+        cy: d => d.end[1],
+      });
   })();
 }
 
-function updateCircles(sel: DataSelection<Point[]>) {
+function updateCircles(sel: DataSelection<Command[]>) {
   const circles = sel.selectAll('circle').data(d => d);
 
   const merged = circles
@@ -153,9 +148,9 @@ function updateCircles(sel: DataSelection<Point[]>) {
     .attr('r', 2)
     .merge(circles);
 
-  merged.classed('added', (d: Point & { added: boolean }) => d.added).attrs({
-    cx: d => d[0],
-    cy: d => d[1],
+  merged.classed('added', (d: Command & { added: boolean }) => d.isSplit).attrs({
+    cx: d => d.end[0],
+    cy: d => d.end[1],
   });
 
   circles.exit().remove();
