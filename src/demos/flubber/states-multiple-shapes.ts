@@ -11,7 +11,7 @@ export function run() {
     .append('svg')
     .attrs({ width, height });
 
-  d3.json('/assets/us.topo.json', (err, us) => {
+  d3.json('../../assets/us.topo.json', (err, us) => {
     const states = topojson
       .feature(us, (us as any).objects.states)
       .features.map(d => d.geometry.coordinates[0]);

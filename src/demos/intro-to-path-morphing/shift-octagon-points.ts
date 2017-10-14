@@ -1,5 +1,5 @@
 import * as Callable from 'scripts/callable';
-import * as Data from './data';
+import * as Data from './util/data';
 import * as Elements from 'scripts/elements';
 import * as _ from 'lodash-es';
 import * as d3 from 'lib/d3';
