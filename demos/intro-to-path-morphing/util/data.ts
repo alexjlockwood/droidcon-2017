@@ -1,4 +1,4 @@
-import { Point } from 'scripts/types';
+import { Point } from 'scripts/math';
 
 export function newSquareRing(topLeft: Point, center: Point) {
   const [tx, ty] = topLeft;

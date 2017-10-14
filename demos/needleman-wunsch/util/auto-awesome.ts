@@ -1,9 +1,9 @@
 import * as NeedlemanWunsch from './needleman-wunsch';
 import * as _ from 'lodash-es';
 
-import { arePointsEqual, distance } from 'scripts/math';
+import { distance, samePoint } from 'scripts/math';
 
-import { Command } from './command';
+import { Command } from 'scripts/paths/command';
 
 type Path = ReadonlyArray<Command>;
 
@@ -269,7 +269,7 @@ function shiftCommands(commands: Path, numShifts = 0): Path {
 }
 
 function isClosed(cmds: Path) {
-  return cmds.length > 0 && arePointsEqual(cmds[0].end, _.last(cmds).end);
+  return cmds.length > 0 && samePoint(cmds[0].end, _.last(cmds).end);
 }
 
 function isClockwise(cmds: Path) {

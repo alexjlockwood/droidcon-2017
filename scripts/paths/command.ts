@@ -1,13 +1,14 @@
 import * as PathParser from './path-parser';
 import * as _ from 'lodash-es';
 
-import { distance, lerp } from 'scripts/math';
+import { Point, distance, lerp } from 'scripts/math';
 
 import Bezier from 'bezier-js';
-import { Point } from 'scripts/types';
 import { SvgChar } from './svgchar';
 
-/** Represents an individual SVG command. */
+/**
+ * Represents an individual SVG command.
+ */
 export class Command {
   private readonly bezier: any;
 
