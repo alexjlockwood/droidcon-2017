@@ -2,6 +2,7 @@
   "name": "droidcon-2017",
   "version": "1.0.0",
   "description": "Droidcon 2017 demos.",
+  "repository": "https://github.com/alexjlockwood/droidcon-2017",
   "scripts": {
     "prestart": "tsc && rollup -c",
     "start": "npm-run-all --parallel serve tsc:w rollup:w",
