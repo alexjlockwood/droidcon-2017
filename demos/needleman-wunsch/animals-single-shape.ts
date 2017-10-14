@@ -101,7 +101,7 @@ export function run() {
   const path = svg.append('path');
   const circles = svg.append('g');
 
-  const shapes = [hippo, elephant, buffalo, circle, star].map(d => Command.fromPathData(d));
+  const shapes = [hippo, elephant, buffalo /*, circle, star*/].map(d => Command.fromPathData(d));
 
   d3.shuffle(shapes);
 
