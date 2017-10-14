@@ -1,8 +1,8 @@
 import * as d3 from 'lib/d3';
 import * as topojson from 'topojson-client';
 
-import { addPoints, closestCentroids, join, wind } from './util/common';
-import { distance, lerp } from 'scripts/math';
+import { Point, Ring, Triangle, distance, lerp } from 'scripts/math';
+import { addPoints, align, closestCentroids, join, wind } from './util/common';
 
 import { Topology } from './util/triangulate';
 import earcut from 'earcut';
@@ -24,15 +24,14 @@ export function run() {
     const points = tx.coordinates[0];
     const vertices = points.reduce((arr, point) => arr.concat(point), []);
     const cuts = earcut(vertices);
-    const triangles = [];
-    let topology;
+    const triangles: Triangle[] = [];
 
     for (let i = 0, l = cuts.length; i < l; i += 3) {
       // Save each triangle as segments [a, b], [b, c], [c, a]
       triangles.push([[cuts[i], cuts[i + 1]], [cuts[i + 1], cuts[i + 2]], [cuts[i + 2], cuts[i]]]);
     }
 
-    topology = createTopology(triangles, points);
+    const topology = createTopology(triangles, points);
 
     svg
       .append('path')
@@ -45,12 +44,14 @@ export function run() {
     // Asynchronous for demo purposes.
     collapse(topology, 8, done);
 
-    function done(pieces) {
+    function done(pieces: Ring[]) {
       // Turn MultiPolygon into list of rings
       const destinations = hi.coordinates.map(poly => poly[0]);
 
-      // Get array of tweenable pairs of rings
-      const pairs = getTweenablePairs(pieces, destinations);
+      // Get array of tweenable pairs of rings rearrange order of polygons for least movement.
+      const pairs = closestCentroids(pieces, destinations).map((a, i) =>
+        align([...a], [...destinations[i]]),
+      );
 
       // Collate the pairs into before/after path strings
       const pathStrings = [
@@ -129,7 +130,6 @@ export function run() {
 
   function morph(d) {
     const p = d3.select(this);
-
     p
       .transition()
       .delay(d.direction ? 0 : 1000)
@@ -140,19 +140,17 @@ export function run() {
       .attr('d', d[1])
       .on('end', () => {
         d.reverse();
-
-        // Show borderless
         if (!(d.direction = !d.direction)) {
+          // Show borderless
           p.attr('d', d.outer);
         }
-
         p.each(morph);
       });
   }
 
-  function createTopology(triangles, points) {
-    const arcIndices = {};
-    const topology = {
+  function createTopology(triangles: Triangle[], points: Point[]) {
+    const arcIndices: { [index: string]: number } = {};
+    const topology: Topology = {
       type: 'Topology',
       objects: {
         triangles: {
@@ -164,7 +162,7 @@ export function run() {
     };
 
     triangles.forEach(triangle => {
-      const geometry = [];
+      const geometry: number[] = [];
 
       triangle.forEach((arc, i) => {
         const slug = arc[0] < arc[1] ? arc.join(',') : arc[1] + ',' + arc[0];
@@ -189,40 +187,5 @@ export function run() {
     // Sort smallest first
     topology.objects.triangles.geometries.sort((a, b) => a.area - b.area);
     return topology;
-  }
-
-  function getTweenablePairs(start, end) {
-    // Rearrange order of polygons for least movement
-    start = closestCentroids(start, end);
-    return start.map((a, i) => align(a.slice(0), end[i].slice(0)));
-  }
-
-  function align(a, b) {
-    // Matching rotation
-    if (d3.polygonArea(a) * d3.polygonArea(b) < 0) {
-      a.reverse();
-    }
-
-    // Smooth out by bisecting long triangulation cuts
-    bisectSegments(a, 25);
-    bisectSegments(b, 25);
-
-    // Same number of points on each ring
-    if (a.length < b.length) {
-      addPoints(a, b.length - a.length);
-    } else if (b.length < a.length) {
-      addPoints(b, a.length - b.length);
-    }
-
-    // Wind the first to minimize sum-of-squares distance to the second
-    return [wind(a, b), b];
-  }
-
-  function bisectSegments(ring, threshold) {
-    for (let i = 0; i < ring.length - 1; i++) {
-      while (distance(ring[i], ring[i + 1]) > threshold) {
-        ring.splice(i + 1, 0, lerp(ring[i], ring[i + 1], 0.5));
-      }
-    }
   }
 }
