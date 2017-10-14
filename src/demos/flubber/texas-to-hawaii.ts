@@ -69,9 +69,9 @@ export function run() {
   }
 
   function morph(d) {
-    const path = d3.select(this);
+    const p = d3.select(this);
 
-    path
+    p
       .transition()
       .delay(d.direction ? 0 : 1000)
       .duration(0)
@@ -84,10 +84,10 @@ export function run() {
 
         // Show borderless
         if (!(d.direction = !d.direction)) {
-          path.attr('d', d.outer);
+          p.attr('d', d.outer);
         }
 
-        path.each(morph);
+        p.each(morph);
       });
   }
 
@@ -169,6 +169,7 @@ export function run() {
         const coordinates = arc.map(pointIndex => points[pointIndex]);
 
         if (slug in arcIndices) {
+          // tslint:disable-next-line no-bitwise
           geometry.push(~arcIndices[slug]);
         } else {
           geometry.push((arcIndices[slug] = topology.arcs.length));

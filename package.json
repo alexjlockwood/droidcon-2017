@@ -15,7 +15,6 @@
   "author": "Alex Lockwood",
   "license": "ISC",
   "dependencies": {
-    "@types/d3-queue": "^3.0.5",
     "bezier-js": "^2.2.3",
     "d3-array": "^1.2.1",
     "d3-geo": "^1.9.0",
@@ -35,9 +34,10 @@
   },
   "devDependencies": {
     "@types/d3-array": "^1.0.0",
-    "@types/d3-geo": "^1.0.0",
+    "@types/d3-geo": "^1.9.1",
     "@types/d3-interpolate": "^1.0.0",
     "@types/d3-polygon": "^1.0.0",
+    "@types/d3-queue": "^3.0.5",
     "@types/d3-request": "^1.0.0",
     "@types/d3-scale": "^1.0.0",
     "@types/d3-selection": "^1.0.0",
