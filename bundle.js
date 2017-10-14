@@ -4560,51 +4560,6 @@ selection.prototype.properties = selection_properties;
 transition.prototype.attrs = transition_attrs;
 transition.prototype.styles = transition_styles;
 
-function ringToPathData(selection) {
-    selection.attr('d', function (ring) { return 'M' + ring.join('L') + 'Z'; });
-}
-//# sourceMappingURL=callable.js.map
-
-function newSquareRing(topLeft, center) {
-    var tx = topLeft[0], ty = topLeft[1];
-    var cx = center[0], cy = center[1];
-    var sx = (cx - tx) * 2;
-    var sy = (cy - ty) * 2;
-    return [
-        [0.5, 0],
-        [0.75, 0.25],
-        [1, 0.5],
-        [0.75, 0.75],
-        [0.5, 1],
-        [0.25, 0.75],
-        [0, 0.5],
-        [0.25, 0.25],
-    ].map(function (_a) {
-        var x = _a[0], y = _a[1];
-        return [x * sx + tx, y * sy + ty];
-    });
-}
-function newOctagonRing(topLeft, center) {
-    var tx = topLeft[0], ty = topLeft[1];
-    var cx = center[0], cy = center[1];
-    var sx = (cx - tx) * 2;
-    var sy = (cy - ty) * 2;
-    return [
-        [0.5, 0],
-        [0.854, 0.146],
-        [1, 0.5],
-        [0.854, 0.854],
-        [0.5, 1],
-        [0.146, 0.854],
-        [0, 0.5],
-        [0.146, 0.146],
-    ].map(function (_a) {
-        var x = _a[0], y = _a[1];
-        return [x * sx + tx, y * sy + ty];
-    });
-}
-//# sourceMappingURL=data.js.map
-
 /** Detect free variable `global` from Node.js. */
 var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
 
@@ -15674,7 +15629,7 @@ function baseUpdate(object, path, updater, customizer) {
   return baseSet(object, path, updater(baseGet(object, path)), customizer);
 }
 
-function update$1(object, path, updater) {
+function update(object, path, updater) {
   return object == null ? object : baseUpdate(object, path, castFunction(updater));
 }
 
@@ -15897,7 +15852,7 @@ var object$1 = {
   invoke, keys, keysIn: keysIn$1, mapKeys, mapValues,
   merge: merge$1, mergeWith, omit, omitBy, pick,
   pickBy, result, set: set$4, setWith, toPairs,
-  toPairsIn, transform, unset, update: update$1, updateWith,
+  toPairsIn, transform, unset, update, updateWith,
   values: values$1, valuesIn
 };
 
@@ -17353,104 +17308,6 @@ function newViewport(options) {
     return viewport;
 }
 //# sourceMappingURL=elements.js.map
-
-var options = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
-var pixelRatio = options.size / Math.max(options.viewportWidth, options.viewportHeight);
-function run() {
-    var viewport = newViewport(options);
-    var squareRing = newSquareRing([3, 3], [6, 6]);
-    var octagonRing = newOctagonRing([13, 1], [18, 6]);
-    var fromContainer = viewport.append('g.from');
-    var toContainer = viewport.append('g.to');
-    fromContainer
-        .append('path.from')
-        .datum(squareRing)
-        .call(ringToPathData);
-    toContainer
-        .append('path.to')
-        .datum(octagonRing)
-        .call(ringToPathData);
-    var squareData = squareRing.map(function (segmentPoint, position) {
-        var labelPoint = [
-            segmentPoint[0] + getLabelOffsetX(position),
-            segmentPoint[1] + getLabelOffsetY(position),
-        ];
-        return { segmentPoint: segmentPoint, labelPoint: labelPoint, position: position };
-    });
-    var octagonData = octagonRing.map(function (segmentPoint, position) {
-        var labelPoint = [
-            segmentPoint[0] + getLabelOffsetX(position),
-            segmentPoint[1] + getLabelOffsetY(position),
-        ];
-        return { segmentPoint: segmentPoint, labelPoint: labelPoint, position: position };
-    });
-    // The initial display.
-    update(fromContainer, squareData);
-    update(toContainer, octagonData);
-    var shiftOffset = 0;
-    timeout$1(function recurseFn() {
-        shiftOffset = (shiftOffset + 1) % octagonData.length;
-        var data = octagonData.map(function (d, i) {
-            var _a = octagonData[(i + shiftOffset) % octagonData.length], segmentPoint = _a.segmentPoint, labelPoint = _a.labelPoint;
-            return {
-                segmentPoint: segmentPoint,
-                labelPoint: labelPoint,
-                position: d.position,
-            };
-        });
-        update(fromContainer, squareData);
-        update(toContainer, data);
-        if (shiftOffset !== 0) {
-            timeout$1(recurseFn, 1000);
-        }
-    }, 1000);
-}
-function update(container, data) {
-    var t = transition(undefined).duration(500);
-    // JOIN new data with old elements.
-    var keyFn = function (d) { return d.position.toString(); };
-    var segments = container.selectAll('circle.segment').data(data, keyFn);
-    var labels = container.selectAll('text.label').data(data, keyFn);
-    // EXIT old elements not present in new data.
-    segments.exit().remove();
-    labels.exit().remove();
-    // UPDATE old elements present in new data.
-    segments.transition(t).attrs({
-        cx: function (d) { return d.segmentPoint[0]; },
-        cy: function (d) { return d.segmentPoint[1]; },
-        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
-    });
-    labels.transition(t).attrs({ x: function (d) { return d.labelPoint[0]; }, y: function (d) { return d.labelPoint[1]; } });
-    // ENTER new elements present in new data.
-    segments
-        .enter()
-        .append('circle.segment')
-        .attrs({
-        cx: function (d) { return d.segmentPoint[0]; },
-        cy: function (d) { return d.segmentPoint[1]; },
-        r: function () { return 0.2; },
-        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
-    });
-    labels
-        .enter()
-        .append('text.label')
-        .text(function (d) { return d.position + 1; })
-        .attrs({
-        x: function (d) { return d.labelPoint[0]; },
-        y: function (d) { return d.labelPoint[1]; },
-        'font-family': 'Roboto',
-        'alignment-baseline': 'middle',
-        'text-anchor': 'middle',
-        'font-size': 36 / pixelRatio,
-    });
-}
-function getLabelOffsetX(i) {
-    return i === 1 || i === 3 ? 0.4 : i === 2 ? 0.6 : i === 5 || i === 7 ? -0.4 : i === 6 ? -0.6 : 0;
-}
-function getLabelOffsetY(i) {
-    return i === 1 || i === 7 ? -0.4 : i === 0 ? -0.5 : i === 3 || i === 5 ? 0.4 : i === 4 ? 0.6 : 0;
-}
-//# sourceMappingURL=demo1.js.map
 
 var MATCH = 1;
 var MISMATCH = -1;
@@ -20104,9 +19961,9 @@ function findTimeByDistance$1(bezier, dist) {
 
 //# sourceMappingURL=index.js.map
 
-var options$1 = { size: 1440, viewportWidth: 1600, viewportHeight: 800 };
-function run$1() {
-    var viewport = newViewport(options$1);
+var options = { size: 1440, viewportWidth: 1600, viewportHeight: 800 };
+function run() {
+    var viewport = newViewport(options);
     var hippoCmds = Command$1.fromPathData(hippo);
     var elephantCmds = Command$1.fromPathData(elephant);
     var fixResult = fix({ from: hippoCmds, to: elephantCmds });
@@ -20166,7 +20023,7 @@ function showSegments(from, fromCmds, to, toCmds) {
 // morph(fromContainer, toContainer);
 var hippo = "\nM 139.8 164.88 C 142.54 128.14 155.9 95.8 179.9 67.82 C 206.94 36.22 240.82 20.42 281.53 20.42\nC 297.01 20.42 320.01 22.88 350.55 27.72 C 381.1 32.6 404.1 35 419.6 35\nC 443.28 35 477.45 43.84 522.1 61.47 C 530.03 64.47 539.58 72.71 550.8 86.07\nC 557.2 93.95 567.07 105.83 580.43 121.63 C 583.47 123.77 587.43 126.93 592.3 131.23\nC 597.15 135.45 600.5 137.29 602.3 136.68 C 602.9 134.84 604.44 132.28 606.87 128.94\nC 608.07 127.72 608.83 127.11 609.13 127.11 L 611.88 128.95\nC 612.78 129.57 613.08 131.37 612.78 134.41 C 612.18 139.88 611.88 141.55 611.88 139.41\nC 611.55 142.46 611.12 144.41 610.5 145.36 C 606.55 152.03 605.02 157.21 605.95 160.83\nC 606.87 164.16 609.72 169.5 614.6 176.79 C 619.46 184.09 622.18 189.55 622.8 193.19\nC 622.5 195.92 622.36 200.31 622.36 206.41 L 617.79 217.79\nC 617.79 226.29 627.65 240.89 647.39 261.57 C 656.83 265.79 661.51 280.39 661.51 305.27\nC 661.51 324.75 645.43 334.45 613.24 334.45 C 608.98 334.45 604.44 334.32 599.56 333.98\nC 596.23 332.78 591.36 331.42 584.99 329.91 C 577.39 328.97 572.23 326.41 569.51 322.13\nC 564.63 315.18 556.73 308.63 545.81 302.55 C 543.97 301.67 541.31 298.33 537.81 292.55\nC 534.31 286.75 531.21 283.12 528.49 281.59 C 525.77 280.09 521.81 279.77 516.63 280.71\nC 507.83 282.21 502.95 282.97 502.06 282.97 C 499.92 282.97 496.81 282.37 492.71 281.14\nC 488.61 279.92 485.66 279.31 483.81 279.31 C 481.71 289.04 481.23 298.46 482.46 307.56\nC 482.76 310.01 484.29 311.99 487.01 313.48 C 491.28 316.53 493.55 318.18 493.86 318.53\nC 496.58 320.63 499.48 324.13 502.51 328.97 C 503.11 330.82 501.98 333.92 499.09 338.31\nC 496.19 342.71 493.86 345.31 492.02 346.05 C 490.22 346.85 486.26 347.23 480.18 347.23\nC 471.35 347.23 467.88 347.36 469.7 347.66 C 457.56 345.83 450.72 344.78 449.2 344.5\nC 441.6 342.96 435.06 340.55 429.6 337.2 C 426.85 335.37 423.7 326.85 420.05 311.66\nC 416.37 295.26 413.33 285.39 410.91 282.03 C 410.31 281.13 409.56 280.7 408.65 280.7\nC 407.12 280.7 404.6 282.2 401.12 285.26 C 397.62 288.26 395.26 289.91 394.07 290.26\nC 389.81 308.16 387.67 316.66 387.67 315.74 C 387.67 322.74 389.63 328.64 393.57 333.51\nC 397.52 338.37 401.64 343.08 405.9 347.61 C 411.06 353.41 413.64 358.41 413.64 362.66\nC 413.64 365.06 412.89 367.19 411.36 369.04 C 404.96 376.92 394.33 380.88 379.44 380.88\nC 362.74 380.88 351.8 378.6 346.64 374.04 C 339.94 368.27 335.7 362.18 333.89 355.84\nC 333.59 354.31 332.83 349.74 331.61 342.17 C 331.01 337.59 329.63 334.87 327.53 333.97\nC 321.43 333.07 313.83 331.41 304.75 328.97 C 302.9 327.77 300.93 324.72 298.8 319.87\nC 294.86 310.47 291.97 304.07 290.14 300.72 C 281 296.17 266.42 291.04 246.37 285.28\nC 245.45 287.11 245.02 289.65 245.02 293 C 248.36 297.26 253.36 303.8 260.05 312.58\nC 265.53 319.88 268.27 326.88 268.27 333.55 C 268.27 346.33 260.07 352.68 243.67 352.68\nC 231.2 352.68 222.7 351.8 218.13 349.98 C 211.46 347.24 205.83 340.83 201.28 330.84\nC 193.68 314.09 189.43 304.68 188.52 302.57 C 183.65 291.34 180.32 281.43 178.52 272.91\nC 177.28 266.85 175.45 257.55 173.02 245.11 C 170.92 234.81 167.57 226.74 163.02 220.97\nC 146.28 199.37 138.52 180.67 139.75 164.89 Z\n";
 var elephant = "\nM 437.47 19.67 C 449.57 19.67 461.3 26.67 472.7 40.67 C 484.08 54.65 490.67 61.65 492.46 61.65\nL 509.58 61.65 C 546.58 61.65 575.23 80.17 595.53 117.2 C 600.88 127.57 609.05 142.8 620.11 162.9\nC 631.14 183.04 643.98 197.9 658.59 207.53 C 674.96 218.23 691.51 224.13 708.23 225.16\nC 716.05 225.52 724.63 224.08 733.89 220.86 C 742.09 217.28 750.25 213.69 758.43 210.11\nL 763.77 221.98 C 737.44 242.18 712.34 252.62 688.47 253.34\nC 662.87 254.04 635.25 247.82 605.71 234.69 C 630.98 263.89 652.71 281.69 670.87 288.09\nL 666.6 292.39 C 634.55 286.69 605 270.29 577.94 243.24 L 556.57 256\nC 556.57 257.43 555.24 258.94 552.57 260.53 C 549.9 262.13 548.72 263.43 549.07 264.51\nC 550.51 269.15 557.82 280.51 570.97 298.58 C 584.17 316.71 590.74 326.28 590.74 327.33\nC 590.74 330.53 586.64 333.73 578.44 336.93 C 570.27 340.11 565.84 343.67 565.12 347.57\nC 564.4 350.77 565.45 354.67 568.32 359.27 C 571.15 363.91 572.58 366.71 572.58 367.81\nC 572.58 374.89 566.35 379.31 553.91 381.11 C 551.76 381.45 544.99 381.64 533.61 381.64\nC 512.26 381.64 496.94 376.84 487.68 367.3 C 480.21 359.14 474.32 344.24 470.05 322.63\nC 468.61 315.2 466.15 301.9 462.58 282.73 C 426.28 291.99 388.88 296.63 350.41 296.63\nC 326.91 296.63 301.45 294.86 274.03 291.28 C 278.67 303.04 285.25 322.63 293.83 350.04\nC 276.03 347.54 254.63 343.99 229.73 339.34 C 218.68 356.07 209.23 364.1 201.41 363.38\nC 187.51 362.33 167.57 355.38 141.59 342.58 C 135.17 339.38 131.99 334.56 131.99 328.15\nC 131.99 321.75 136.97 309.99 146.93 292.9 C 156.88 275.82 162.23 263.9 162.93 257.12\nC 163.66 251.04 161.91 242.72 157.63 232.02 C 152.29 218.12 149.25 209.07 148.53 204.77\nL 150.69 204.77 L 146.41 191.95 C 130.01 209.75 115.06 222.75 101.53 230.95\nC 85.85 240.55 67.33 246.81 45.98 249.61 C 41.71 245.38 38.88 243.24 37.44 243.24\nC 63.78 231.84 89.8 213.87 115.42 189.28 C 116.52 188.21 123.25 183.42 135.74 174.84\nC 142.84 170.22 147.11 164.74 148.54 158.34 C 157.44 122.74 175.6 97.59 203.01 82.99\nC 225.43 71.25 256.96 65.39 297.53 65.39 C 316.05 65.39 333.69 66.63 350.41 69.09\nC 358.24 71.25 370.71 73.76 387.81 76.59 C 389.24 62.43 394.21 49.84 402.76 38.85\nC 412.39 26.07 423.96 19.68 437.48 19.68 Z\n";
-//# sourceMappingURL=demo2.js.map
+//# sourceMappingURL=add-points-to-animals.js.map
 
 var identity$9 = function(x) {
   return x;
@@ -21212,7 +21069,7 @@ earcut.flatten = function (data) {
     return result;
 };
 
-function run$2() {
+function run$1() {
     var width = 960;
     var height = 500;
     var svg = select('body')
@@ -21528,7 +21385,7 @@ function run$2() {
 }
 //# sourceMappingURL=states-multiple-shapes.js.map
 
-function run$3() {
+function run$2() {
     var svg = select('body')
         .append('svg')
         .attrs({ width: 960, height: 500 });
@@ -21632,7 +21489,7 @@ function wind(ring, vs) {
 }
 //# sourceMappingURL=states-single-shape.js.map
 
-function run$4() {
+function run$3() {
     var svg = select('body')
         .append('svg')
         .attrs({ width: 960, height: 500 });
@@ -21892,15 +21749,154 @@ function run$4() {
 }
 //# sourceMappingURL=texas-to-hawaii.js.map
 
+function ringToPathData(selection) {
+    selection.attr('d', function (ring) { return 'M' + ring.join('L') + 'Z'; });
+}
+
+function newSquareRing(topLeft, center) {
+    var tx = topLeft[0], ty = topLeft[1];
+    var cx = center[0], cy = center[1];
+    var sx = (cx - tx) * 2;
+    var sy = (cy - ty) * 2;
+    return [
+        [0.5, 0],
+        [0.75, 0.25],
+        [1, 0.5],
+        [0.75, 0.75],
+        [0.5, 1],
+        [0.25, 0.75],
+        [0, 0.5],
+        [0.25, 0.25],
+    ].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+}
+function newOctagonRing(topLeft, center) {
+    var tx = topLeft[0], ty = topLeft[1];
+    var cx = center[0], cy = center[1];
+    var sx = (cx - tx) * 2;
+    var sy = (cy - ty) * 2;
+    return [
+        [0.5, 0],
+        [0.854, 0.146],
+        [1, 0.5],
+        [0.854, 0.854],
+        [0.5, 1],
+        [0.146, 0.854],
+        [0, 0.5],
+        [0.146, 0.146],
+    ].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+}
+
+var options$1 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
+var pixelRatio$1 = options$1.size / Math.max(options$1.viewportWidth, options$1.viewportHeight);
+function run$4() {
+    var viewport = newViewport(options$1);
+    var squareRing = newSquareRing([3, 3], [6, 6]);
+    var octagonRing = newOctagonRing([13, 1], [18, 6]);
+    var fromContainer = viewport.append('g.from');
+    var toContainer = viewport.append('g.to');
+    fromContainer
+        .append('path.from')
+        .datum(squareRing)
+        .call(ringToPathData);
+    toContainer
+        .append('path.to')
+        .datum(octagonRing)
+        .call(ringToPathData);
+    var squareData = squareRing.map(function (segmentPoint, position) {
+        var labelPoint = [
+            segmentPoint[0] + getLabelOffsetX(position),
+            segmentPoint[1] + getLabelOffsetY(position),
+        ];
+        return { segmentPoint: segmentPoint, labelPoint: labelPoint, position: position };
+    });
+    var octagonData = octagonRing.map(function (segmentPoint, position) {
+        var labelPoint = [
+            segmentPoint[0] + getLabelOffsetX(position),
+            segmentPoint[1] + getLabelOffsetY(position),
+        ];
+        return { segmentPoint: segmentPoint, labelPoint: labelPoint, position: position };
+    });
+    // The initial display.
+    update$2(fromContainer, squareData);
+    update$2(toContainer, octagonData);
+    var shiftOffset = 0;
+    timeout$1(function recurseFn() {
+        shiftOffset = (shiftOffset + 1) % octagonData.length;
+        var data = octagonData.map(function (d, i) {
+            var _a = octagonData[(i + shiftOffset) % octagonData.length], segmentPoint = _a.segmentPoint, labelPoint = _a.labelPoint;
+            return {
+                segmentPoint: segmentPoint,
+                labelPoint: labelPoint,
+                position: d.position,
+            };
+        });
+        update$2(fromContainer, squareData);
+        update$2(toContainer, data);
+        if (shiftOffset !== 0) {
+            timeout$1(recurseFn, 1000);
+        }
+    }, 1000);
+}
+function update$2(container, data) {
+    var t = transition(undefined).duration(500);
+    // JOIN new data with old elements.
+    var keyFn = function (d) { return d.position.toString(); };
+    var segments = container.selectAll('circle.segment').data(data, keyFn);
+    var labels = container.selectAll('text.label').data(data, keyFn);
+    // EXIT old elements not present in new data.
+    segments.exit().remove();
+    labels.exit().remove();
+    // UPDATE old elements present in new data.
+    segments.transition(t).attrs({
+        cx: function (d) { return d.segmentPoint[0]; },
+        cy: function (d) { return d.segmentPoint[1]; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels.transition(t).attrs({ x: function (d) { return d.labelPoint[0]; }, y: function (d) { return d.labelPoint[1]; } });
+    // ENTER new elements present in new data.
+    segments
+        .enter()
+        .append('circle.segment')
+        .attrs({
+        cx: function (d) { return d.segmentPoint[0]; },
+        cy: function (d) { return d.segmentPoint[1]; },
+        r: function () { return 0.2; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels
+        .enter()
+        .append('text.label')
+        .text(function (d) { return d.position + 1; })
+        .attrs({
+        x: function (d) { return d.labelPoint[0]; },
+        y: function (d) { return d.labelPoint[1]; },
+        'font-family': 'Roboto',
+        'alignment-baseline': 'middle',
+        'text-anchor': 'middle',
+        'font-size': 36 / pixelRatio$1,
+    });
+}
+function getLabelOffsetX(i) {
+    return i === 1 || i === 3 ? 0.4 : i === 2 ? 0.6 : i === 5 || i === 7 ? -0.4 : i === 6 ? -0.6 : 0;
+}
+function getLabelOffsetY(i) {
+    return i === 1 || i === 7 ? -0.4 : i === 0 ? -0.5 : i === 3 || i === 5 ? 0.4 : i === 4 ? 0.6 : 0;
+}
+
 // Importing with side-effects is necessary to ensure the add-ons are loaded properly.
 var demoMap = new Map([
-    ['/demos/intro-to-path-morphing/demo1.html', run],
-    ['/demos/needleman-wunsch/demo2.html', run$1],
-    ['/demos/flubber/states-single-shape.html', run$3],
-    ['/demos/flubber/states-multiple-shapes.html', run$2],
-    ['/demos/flubber/texas-to-hawaii.html', run$4],
+    ['/demos/intro-to-path-morphing/shifting-points.html', run$4],
+    ['/demos/needleman-wunsch/add-points-to-animal.html', run],
+    ['/demos/flubber/states-single-shape.html', run$2],
+    ['/demos/flubber/states-multiple-shapes.html', run$1],
+    ['/demos/flubber/texas-to-hawaii.html', run$3],
 ]);
-console.log();
 var demoPath = window.location.pathname.slice(window.location.pathname.indexOf('/demos'));
 if (demoMap.has(demoPath)) {
     demoMap.get(demoPath)();
