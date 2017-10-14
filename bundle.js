@@ -5584,6 +5584,44 @@ var neighbors = function(objects) {
   return neighbors;
 };
 
+function createTopology(triangles, points) {
+    var arcIndices = {};
+    var topology = {
+        type: 'Topology',
+        objects: {
+            triangles: {
+                type: 'GeometryCollection',
+                geometries: [],
+            },
+        },
+        arcs: [],
+    };
+    triangles.forEach(function (triangle) {
+        var geometry = [];
+        triangle.forEach(function (arc, i) {
+            var slug = arc[0] < arc[1] ? arc.join(',') : arc[1] + ',' + arc[0];
+            var coordinates = arc.map(function (pointIndex) { return points[pointIndex]; });
+            if (slug in arcIndices) {
+                // tslint:disable-next-line no-bitwise
+                geometry.push(~arcIndices[slug]);
+            }
+            else {
+                geometry.push((arcIndices[slug] = topology.arcs.length));
+                topology.arcs.push(coordinates);
+            }
+        });
+        topology.objects.triangles.geometries.push({
+            type: 'Polygon',
+            area: Math.abs(area$1(triangle.map(function (d) { return points[d[0]]; }))),
+            arcs: [geometry],
+        });
+    });
+    // Sort smallest first.
+    topology.objects.triangles.geometries.sort(function (a, b) { return a.area - b.area; });
+    return topology;
+}
+//# sourceMappingURL=triangulate.js.map
+
 function lerp(a, b, t) {
     if (typeof a === 'number' && typeof b === 'number') {
         return a + (b - a) * t;
@@ -5705,44 +5743,6 @@ function join$1(d) {
     return 'M' + d.join('L') + 'Z';
 }
 //# sourceMappingURL=common.js.map
-
-function createTopology(triangles, points) {
-    var arcIndices = {};
-    var topology = {
-        type: 'Topology',
-        objects: {
-            triangles: {
-                type: 'GeometryCollection',
-                geometries: [],
-            },
-        },
-        arcs: [],
-    };
-    triangles.forEach(function (triangle) {
-        var geometry = [];
-        triangle.forEach(function (arc, i) {
-            var slug = arc[0] < arc[1] ? arc.join(',') : arc[1] + ',' + arc[0];
-            var coordinates = arc.map(function (pointIndex) { return points[pointIndex]; });
-            if (slug in arcIndices) {
-                // tslint:disable-next-line no-bitwise
-                geometry.push(~arcIndices[slug]);
-            }
-            else {
-                geometry.push((arcIndices[slug] = topology.arcs.length));
-                topology.arcs.push(coordinates);
-            }
-        });
-        topology.objects.triangles.geometries.push({
-            type: 'Polygon',
-            area: Math.abs(area$1(triangle.map(function (d) { return points[d[0]]; }))),
-            arcs: [geometry],
-        });
-    });
-    // Sort smallest first.
-    topology.objects.triangles.geometries.sort(function (a, b) { return a.area - b.area; });
-    return topology;
-}
-//# sourceMappingURL=triangulate.js.map
 
 'use strict';
 
@@ -6811,6 +6811,7 @@ function run$2() {
         }
     }
 }
+//# sourceMappingURL=texas-to-hawaii.js.map
 
 'use strict';
 
