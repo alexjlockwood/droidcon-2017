@@ -1,11 +1,10 @@
-import * as Callable from '../../scripts/callable';
-import * as Data from '../../scripts/data';
-import * as Elements from '../../scripts/elements';
+import * as Callable from 'scripts/callable';
+import * as Elements from 'scripts/elements';
 import * as _ from 'lodash-es';
-import * as d3 from '../../lib/d3';
+import * as d3 from 'lib/d3';
 
-import { AutoAwesome, Command } from '../../scripts/paths';
-import { DataSelection, Point } from '../../scripts/types';
+import { AutoAwesome, Command } from './util';
+import { DataSelection, Point } from 'scripts/types';
 
 const options = { size: 1440, viewportWidth: 1600, viewportHeight: 800 };
 const pixelRatio = options.size / Math.max(options.viewportWidth, options.viewportHeight);

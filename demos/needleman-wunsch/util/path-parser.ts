@@ -1,5 +1,5 @@
 import { Command } from './command';
-import { Point } from '../types';
+import { Point } from 'scripts/types';
 import { SvgChar } from './svgchar';
 
 /**

@@ -1,8 +1,8 @@
-import * as Callable from '../../scripts/callable';
-import * as Data from '../../scripts/data';
-import * as Elements from '../../scripts/elements';
+import * as Callable from 'scripts/callable';
+import * as Data from './data';
+import * as Elements from 'scripts/elements';
 import * as _ from 'lodash-es';
-import * as d3 from '../../lib/d3';
+import * as d3 from 'lib/d3';
 
 import { DataSelection, Point } from '../../scripts/types';
 

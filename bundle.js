@@ -8623,7 +8623,7 @@ function getAllKeysIn(object) {
 
 var DataView = getNative(root$2, 'DataView');
 
-var Promise = getNative(root$2, 'Promise');
+var Promise$1 = getNative(root$2, 'Promise');
 
 var Set$1 = getNative(root$2, 'Set');
 
@@ -8638,7 +8638,7 @@ var dataViewTag$2 = '[object DataView]';
 /** Used to detect maps, sets, and weakmaps. */
 var dataViewCtorString = toSource(DataView);
 var mapCtorString = toSource(Map$2);
-var promiseCtorString = toSource(Promise);
+var promiseCtorString = toSource(Promise$1);
 var setCtorString = toSource(Set$1);
 var weakMapCtorString = toSource(WeakMap);
 
@@ -8654,7 +8654,7 @@ var getTag = baseGetTag;
 // Fallback for data views, maps, sets, and weak maps in IE 11 and promises in Node.js < 6.
 if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag$2) ||
     (Map$2 && getTag(new Map$2) != mapTag$2) ||
-    (Promise && getTag(Promise.resolve()) != promiseTag) ||
+    (Promise$1 && getTag(Promise$1.resolve()) != promiseTag) ||
     (Set$1 && getTag(new Set$1) != setTag$2) ||
     (WeakMap && getTag(new WeakMap) != weakMapTag$2)) {
   getTag = function(value) {
@@ -17314,10 +17314,6 @@ var length$2 = function(polygon) {
   return perimeter;
 };
 
-// export * from 'd3-voronoi';
-// export * from 'd3-zoom';
-//# sourceMappingURL=d3.js.map
-
 function newViewport(options) {
     var size = options.size, viewportWidth = options.viewportWidth, viewportHeight = options.viewportHeight;
     var width = viewportWidth >= viewportHeight ? size : size * viewportWidth / viewportHeight;
@@ -17456,20 +17452,6 @@ function getLabelOffsetY(i) {
 }
 //# sourceMappingURL=demo1.js.map
 
-/** Linearly interpolate between a and b using time t. */
-function lerp(a, b, t) {
-    return a + (b - a) * t;
-}
-/** Calculates the distance between two points. */
-function distance$1(p1, p2) {
-    return Math.hypot(p1[0] - p2[0], p1[1] - p2[1]);
-}
-/** Returns true if the two points are equal. */
-function arePointsEqual(p1, p2) {
-    return p1 && p2 && distance$1(p1, p2) < 1e-9;
-}
-//# sourceMappingURL=common.js.map
-
 var MATCH = 1;
 var MISMATCH = -1;
 var INDEL = 0;
@@ -17530,6 +17512,20 @@ function align$1(sequences, scoringFn) {
     };
 }
 //# sourceMappingURL=needleman-wunsch.js.map
+
+/** Linearly interpolate between a and b using time t. */
+function lerp(a, b, t) {
+    return a + (b - a) * t;
+}
+/** Calculates the distance between two points. */
+function distance$1(p1, p2) {
+    return Math.hypot(p1[0] - p2[0], p1[1] - p2[1]);
+}
+/** Returns true if the two points are equal. */
+function arePointsEqual(p1, p2) {
+    return p1 && p2 && distance$1(p1, p2) < 1e-9;
+}
+//# sourceMappingURL=math.js.map
 
 function parse(pathString) {
     var Token;
@@ -19502,10 +19498,7 @@ var Command = /** @class */ (function () {
             var _a = this.points, _b = _a[0], sx = _b[0], sy = _b[1], _c = _a[1], ex = _c[0], ey = _c[1];
             var cmds = [];
             for (var i = 0; i < numSplits + 1; i++) {
-                var s = [
-                    lerp(sx, ex, i / (numSplits + 1)),
-                    lerp(sy, ey, i / (numSplits + 1)),
-                ];
+                var s = [lerp(sx, ex, i / (numSplits + 1)), lerp(sy, ey, i / (numSplits + 1))];
                 var e = [
                     lerp(sx, ex, (i + 1) / (numSplits + 1)),
                     lerp(sy, ey, (i + 1) / (numSplits + 1)),
@@ -19608,20 +19601,20 @@ var Command = /** @class */ (function () {
     };
     return Command;
 }());
-function findTimeByDistance(bezier, distance) {
-    if (distance < 0 || distance > 1) {
-        throw new Error('Invalid distance: ' + distance);
+function findTimeByDistance(bezier, dist) {
+    if (dist < 0 || dist > 1) {
+        throw new Error('Invalid distance: ' + dist);
     }
-    if (distance === 0 || distance === 1) {
-        return distance;
+    if (dist === 0 || dist === 1) {
+        return dist;
     }
-    var originalDistance = distance;
+    var originalDistance = dist;
     var epsilon = 0.001;
     var maxDepth = -100;
-    var lowToHighRatio = distance / (1 - distance);
+    var lowToHighRatio = dist / (1 - dist);
     var step = -2;
     while (step > maxDepth) {
-        var split = bezier.split(distance);
+        var split = bezier.split(dist);
         var low = split.left.length();
         var high = split.right.length();
         var diff = low - lowToHighRatio * high;
@@ -19631,13 +19624,13 @@ function findTimeByDistance(bezier, distance) {
         }
         // Jump half the t-distance in the direction of the bias.
         step = step - 1;
-        distance += (diff > 0 ? -1 : 1) * Math.pow(2, step);
+        dist += (diff > 0 ? -1 : 1) * Math.pow(2, step);
     }
     if (step === maxDepth) {
         // TODO: handle degenerate curves!!!!!
         return originalDistance;
     }
-    return distance;
+    return dist;
 }
 //# sourceMappingURL=command.js.map
 
@@ -19973,10 +19966,7 @@ var Command$1 = /** @class */ (function () {
             var _a = this.points, _b = _a[0], sx = _b[0], sy = _b[1], _c = _a[1], ex = _c[0], ey = _c[1];
             var cmds = [];
             for (var i = 0; i < numSplits + 1; i++) {
-                var s = [
-                    lerp(sx, ex, i / (numSplits + 1)),
-                    lerp(sy, ey, i / (numSplits + 1)),
-                ];
+                var s = [lerp(sx, ex, i / (numSplits + 1)), lerp(sy, ey, i / (numSplits + 1))];
                 var e = [
                     lerp(sx, ex, (i + 1) / (numSplits + 1)),
                     lerp(sy, ey, (i + 1) / (numSplits + 1)),
@@ -20079,20 +20069,20 @@ var Command$1 = /** @class */ (function () {
     };
     return Command;
 }());
-function findTimeByDistance$1(bezier, distance) {
-    if (distance < 0 || distance > 1) {
-        throw new Error('Invalid distance: ' + distance);
+function findTimeByDistance$1(bezier, dist) {
+    if (dist < 0 || dist > 1) {
+        throw new Error('Invalid distance: ' + dist);
     }
-    if (distance === 0 || distance === 1) {
-        return distance;
+    if (dist === 0 || dist === 1) {
+        return dist;
     }
-    var originalDistance = distance;
+    var originalDistance = dist;
     var epsilon = 0.001;
     var maxDepth = -100;
-    var lowToHighRatio = distance / (1 - distance);
+    var lowToHighRatio = dist / (1 - dist);
     var step = -2;
     while (step > maxDepth) {
-        var split = bezier.split(distance);
+        var split = bezier.split(dist);
         var low = split.left.length();
         var high = split.right.length();
         var diff = low - lowToHighRatio * high;
@@ -20102,13 +20092,13 @@ function findTimeByDistance$1(bezier, distance) {
         }
         // Jump half the t-distance in the direction of the bias.
         step = step - 1;
-        distance += (diff > 0 ? -1 : 1) * Math.pow(2, step);
+        dist += (diff > 0 ? -1 : 1) * Math.pow(2, step);
     }
     if (step === maxDepth) {
         // TODO: handle degenerate curves!!!!!
         return originalDistance;
     }
-    return distance;
+    return dist;
 }
 //# sourceMappingURL=command.js.map
 

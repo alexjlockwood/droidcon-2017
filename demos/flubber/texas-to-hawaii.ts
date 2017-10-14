@@ -1,4 +1,4 @@
-import * as d3 from '../../lib/d3';
+import * as d3 from 'lib/d3';
 import * as topojson from 'topojson';
 
 import { bisector as bisectorFn, sum as sumFn } from 'd3-array';
