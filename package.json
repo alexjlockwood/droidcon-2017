@@ -1,7 +1,7 @@
 {
-  "name": "shape-shifter-demos",
+  "name": "droidcon-2017",
   "version": "1.0.0",
-  "description": "Shape Shifter demos.",
+  "description": "Droidcon 2017 demos.",
   "scripts": {
     "prestart": "tsc && rollup -c",
     "start": "npm-run-all --parallel serve tsc:w rollup:w",
