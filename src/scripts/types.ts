@@ -1,4 +1,13 @@
-import { BaseType, EnterElement, Selection } from 'd3';
+import * as d3 from '../lib/d3';
+
+type BaseType = d3.BaseType;
+type EnterElement = d3.EnterElement;
+type Selection<GElement extends BaseType, Datum, PElement extends BaseType, PDatum> = d3.Selection<
+  GElement,
+  Datum,
+  PElement,
+  PDatum
+>;
 
 export type Point = [number, number];
 

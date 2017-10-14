@@ -1,3 +1,4 @@
+import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 
 export default {
@@ -8,6 +9,9 @@ export default {
     sourcemap: true,
   },
   plugins: [
+    commonjs({
+      include: ['node_modules/earcut/**', 'node_modules/bezier-js/**'],
+    }),
     resolve({
       jsnext: true,
       main: true,

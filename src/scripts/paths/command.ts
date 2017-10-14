@@ -2,7 +2,7 @@ import * as Common from '../common';
 import * as PathParser from './path-parser';
 import * as _ from 'lodash-es';
 
-import { Bezier } from './bezier';
+import Bezier from 'bezier-js';
 import { Point } from '../types';
 import { SvgChar } from './svgchar';
 

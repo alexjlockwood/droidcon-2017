@@ -1,9 +1,7 @@
-import * as d3 from 'd3';
+import * as d3 from '../../lib/d3';
 import * as topojson from 'topojson';
 
-import { bisector as bisectorFn, sum as sumFn } from 'd3-array';
-
-import { earcut as earcutFn } from './earcut';
+import earcut from 'earcut';
 
 export function run() {
   const width = 960;
@@ -83,7 +81,7 @@ export function run() {
     const vertices = ring.reduce(function(arr, point) {
       return arr.concat(point);
     }, []);
-    const cuts = earcutFn(vertices);
+    const cuts = earcut(vertices);
     const triangles = [];
     let topology;
 
@@ -100,7 +98,7 @@ export function run() {
   // Merge polygons into neighbors one at a time until only numPieces remain
   function collapse(topology, numPieces) {
     const geometries = topology.objects.triangles.geometries,
-      bisector = bisectorFn(d => (d as any).area).left;
+      bisector = d3.bisector(d => (d as any).area).left;
 
     while (geometries.length > numPieces) {
       mergeSmallestFeature();
@@ -248,7 +246,7 @@ export function run() {
       bestOffset;
 
     for (var offset = 0; offset < len; offset++) {
-      var sum = sumFn(
+      var sum = d3.sum(
         vs.map(function(p, i) {
           var distance = distanceBetween(ring[(offset + i) % len], p);
           return distance * distance;

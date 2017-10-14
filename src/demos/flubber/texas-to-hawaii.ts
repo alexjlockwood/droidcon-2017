@@ -1,9 +1,9 @@
-import * as d3 from 'd3';
+import * as d3 from '../../lib/d3';
 import * as topojson from 'topojson';
 
 import { bisector as bisectorFn, sum as sumFn } from 'd3-array';
 
-import { earcut as earcutFn } from './earcut';
+import earcut from 'earcut';
 
 export function run() {
   const svg = d3
@@ -21,7 +21,7 @@ export function run() {
   function ready(err, tx, hi) {
     const points = tx.coordinates[0];
     const vertices = points.reduce((arr, point) => arr.concat(point), []);
-    const cuts = earcutFn(vertices);
+    const cuts = earcut(vertices);
     const triangles = [];
     let topology;
 
