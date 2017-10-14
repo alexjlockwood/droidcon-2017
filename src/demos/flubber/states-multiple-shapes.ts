@@ -1,11 +1,11 @@
 import * as d3 from 'lib/d3';
 import * as topojson from 'topojson-client';
 
-import { Point, Ring, Topology, Triangle, distance, lerp } from 'scripts/math';
+import { Point, Ring, Triangle, distance, lerp } from 'scripts/math';
+import { Topology, createTopology } from './util/triangulate';
 import { align, closestCentroids } from './util/common';
 
 import { DataSelection } from 'scripts/types';
-import { createTopology } from './util/triangulate';
 import earcut from 'earcut';
 
 export function run() {
