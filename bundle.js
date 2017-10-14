@@ -21900,10 +21900,11 @@ var demoMap = new Map([
     ['/demos/flubber/states-multiple-shapes.html', run$2],
     ['/demos/flubber/texas-to-hawaii.html', run$4],
 ]);
-if (demoMap.has(window.location.pathname)) {
-    demoMap.get(window.location.pathname)();
+console.log();
+var demoPath = window.location.pathname.slice(window.location.pathname.indexOf('/demos'));
+if (demoMap.has(demoPath)) {
+    demoMap.get(demoPath)();
 }
-//# sourceMappingURL=main.js.map
 
 })));
 //# sourceMappingURL=bundle.js.map

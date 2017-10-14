@@ -16,6 +16,9 @@ const demoMap = new Map<string, () => void>([
   ['/demos/flubber/texas-to-hawaii.html', runFlubberTexasToHawaii],
 ]);
 
-if (demoMap.has(window.location.pathname)) {
-  demoMap.get(window.location.pathname)();
+console.log();
+
+const demoPath = window.location.pathname.slice(window.location.pathname.indexOf('/demos'));
+if (demoMap.has(demoPath)) {
+  demoMap.get(demoPath)();
 }
