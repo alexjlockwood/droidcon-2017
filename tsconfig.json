@@ -2,6 +2,10 @@
   "compilerOptions": {
     "noImplicitAny": false,
     "noImplicitReturns": true,
+    "baseUrl": "src",
+    "paths": {
+      "src/*": ["./src/*"]
+    },
     "target": "es5",
     "sourceMap": true,
     "declaration": false,

@@ -1,6 +1,7 @@
-import * as Common from '../common';
 import * as NeedlemanWunsch from './needleman-wunsch';
 import * as _ from 'lodash-es';
+
+import { arePointsEqual, distance } from 'scripts/math';
 
 import { Command } from './command';
 
@@ -50,7 +51,7 @@ function align({ from, to }: { from: Path; to: Path }) {
     if (charA !== charB && !a.canConvertTo(charB) && !b.canConvertTo(charA)) {
       return NeedlemanWunsch.MISMATCH;
     }
-    return 1 / Math.max(NeedlemanWunsch.MATCH, Common.distance(a.end, b.end));
+    return 1 / Math.max(NeedlemanWunsch.MATCH, distance(a.end, b.end));
   };
 
   const alignmentInfos = fromPaths.map(generatedFromPath => {
@@ -182,9 +183,7 @@ function permute({ from, to }: { from: Path; to: Path }) {
   for (const fromCmds of fromPaths) {
     let sumOfSqs = 0;
     const toCmds = to;
-    fromCmds.forEach(
-      (c, cmdIdx) => (sumOfSqs += Math.pow(Common.distance(c.end, toCmds[cmdIdx].end), 2)),
-    );
+    fromCmds.forEach((c, cmdIdx) => (sumOfSqs += Math.pow(distance(c.end, toCmds[cmdIdx].end), 2)));
     if (sumOfSqs < min) {
       min = sumOfSqs;
       bestFromPath = fromCmds;
@@ -270,7 +269,7 @@ function shiftCommands(commands: Path, numShifts = 0): Path {
 }
 
 function isClosed(cmds: Path) {
-  return cmds.length > 0 && Common.arePointsEqual(cmds[0].end, _.last(cmds).end);
+  return cmds.length > 0 && arePointsEqual(cmds[0].end, _.last(cmds).end);
 }
 
 function isClockwise(cmds: Path) {

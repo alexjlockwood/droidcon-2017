@@ -1,5 +1,6 @@
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
+import typescript from 'rollup-plugin-typescript';
 
 export default {
   input: 'dist/out-tsc/src/main.js',
@@ -17,6 +18,7 @@ export default {
       main: true,
       module: true,
     }),
+    typescript({ typescript: require('typescript') }),
   ],
   name: 'app',
 };

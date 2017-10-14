@@ -1,9 +1,10 @@
-import * as Common from '../common';
 import * as PathParser from './path-parser';
 import * as _ from 'lodash-es';
 
+import { distance, lerp } from 'scripts/math';
+
 import Bezier from 'bezier-js';
-import { Point } from '../types';
+import { Point } from 'scripts/types';
 import { SvgChar } from './svgchar';
 
 /** Represents an individual SVG command. */
@@ -65,7 +66,7 @@ export class Command {
         return 0;
       case 'L':
       case 'Z':
-        return Common.distance(_.first(this.points), _.last(this.points));
+        return distance(_.first(this.points), _.last(this.points));
       case 'Q':
       case 'C':
         return this.bezier.length();
@@ -80,13 +81,10 @@ export class Command {
       const [[sx, sy], [ex, ey]] = this.points;
       const cmds: Command[] = [];
       for (let i = 0; i < numSplits + 1; i++) {
-        const s: Point = [
-          Common.lerp(sx, ex, i / (numSplits + 1)),
-          Common.lerp(sy, ey, i / (numSplits + 1)),
-        ];
+        const s: Point = [lerp(sx, ex, i / (numSplits + 1)), lerp(sy, ey, i / (numSplits + 1))];
         const e: Point = [
-          Common.lerp(sx, ex, (i + 1) / (numSplits + 1)),
-          Common.lerp(sy, ey, (i + 1) / (numSplits + 1)),
+          lerp(sx, ex, (i + 1) / (numSplits + 1)),
+          lerp(sy, ey, (i + 1) / (numSplits + 1)),
         ];
         const type = i === numSplits && this.type === 'Z' ? 'Z' : 'L';
         cmds.push(new Command(type, [s, e], i !== numSplits));
@@ -149,14 +147,14 @@ export class Command {
           case 'Q': {
             const [sx, sy] = start;
             const [ex, ey] = end;
-            const cp: Point = [Common.lerp(sx, ex, 0.5), Common.lerp(sy, ey, 0.5)];
+            const cp: Point = [lerp(sx, ex, 0.5), lerp(sy, ey, 0.5)];
             return new Command(type, [start, cp, end], this.isSplit);
           }
           case 'C': {
             const [sx, sy] = start;
             const [ex, ey] = end;
-            const cp1: Point = [Common.lerp(sx, ex, 1 / 3), Common.lerp(sy, ey, 1 / 3)];
-            const cp2: Point = [Common.lerp(sx, ex, 2 / 3), Common.lerp(sy, ey, 2 / 3)];
+            const cp1: Point = [lerp(sx, ex, 1 / 3), lerp(sy, ey, 1 / 3)];
+            const cp2: Point = [lerp(sx, ex, 2 / 3), lerp(sy, ey, 2 / 3)];
             return new Command(type, [start, cp1, cp2, end], this.isSplit);
           }
         }
@@ -190,21 +188,21 @@ export class Command {
   }
 }
 
-function findTimeByDistance(bezier: any, distance: number) {
-  if (distance < 0 || distance > 1) {
-    throw new Error('Invalid distance: ' + distance);
+function findTimeByDistance(bezier: any, dist: number) {
+  if (dist < 0 || dist > 1) {
+    throw new Error('Invalid distance: ' + dist);
   }
-  if (distance === 0 || distance === 1) {
-    return distance;
+  if (dist === 0 || dist === 1) {
+    return dist;
   }
-  const originalDistance = distance;
+  const originalDistance = dist;
   const epsilon = 0.001;
   const maxDepth = -100;
 
-  const lowToHighRatio = distance / (1 - distance);
+  const lowToHighRatio = dist / (1 - dist);
   let step = -2;
   while (step > maxDepth) {
-    const split = bezier.split(distance);
+    const split = bezier.split(dist);
     const low = split.left.length();
     const high = split.right.length();
     const diff = low - lowToHighRatio * high;
@@ -214,11 +212,11 @@ function findTimeByDistance(bezier: any, distance: number) {
     }
     // Jump half the t-distance in the direction of the bias.
     step = step - 1;
-    distance += (diff > 0 ? -1 : 1) * 2 ** step;
+    dist += (diff > 0 ? -1 : 1) * 2 ** step;
   }
   if (step === maxDepth) {
     // TODO: handle degenerate curves!!!!!
     return originalDistance;
   }
-  return distance;
+  return dist;
 }
