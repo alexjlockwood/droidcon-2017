@@ -1,5 +1,5 @@
 import * as NeedlemanWunsch from './needleman-wunsch';
-import * as _ from 'lodash-es';
+import * as _ from 'lib/lodash';
 
 import { distance, samePoint } from 'scripts/math';
 

@@ -1,9 +1,16 @@
 export type Point = [number, number];
+export type Triangle = [Point, Point, Point];
 export type Ring = Point[];
 
 /** Linearly interpolate between a and b using time t. */
-export function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
+export function lerp(a: number, b: number, t: number): number;
+export function lerp(a: Point, b: Point, t: number): Point;
+export function lerp(a: number | Point, b: number | Point, t: number): number | Point {
+  if (typeof a === 'number' && typeof b === 'number') {
+    return a + (b - a) * t;
+  } else {
+    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  }
 }
 
 /** Calculates the distance between two points. */

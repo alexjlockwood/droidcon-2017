@@ -1,8 +1,8 @@
-import { Ring, isFiniteNumber, samePoint } from 'scripts/math';
+import * as d3 from 'lib/d3';
 
-import { bisect } from './add.js';
-import { pathStringToRing } from './svg.js';
-import { polygonArea } from 'd3-polygon';
+import { Ring, distance, isFiniteNumber, lerp, samePoint } from 'scripts/math';
+
+import { pathStringToRing } from './svg';
 
 export default function normalizeRing(ring: string | Ring, maxSegmentLength: number) {
   let points, area, skipBisect;
@@ -27,7 +27,7 @@ export default function normalizeRing(ring: string | Ring, maxSegmentLength: num
     points.pop();
   }
 
-  area = polygonArea(points);
+  area = d3.polygonArea(points);
 
   // Make all rings clockwise
   if (area > 0) {
@@ -50,4 +50,17 @@ function validRing(ring: Ring) {
       isFiniteNumber(point[1])
     );
   });
+}
+
+function bisect(ring: Ring, maxSegmentLength = Infinity) {
+  for (let i = 0; i < ring.length; i++) {
+    const a = ring[i];
+    let b = i === ring.length - 1 ? ring[0] : ring[i + 1];
+
+    // Could splice the whole set for a segment instead, but a bit messy.
+    while (distance(a, b) > maxSegmentLength) {
+      b = lerp(a, b, 0.5);
+      ring.splice(i + 1, 0, b);
+    }
+  }
 }

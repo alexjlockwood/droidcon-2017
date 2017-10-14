@@ -1,4 +1,4 @@
-import * as _ from 'lodash-es';
+import * as _ from 'lib/lodash';
 
 // Needleman-Wunsch scoring function constants.
 export const MATCH = 1;
@@ -62,6 +62,7 @@ export function align<T>(
       alignedListB.unshift(listB[j--]);
     }
   }
+  const a = _.last(matrix);
   return {
     from: alignedListA,
     to: alignedListB,

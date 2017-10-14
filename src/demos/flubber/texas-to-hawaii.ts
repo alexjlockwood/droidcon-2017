@@ -1,8 +1,10 @@
 import * as d3 from 'lib/d3';
 import * as topojson from 'topojson-client';
 
-import { bisector as bisectorFn, sum as sumFn } from 'd3-array';
+import { addPoints, closestCentroids, join, wind } from './util/common';
+import { distance, lerp } from 'scripts/math';
 
+import { Topology } from './util/triangulate';
 import earcut from 'earcut';
 
 export function run() {
@@ -40,7 +42,7 @@ export function run() {
 
     svg.append('path').attr('class', 'mesh');
 
-    // Asynchronous for demo purposes
+    // Asynchronous for demo purposes.
     collapse(topology, 8, done);
 
     function done(pieces) {
@@ -68,36 +70,13 @@ export function run() {
     }
   }
 
-  function morph(d) {
-    const p = d3.select(this);
-
-    p
-      .transition()
-      .delay(d.direction ? 0 : 1000)
-      .duration(0)
-      .attr('d', d[0])
-      .transition()
-      .duration(2500)
-      .attr('d', d[1])
-      .on('end', () => {
-        d.reverse();
-
-        // Show borderless
-        if (!(d.direction = !d.direction)) {
-          p.attr('d', d.outer);
-        }
-
-        p.each(morph);
-      });
-  }
-
-  // Merge polygons into neighbors one at a time until only numPieces remain
-  function collapse(topology, numPieces, cb) {
+  // Merge polygons into neighbors one at a time until only numPieces remain!
+  function collapse(topology: Topology, numPieces: number, cb: (...args: any[]) => void) {
     // Show fragment being merged for demo purposes
     const merging = svg.append('path').attr('class', 'merging');
 
     const geometries = topology.objects.triangles.geometries;
-    const bisector = bisectorFn(d => (d as any).area).left;
+    const bisectorFn = d3.bisector(d => (d as any).area).left;
 
     if (geometries.length > numPieces) {
       mergeSmallestFeature();
@@ -121,7 +100,7 @@ export function run() {
       geometries.shift();
 
       // Add new merged shape in sorted order
-      geometries.splice(bisector(geometries, merged.area), 0, merged);
+      geometries.splice(bisectorFn(geometries, merged.area), 0, merged);
 
       if (geometries.length > numPieces) {
         // Don't bother repainting if we're still on tiny triangles
@@ -146,6 +125,29 @@ export function run() {
         cb(features.map(f => f.geometry.coordinates[0]));
       }
     }
+  }
+
+  function morph(d) {
+    const p = d3.select(this);
+
+    p
+      .transition()
+      .delay(d.direction ? 0 : 1000)
+      .duration(0)
+      .attr('d', d[0])
+      .transition()
+      .duration(2500)
+      .attr('d', d[1])
+      .on('end', () => {
+        d.reverse();
+
+        // Show borderless
+        if (!(d.direction = !d.direction)) {
+          p.attr('d', d.outer);
+        }
+
+        p.each(morph);
+      });
   }
 
   function createTopology(triangles, points) {
@@ -186,7 +188,6 @@ export function run() {
 
     // Sort smallest first
     topology.objects.triangles.geometries.sort((a, b) => a.area - b.area);
-
     return topology;
   }
 
@@ -217,106 +218,10 @@ export function run() {
     return [wind(a, b), b];
   }
 
-  function addPoints(ring, numPoints) {
-    const desiredLength = ring.length + numPoints,
-      step = d3.polygonLength(ring) / numPoints;
-
-    let i = 0;
-    let cursor = 0;
-    let insertAt = step / 2;
-
-    while (ring.length < desiredLength) {
-      const a = ring[i];
-      const b = ring[(i + 1) % ring.length];
-
-      const segment = distanceBetween(a, b);
-
-      if (insertAt <= cursor + segment) {
-        ring.splice(i + 1, 0, pointBetween(a, b, (insertAt - cursor) / segment));
-        insertAt += step;
-        continue;
-      }
-
-      cursor += segment;
-      i++;
-    }
-  }
-
-  function wind(ring, vs) {
-    const len = ring.length;
-    let min = Infinity;
-    let bestOffset;
-
-    for (let offset = 0; offset < len; offset++) {
-      const sum = sumFn(
-        vs.map((p, i) => {
-          const distance = distanceBetween(ring[(offset + i) % len], p);
-          return distance * distance;
-        }),
-      );
-
-      if (sum < min) {
-        min = sum;
-        bestOffset = offset;
-      }
-    }
-
-    return ring.slice(bestOffset).concat(ring.slice(0, bestOffset));
-  }
-
-  // Find ordering of first set that minimizes squared distance between centroid pairs
-  // Could loosely optimize instead of trying every permutation (would probably have to with 10+ pieces)
-  function closestCentroids(start, end) {
-    let min = Infinity;
-    let best;
-    const distances = start.map(p1 => {
-      return end.map(p2 => {
-        const distance = distanceBetween(d3.polygonCentroid(p1), d3.polygonCentroid(p2));
-        return distance * distance;
-      });
-    });
-
-    function permute(arr, order = [], sum = 0) {
-      let cur;
-      let distance;
-
-      for (let i = 0; i < arr.length; i++) {
-        cur = arr.splice(i, 1);
-        distance = distances[cur[0]][order.length];
-        if (arr.length) {
-          permute(arr.slice(), order.concat(cur), sum + distance);
-          arr.splice(i, 0, cur[0]);
-        } else if (sum + distance < min) {
-          min = sum + distance;
-          best = order.concat(cur);
-        }
-      }
-    }
-
-    permute(d3.range(start.length));
-    return best.map(i => start[i]);
-  }
-
   function bisectSegments(ring, threshold) {
     for (let i = 0; i < ring.length - 1; i++) {
-      while (distanceBetween(ring[i], ring[i + 1]) > threshold) {
-        ring.splice(i + 1, 0, pointBetween(ring[i], ring[i + 1], 0.5));
+      while (distance(ring[i], ring[i + 1]) > threshold) {
+        ring.splice(i + 1, 0, lerp(ring[i], ring[i + 1], 0.5));
       }
     }
   }
-
-  function distanceBetween(a, b) {
-    const dx = a[0] - b[0];
-    const dy = a[1] - b[1];
-
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  function pointBetween(a, b, pct) {
-    return [a[0] + (b[0] - a[0]) * pct, a[1] + (b[1] - a[1]) * pct];
-  }
-
-  function join(ring) {
-    return 'M' + ring.join('L') + 'Z';
-  }
-}
