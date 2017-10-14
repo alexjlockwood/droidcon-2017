@@ -1,1 +1,1 @@
-export { run as runAddPointsToAnimal } from './add-points-to-animals';
+export { run as runAddPointsToAnimals } from './add-points-to-animals';

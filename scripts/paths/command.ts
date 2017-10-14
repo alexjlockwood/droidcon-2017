@@ -1,5 +1,5 @@
 import * as PathParser from './path-parser';
-import * as _ from 'lodash-es';
+import * as _ from 'lib/lodash';
 
 import { Point, distance, lerp } from 'scripts/math';
 

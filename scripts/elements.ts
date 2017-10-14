@@ -1,4 +1,3 @@
-import * as _ from 'lodash-es';
 import * as d3 from '../lib/d3';
 
 import { Point } from './math';
@@ -34,8 +33,8 @@ export function newViewport(options: Options) {
       .append('g')
       .selectAll('line.grid')
       .data([
-        ..._.range(viewportWidth + 1).map(x => [[x, 0], [x, viewportHeight]] as [Point, Point]),
-        ..._.range(viewportHeight + 1).map(y => [[0, y], [viewportWidth, y]] as [Point, Point]),
+        ...d3.range(viewportWidth + 1).map(x => [[x, 0], [x, viewportHeight]] as [Point, Point]),
+        ...d3.range(viewportHeight + 1).map(y => [[0, y], [viewportWidth, y]] as [Point, Point]),
       ])
       .enter()
       .append('line.grid')

@@ -1,6 +1,7 @@
 import * as d3 from 'lib/d3';
 
 import { Point, Ring } from 'scripts/math';
+import { addPoints, join, wind } from './util/common';
 
 import { DataSelection } from 'scripts/types';
 import { pathStringToRing } from './util/svg';
@@ -114,7 +115,7 @@ export function run() {
     // Pick optimal winding.
     a = wind(a, b);
 
-    path.attr('d', join(a));
+    path.attrs({ d: join(a) });
 
     // Redraw points.
     circles.datum(a).call(updateCircles);
@@ -128,7 +129,7 @@ export function run() {
         animals.push(animals.shift());
         setTimeout(draw, 100);
       })
-      .attr('d', join(b));
+      .attrs({ d: join(b) });
 
     circles
       .selectAll('circle')
@@ -153,59 +154,4 @@ function updateCircles(sel: DataSelection<Point[]>) {
   });
 
   circles.exit().remove();
-}
-
-function addPoints(ring: Point[], numPoints: number) {
-  const desiredLength = ring.length + numPoints;
-  const step = d3.polygonLength(ring) / numPoints;
-
-  let i = 0;
-  let cursor = 0;
-  let insertAt = step / 2;
-
-  do {
-    const a = ring[i];
-    const b = ring[(i + 1) % ring.length];
-
-    const segment = distanceBetween(a, b);
-    if (insertAt <= cursor + segment) {
-      ring.splice(i + 1, 0, pointBetween(a, b, (insertAt - cursor) / segment));
-      insertAt += step;
-      continue;
-    }
-
-    cursor += segment;
-    i++;
-  } while (ring.length < desiredLength);
-}
-
-function pointBetween(a: Point, b: Point, pct: number): Point & { added: boolean } {
-  const point = [a[0] + (b[0] - a[0]) * pct, a[1] + (b[1] - a[1]) * pct] as Point & {
-    added: boolean;
-  };
-  point.added = true;
-  return point;
-}
-
-function distanceBetween(a: Point, b: Point) {
-  return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
-}
-
-function join(d: Point[]) {
-  return 'M' + d.join('L') + 'Z';
-}
-
-function wind(ring: Point[], vs: Point[]) {
-  const len = ring.length;
-  let min = Infinity;
-  let bestOffset: number;
-
-  for (let offset = 0; offset < len; offset++) {
-    const s = d3.sum(vs.map((p, i) => Math.pow(distanceBetween(ring[(offset + i) % len], p), 2)));
-    if (s < min) {
-      min = s;
-      bestOffset = offset;
-    }
-  }
-  return ring.slice(bestOffset).concat(ring.slice(0, bestOffset));
 }

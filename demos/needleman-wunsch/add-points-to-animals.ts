@@ -1,6 +1,5 @@
 import * as Callable from 'scripts/callable';
 import * as Elements from 'scripts/elements';
-import * as _ from 'lodash-es';
 import * as d3 from 'lib/d3';
 
 import { AutoAwesome } from './util';
@@ -12,6 +11,7 @@ const options = { size: 1440, viewportWidth: 1600, viewportHeight: 800 };
 const pixelRatio = options.size / Math.max(options.viewportWidth, options.viewportHeight);
 
 export function run() {
+  console.log('asdf');
   const viewport = Elements.newViewport(options);
   const hippoCmds = Command.fromPathData(hippo);
   const elephantCmds = Command.fromPathData(elephant);

@@ -120,7 +120,7 @@ function reverseSegments(segments) {
 }
 
 function shiftSegments(segments, numShifts) {
-  _.times(numShifts, () => segments.unshift(segments.pop()));
+  // _.times(numShifts, () => segments.unshift(segments.pop()));
   return segments;
 }
 
