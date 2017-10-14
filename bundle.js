@@ -19986,12 +19986,12 @@ function showSegments(from, fromCmds, to, toCmds) {
         var segments = container.selectAll('circle.segment').data(cmds);
         // EXIT old elements not present in new data.
         segments.exit().remove();
-        var interpolateColor = function (i) { return cool(i / cmds.length * 0.7 + 0.15); };
+        var interpolateColor_1 = function (i) { return cool(i / cmds.length * 0.7 + 0.15); };
         // UPDATE old elements present in new data.
         segments.attrs({
             cx: function (d) { return d.end[0]; },
             cy: function (d) { return d.end[1]; },
-            fill: function (d, i) { return (d.isSplit ? '#E64A19' : i >= minNumCmds ? '#D32F2F' : interpolateColor(i)); },
+            fill: function (d, i) { return (d.isSplit ? '#E64A19' : i >= minNumCmds ? '#D32F2F' : interpolateColor_1(i)); },
         });
         // ENTER new elements present in new data.
         segments
@@ -20001,7 +20001,7 @@ function showSegments(from, fromCmds, to, toCmds) {
             cx: function (d) { return d.end[0]; },
             cy: function (d) { return d.end[1]; },
             r: function (d) { return (d.isSplit ? 0 : 5); },
-            fill: function (d, i) { return (d.isSplit ? '#E64A19' : i >= minNumCmds ? '#D32F2F' : interpolateColor(i)); },
+            fill: function (d, i) { return (d.isSplit ? '#E64A19' : i >= minNumCmds ? '#D32F2F' : interpolateColor_1(i)); },
         })
             .transition(t)
             .attrs({ r: function (d, i) { return 5; } });
@@ -21075,7 +21075,7 @@ function run$1() {
     var svg = select('body')
         .append('svg')
         .attrs({ width: width, height: height });
-    json('/assets/us.topo.json', function (err, us) {
+    json('../../assets/us.topo.json', function (err, us) {
         var states = feature(us, us.objects.states)
             .features.map(function (d) { return d.geometry.coordinates[0]; });
         shuffle(states);
@@ -21383,7 +21383,6 @@ function run$1() {
         return [[x0, y0], [x1, y1]];
     }
 }
-//# sourceMappingURL=states-multiple-shapes.js.map
 
 function run$2() {
     var svg = select('body')
@@ -21391,7 +21390,7 @@ function run$2() {
         .attrs({ width: 960, height: 500 });
     var path = svg.append('path');
     var circles = svg.append('g');
-    json('/assets/us.topo.json', function (err, topo) {
+    json('../../assets/us.topo.json', function (err, topo) {
         var states = feature(topo, topo.objects.states)
             .features.map(function (d) { return d.geometry.coordinates[0]; });
         shuffle(states);
@@ -21495,8 +21494,8 @@ function run$3() {
         .attrs({ width: 960, height: 500 });
     var path = index();
     queue()
-        .defer(json, '/assets/TX.json')
-        .defer(json, '/assets/HI.json')
+        .defer(json, '../../assets/TX.json')
+        .defer(json, '../../assets/HI.json')
         .await(ready);
     function ready(err, tx, hi) {
         var points = tx.coordinates[0];
@@ -21749,9 +21748,30 @@ function run$3() {
 }
 //# sourceMappingURL=texas-to-hawaii.js.map
 
+function run$4() {
+    console.log('asdf');
+}
+//# sourceMappingURL=morph-sq-to-oct.js.map
+
+function run$5() {
+    console.log('asdf');
+}
+//# sourceMappingURL=morph-sq-to-oct-reversed.js.map
+
+function run$6() {
+    console.log('asdf');
+}
+//# sourceMappingURL=morph-sq-to-oct-shifted.js.map
+
+function run$7() {
+    console.log('asdf');
+}
+//# sourceMappingURL=morph-sq-to-sq.js.map
+
 function ringToPathData(selection) {
     selection.attr('d', function (ring) { return 'M' + ring.join('L') + 'Z'; });
 }
+//# sourceMappingURL=callable.js.map
 
 function newSquareRing(topLeft, center) {
     var tx = topLeft[0], ty = topLeft[1];
@@ -21791,10 +21811,11 @@ function newOctagonRing(topLeft, center) {
         return [x * sx + tx, y * sy + ty];
     });
 }
+//# sourceMappingURL=data.js.map
 
 var options$1 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
 var pixelRatio$1 = options$1.size / Math.max(options$1.viewportWidth, options$1.viewportHeight);
-function run$4() {
+function run$8() {
     var viewport = newViewport(options$1);
     var squareRing = newSquareRing([3, 3], [6, 6]);
     var octagonRing = newOctagonRing([13, 1], [18, 6]);
@@ -21888,10 +21909,15 @@ function getLabelOffsetX(i) {
 function getLabelOffsetY(i) {
     return i === 1 || i === 7 ? -0.4 : i === 0 ? -0.5 : i === 3 || i === 5 ? 0.4 : i === 4 ? 0.6 : 0;
 }
+//# sourceMappingURL=shift-octagon-points.js.map
 
 // Importing with side-effects is necessary to ensure the add-ons are loaded properly.
 var demoMap = new Map([
-    ['/demos/intro-to-path-morphing/shifting-points.html', run$4],
+    ['/demos/intro-to-path-morphing/shift-octagon-points.html', run$8],
+    ['/demos/intro-to-path-morphing/morph-sq-to-sq.html', run$7],
+    ['/demos/intro-to-path-morphing/morph-sq-to-oct.html', run$4],
+    ['/demos/intro-to-path-morphing/morph-sq-to-oct-reversed.html', run$5],
+    ['/demos/intro-to-path-morphing/morph-sq-to-oct-shifted.html', run$6],
     ['/demos/needleman-wunsch/add-points-to-animal.html', run],
     ['/demos/flubber/states-single-shape.html', run$2],
     ['/demos/flubber/states-multiple-shapes.html', run$1],
@@ -21901,6 +21927,7 @@ var demoPath = window.location.pathname.slice(window.location.pathname.indexOf('
 if (demoMap.has(demoPath)) {
     demoMap.get(demoPath)();
 }
+//# sourceMappingURL=main.js.map
 
 })));
 //# sourceMappingURL=bundle.js.map

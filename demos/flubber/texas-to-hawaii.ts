@@ -14,8 +14,8 @@ export function run() {
 
   d3
     .queue()
-    .defer(d3.json, '/assets/TX.json')
-    .defer(d3.json, '/assets/HI.json')
+    .defer(d3.json, '../../assets/TX.json')
+    .defer(d3.json, '../../assets/HI.json')
     .await(ready);
 
   function ready(err, tx, hi) {

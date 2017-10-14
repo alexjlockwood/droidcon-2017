@@ -11,7 +11,7 @@ export function run() {
   const path = svg.append('path');
   const circles = svg.append('g');
 
-  d3.json('/assets/us.topo.json', (err, topo) => {
+  d3.json('../../assets/us.topo.json', (err, topo) => {
     const states = topojson
       .feature(topo, (topo as any).objects.states)
       .features.map((d: any) => d.geometry.coordinates[0]);
