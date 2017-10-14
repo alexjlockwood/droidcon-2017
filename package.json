@@ -8,7 +8,7 @@
     "serve": "live-server src src/demos --watch=src/**/*.html,src/bundle.js,src/**/*.css",
     "tsc:w": "tsc -w",
     "rollup:w": "rollup -c -w",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d src"
   },
   "keywords": [],
   "author": "Alex Lockwood",
