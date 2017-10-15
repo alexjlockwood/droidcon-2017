@@ -1,4 +1,4 @@
-import * as d3 from '../lib/d3';
+import * as d3 from 'lib/d3';
 
 type BaseType = d3.BaseType;
 type EnterElement = d3.EnterElement;

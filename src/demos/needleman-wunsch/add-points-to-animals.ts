@@ -1,5 +1,4 @@
-import * as Callable from 'scripts/callable';
-import * as Elements from 'scripts/elements';
+import * as Viewport from 'scripts/viewport';
 import * as d3 from 'lib/d3';
 
 import { AutoAwesome } from './util';
@@ -8,11 +7,9 @@ import { DataSelection } from 'scripts/types';
 import { Point } from 'scripts/math';
 
 const options = { size: 1440, viewportWidth: 1600, viewportHeight: 800 };
-const pixelRatio = options.size / Math.max(options.viewportWidth, options.viewportHeight);
 
 export function run() {
-  console.log('asdf');
-  const viewport = Elements.newViewport(options);
+  const viewport = Viewport.create(options);
   const hippoCmds = Command.fromPathData(hippo);
   const elephantCmds = Command.fromPathData(elephant);
   const fixResult = AutoAwesome.fix({ from: hippoCmds, to: elephantCmds });

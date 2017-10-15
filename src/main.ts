@@ -13,17 +13,23 @@ import {
   runFlubberTexasToHawaii,
 } from './demos/flubber';
 import {
-  runMorphSquareToOctagon,
   runMorphSquareToOctagonReversed,
   runMorphSquareToOctagonShifted,
-  runMorphSquareToSquare,
   runShiftOctagonPoints,
+  runSqToOct,
+  runSqToSq,
+  runSqToSqMorph,
+  runSqWithDummiesToOct,
+  runSqWithDummiesToOctMorph,
 } from './demos/intro-to-path-morphing';
 
 const demoMap = new Map<string, () => void>([
+  ['/demos/intro-to-path-morphing/sq-to-sq.html', runSqToSq],
+  ['/demos/intro-to-path-morphing/sq-to-sq-morph.html', runSqToSqMorph],
+  ['/demos/intro-to-path-morphing/sq-to-oct.html', runSqToOct],
+  ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct.html', runSqWithDummiesToOct],
+  ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct-morph.html', runSqWithDummiesToOctMorph],
   ['/demos/intro-to-path-morphing/shift-octagon-points.html', runShiftOctagonPoints],
-  ['/demos/intro-to-path-morphing/morph-sq-to-sq.html', runMorphSquareToSquare],
-  ['/demos/intro-to-path-morphing/morph-sq-to-oct.html', runMorphSquareToOctagon],
   ['/demos/intro-to-path-morphing/morph-sq-to-oct-reversed.html', runMorphSquareToOctagonReversed],
   ['/demos/intro-to-path-morphing/morph-sq-to-oct-shifted.html', runMorphSquareToOctagonShifted],
   ['/demos/needleman-wunsch/animals-single-shape.html', runNeedlemanWunschAnimalsSingleShape],
