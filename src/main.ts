@@ -15,6 +15,7 @@ import {
 import {
   runMorphSquareToOctagonReversed,
   runMorphSquareToOctagonShifted,
+  runOctToCircle,
   runShiftOctagonPoints,
   runSqToOct,
   runSqToSq,
@@ -29,6 +30,7 @@ const demoMap = new Map<string, () => void>([
   ['/demos/intro-to-path-morphing/sq-to-oct.html', runSqToOct],
   ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct.html', runSqWithDummiesToOct],
   ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct-morph.html', runSqWithDummiesToOctMorph],
+  ['/demos/intro-to-path-morphing/oct-to-circle.html', runOctToCircle],
   ['/demos/intro-to-path-morphing/shift-octagon-points.html', runShiftOctagonPoints],
   ['/demos/intro-to-path-morphing/morph-sq-to-oct-reversed.html', runMorphSquareToOctagonReversed],
   ['/demos/intro-to-path-morphing/morph-sq-to-oct-shifted.html', runMorphSquareToOctagonShifted],

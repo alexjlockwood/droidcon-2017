@@ -1,7 +1,7 @@
 import * as Viewport from 'scripts/viewport';
 import * as d3 from 'lib/d3';
 
-import { Datum, newOctagonData, newSquareData } from './util/data';
+import { Datum, newCircleData, newOctagonData } from './util/data';
 
 import { DataSelection } from 'scripts/types';
 import { Point } from 'scripts/math';
@@ -12,43 +12,25 @@ const pixelRatio = options.size / Math.max(options.viewportWidth, options.viewpo
 export function run() {
   const viewport = Viewport.create(options);
 
-  const squareData = newSquareData([3, 3], [6, 6]);
-  const octagonData = newOctagonData([13, 1], [18, 6]);
+  const fromData = newOctagonData([3, 3], [6, 6]);
+  const toData = newCircleData([15, 3], [18, 6]);
 
   const fromContainer = viewport.append('g.from');
   const toContainer = viewport.append('g.to');
 
   fromContainer
-    .append('path.from')
-    .datum(squareData)
+    .append('path.outlined')
+    .datum(fromData)
     .attrs({ d: d => 'M' + d.map(({ segment }) => segment).join('L') + 'Z' });
 
   toContainer
-    .append('path.to')
-    .datum(octagonData)
-    .attrs({ d: d => 'M' + d.map(({ segment }) => segment).join('L') + 'Z' });
+    .append('path.outlined')
+    .datum(toData)
+    .call(segmentsToPathDataAttr);
 
   // The initial display.
-  update(fromContainer, squareData);
-  update(toContainer, octagonData);
-
-  let shiftOffset = 0;
-  d3.timeout(function recurseFn() {
-    shiftOffset = (shiftOffset + 1) % octagonData.length;
-    const data = octagonData.map((d, i) => {
-      const { segment, label } = octagonData[(i + shiftOffset) % octagonData.length];
-      return {
-        segment,
-        label,
-        position: d.position,
-      };
-    });
-    update(fromContainer, squareData);
-    update(toContainer, data);
-    if (shiftOffset !== 0) {
-      d3.timeout(recurseFn, 1000);
-    }
-  }, 1000);
+  update(fromContainer, fromData);
+  update(toContainer, toData);
 }
 
 function update(container: DataSelection, data: Datum[]) {
@@ -95,10 +77,15 @@ function update(container: DataSelection, data: Datum[]) {
     });
 }
 
-function getLabelOffsetX(i: number) {
-  return i === 1 || i === 3 ? 0.4 : i === 2 ? 0.6 : i === 5 || i === 7 ? -0.4 : i === 6 ? -0.6 : 0;
-}
-
-function getLabelOffsetY(i: number) {
-  return i === 1 || i === 7 ? -0.4 : i === 0 ? -0.5 : i === 3 || i === 5 ? 0.4 : i === 4 ? 0.6 : 0;
+function segmentsToPathDataAttr(selection: DataSelection<Datum[]>) {
+  selection.attr('d', data => {
+    const bezierCommands = data
+      .map(({ handleOut: h2 }, i) => {
+        const { segment: p, handleIn: h1 } = data[(i + 1) % data.length];
+        return 'C' + [h2, h1, p].join(' ');
+      })
+      .join(' ');
+    console.log(bezierCommands);
+    return `M ${data[0].segment}` + bezierCommands + 'Z';
+  });
 }

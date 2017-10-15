@@ -2,6 +2,12 @@ import * as d3 from 'lib/d3';
 
 import { Point } from './math';
 
+export interface Options {
+  readonly size: number;
+  readonly viewportWidth: number;
+  readonly viewportHeight: number;
+}
+
 export function create(options: Options) {
   const { size, viewportWidth, viewportHeight } = options;
   const width = viewportWidth >= viewportHeight ? size : size * viewportWidth / viewportHeight;
@@ -47,10 +53,4 @@ export function create(options: Options) {
   }
 
   return viewport;
-}
-
-interface Options {
-  readonly size: number;
-  readonly viewportWidth: number;
-  readonly viewportHeight: number;
 }
