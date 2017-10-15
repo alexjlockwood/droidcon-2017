@@ -32,6 +32,7 @@ export function create(options: Options) {
     y1: 0,
     width: viewportWidth,
     height: viewportHeight,
+    fill: '#445156',
   });
 
   if (scale.x >= 4 && scale.y >= 4) {
@@ -49,6 +50,9 @@ export function create(options: Options) {
         y1: d => d[0][1],
         x2: d => d[1][0],
         y2: d => d[1][1],
+        stroke: 'rgba(128, 128, 128, 0.5)',
+        'stroke-width': 2,
+        'vector-effect': 'non-scaling-stroke',
       });
   }
 

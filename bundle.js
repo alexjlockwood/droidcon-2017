@@ -5237,6 +5237,7 @@ function create$1(options) {
         y1: 0,
         width: viewportWidth,
         height: viewportHeight,
+        fill: '#445156',
     });
     if (scale.x >= 4 && scale.y >= 4) {
         viewport
@@ -5250,6 +5251,9 @@ function create$1(options) {
             y1: function (d) { return d[0][1]; },
             x2: function (d) { return d[1][0]; },
             y2: function (d) { return d[1][1]; },
+            stroke: 'rgba(128, 128, 128, 0.5)',
+            'stroke-width': 2,
+            'vector-effect': 'non-scaling-stroke',
         });
     }
     return viewport;
@@ -10195,12 +10199,12 @@ function showSegments(from, fromCmds, to, toCmds) {
         var segments = container.selectAll('circle.segment').data(cmds);
         // EXIT old elements not present in new data.
         segments.exit().remove();
-        var interpolateColor_1 = function (i) { return cool(i / cmds.length * 0.7 + 0.15); };
+        var interpolateColor = function (i) { return cool(i / cmds.length * 0.7 + 0.15); };
         // UPDATE old elements present in new data.
         segments.attrs({
             cx: function (d) { return d.end[0]; },
             cy: function (d) { return d.end[1]; },
-            fill: function (d, i) { return (d.isSplit ? '#E64A19' : i >= minNumCmds ? '#D32F2F' : interpolateColor_1(i)); },
+            fill: function (d, i) { return (d.isSplit ? '#E64A19' : i >= minNumCmds ? '#D32F2F' : interpolateColor(i)); },
         });
         // ENTER new elements present in new data.
         segments
@@ -10210,7 +10214,7 @@ function showSegments(from, fromCmds, to, toCmds) {
             cx: function (d) { return d.end[0]; },
             cy: function (d) { return d.end[1]; },
             r: function (d) { return (d.isSplit ? 0 : 5); },
-            fill: function (d, i) { return (d.isSplit ? '#E64A19' : i >= minNumCmds ? '#D32F2F' : interpolateColor_1(i)); },
+            fill: function (d, i) { return (d.isSplit ? '#E64A19' : i >= minNumCmds ? '#D32F2F' : interpolateColor(i)); },
         })
             .transition(t)
             .attrs({ r: function (d, i) { return 5; } });
@@ -10287,6 +10291,624 @@ function updateCircles(sel) {
     circles.exit().remove();
 }
 //# sourceMappingURL=animals-single-shape.js.map
+
+//# sourceMappingURL=index.js.map
+
+function newLineData(topLeft, center) {
+    var tx = topLeft[0], ty = topLeft[1];
+    var cx = center[0], cy = center[1];
+    var sx = (cx - tx) * 2;
+    var sy = (cy - ty) * 2;
+    var segments = [[0, 1], [1, 0], [0, 1]].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    var handleIns = [[0, 1], [1, 0], [0, 1]].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    var handleOuts = [[0, 1], [1, 0], [0, 1]].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    return segments.map(function (p, i) {
+        return {
+            segment: p,
+            handleIn: handleIns[i],
+            handleOut: handleOuts[i],
+            label: p,
+            position: i,
+        };
+    });
+}
+function newCurveData(topLeft, center) {
+    var tx = topLeft[0], ty = topLeft[1];
+    var cx = center[0], cy = center[1];
+    var sx = (cx - tx) * 2;
+    var sy = (cy - ty) * 2;
+    var segments = [[0, 1], [1, 0], [0, 1]].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    var handleIns = [[0, 1], [0.2, 0], [0.4, 1]].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    var handleOuts = [[0.4, 1], [0.2, 0], [0, 1]].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    return segments.map(function (p, i) {
+        return {
+            segment: p,
+            handleIn: handleIns[i],
+            handleOut: handleOuts[i],
+            label: p,
+            position: i,
+        };
+    });
+}
+function newSquareData(topLeft, center) {
+    return newSquareDataWithDummyPoints(topLeft, center)
+        .map(function (d, i) { return (i % 2 === 0 ? d : undefined); })
+        .filter(function (d) { return d; })
+        .map(function (d, i) { return ({
+        segment: d.segment,
+        handleIn: d.handleIn,
+        handeOut: d.handleOut,
+        label: d.label,
+        position: i,
+    }); });
+}
+function newSquareDataWithDummyPoints(topLeft, center) {
+    return newSquareRing(topLeft, center).map(function (p, i) {
+        var label = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
+        return { segment: p, label: label, position: i };
+    });
+}
+function newSquareRing(topLeft, center) {
+    var tx = topLeft[0], ty = topLeft[1];
+    var cx = center[0], cy = center[1];
+    var sx = (cx - tx) * 2;
+    var sy = (cy - ty) * 2;
+    return [
+        [0.5, 0],
+        [0.75, 0.25],
+        [1, 0.5],
+        [0.75, 0.75],
+        [0.5, 1],
+        [0.25, 0.75],
+        [0, 0.5],
+        [0.25, 0.25],
+    ].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+}
+function newOctagonData(topLeft, center) {
+    return newOctagonRing(topLeft, center).map(function (p, i) {
+        var label = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
+        return { segment: p, label: label, position: i };
+    });
+}
+function newOctagonRing(topLeft, center) {
+    var tx = topLeft[0], ty = topLeft[1];
+    var cx = center[0], cy = center[1];
+    var sx = (cx - tx) * 2;
+    var sy = (cy - ty) * 2;
+    return [
+        [0.5, 0],
+        [0.854, 0.146],
+        [1, 0.5],
+        [0.854, 0.854],
+        [0.5, 1],
+        [0.146, 0.854],
+        [0, 0.5],
+        [0.146, 0.146],
+    ].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+}
+function newCircleData(topLeft, center) {
+    var tx = topLeft[0], ty = topLeft[1];
+    var cx = center[0], cy = center[1];
+    var sx = (cx - tx) * 2;
+    var sy = (cy - ty) * 2;
+    var segments = [[0.5, 0], [1, 0.5], [0.5, 1], [0, 0.5]].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    var handleIns = [[0.224, 0], [1, 0.224], [0.776, 1], [0, 0.776]].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    var handleOuts = [[0.776, 0], [1, 0.776], [0.224, 1], [0, 0.224]].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    return segments.map(function (p, i) {
+        var label = [p[0] + getLabelOffsetX(i * 2), p[1] + getLabelOffsetY(i * 2)];
+        return {
+            segment: p,
+            handleIn: handleIns[i],
+            handleOut: handleOuts[i],
+            label: label,
+            position: i,
+        };
+    });
+}
+function newCircleDataWithDummyPoints(topLeft, center) {
+    var tx = topLeft[0], ty = topLeft[1];
+    var cx = center[0], cy = center[1];
+    var sx = (cx - tx) * 2;
+    var sy = (cy - ty) * 2;
+    var segments = [
+        [0.5, 0],
+        [0.854, 0.146],
+        [1, 0.5],
+        [0.854, 0.854],
+        [0.5, 1],
+        [0.146, 0.854],
+        [0, 0.5],
+        [0.146, 0.146],
+    ].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    var handleIns = [
+        [0.362, 0],
+        [0.763, 0.056],
+        [1, 0.362],
+        [0.944, 0.763],
+        [0.638, 1],
+        [0.237, 0.944],
+        [0, 0.638],
+        [0.056, 0.237],
+    ].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    var handleOuts = [
+        [0.638, 0],
+        [0.944, 0.237],
+        [1, 0.638],
+        [0.763, 0.944],
+        [0.362, 1],
+        [0.056, 0.763],
+        [0, 0.362],
+        [0.237, 0.056],
+    ].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    return segments.map(function (p, i) {
+        var label = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
+        return {
+            segment: p,
+            handleIn: handleIns[i],
+            handleOut: handleOuts[i],
+            label: label,
+            position: i,
+        };
+    });
+}
+function getLabelOffsetX(i) {
+    return i === 1 || i === 3 ? 0.4 : i === 2 ? 0.6 : i === 5 || i === 7 ? -0.4 : i === 6 ? -0.6 : 0;
+}
+function getLabelOffsetY(i) {
+    return i === 1 || i === 7 ? -0.4 : i === 0 ? -0.5 : i === 3 || i === 5 ? 0.4 : i === 4 ? 0.6 : 0;
+}
+//# sourceMappingURL=data.js.map
+
+function pathFilledAttrs(selection) {
+    selection.attrs({
+        fill: '#d8d8d8',
+        stroke: '#d8d8d8',
+        'stroke-width': 3,
+        'vector-effect': 'non-scaling-stroke',
+    });
+}
+function pathOutlinedAttrs(selection, strokeDashArray) {
+    if (strokeDashArray === void 0) { strokeDashArray = 10; }
+    selection.attrs({
+        fill: 'none',
+        stroke: '#d8d8d8',
+        'stroke-width': 3,
+        'stroke-dasharray': strokeDashArray,
+        'vector-effect': 'non-scaling-stroke',
+    });
+}
+function lineHandleInAttrs(selection) {
+    lineHandleAttrs(selection, 'handleIn');
+}
+function lineHandleOutAttrs(selection) {
+    lineHandleAttrs(selection, 'handleOut');
+}
+function lineHandleAttrs(selection, type) {
+    var dataSelection = isDataTransition(selection)
+        ? selection.selection()
+        : selection;
+    var numSegments = dataSelection.data().length;
+    selection.attrs({
+        x1: function (d) { return (d[type] || d.segment)[0]; },
+        y1: function (d) { return (d[type] || d.segment)[1]; },
+        x2: function (d) { return d.segment[0]; },
+        y2: function (d) { return d.segment[1]; },
+        fill: 'none',
+        stroke: function (d, i) {
+            return cool(((i + (type === 'handleIn' ? 0 : 1)) % numSegments) / numSegments * 0.7 + 0.15);
+        },
+        'stroke-width': 3,
+        'vector-effect': 'non-scaling-stroke',
+    });
+}
+function circleHandleInAttrs(selection) {
+    circleHandleAttrs(selection, 'handleIn');
+}
+function circleHandleOutAttrs(selection) {
+    circleHandleAttrs(selection, 'handleOut');
+}
+function circleHandleAttrs(selection, type) {
+    var dataSelection = isDataTransition(selection)
+        ? selection.selection()
+        : selection;
+    var numSegments = dataSelection.data().length;
+    selection.attrs({
+        cx: function (d) { return (d[type] || d.segment)[0]; },
+        cy: function (d) { return (d[type] || d.segment)[1]; },
+        r: function () { return 0.1; },
+        fill: function (d, i) {
+            return cool(((i + (type === 'handleIn' ? 0 : 1)) % numSegments) / numSegments * 0.7 + 0.15);
+        },
+        'stroke-width': 2,
+        'vector-effect': 'non-scaling-stroke',
+    });
+}
+function circleSegmentAttrs(selection) {
+    var dataSelection = isDataTransition(selection)
+        ? selection.selection()
+        : selection;
+    selection.attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        r: function () { return 0.2; },
+        fill: function (d, i) { return cool(i / dataSelection.data().length * 0.7 + 0.15); },
+        'stroke-width': 2,
+        'vector-effect': 'non-scaling-stroke',
+    });
+}
+function textLabelAttrs(selection, pixelRatio) {
+    if (pixelRatio === void 0) { pixelRatio = 1; }
+    selection.attrs({
+        x: function (d) { return d.label[0]; },
+        y: function (d) { return d.label[1]; },
+        fill: '#d8d8d8',
+        'font-family': 'Roboto',
+        'alignment-baseline': 'middle',
+        'text-anchor': 'middle',
+        'font-size': 36 / pixelRatio,
+    });
+}
+function toPathDataAttr(selection) {
+    selection.attrs({
+        d: function (data) {
+            var cmds = data
+                .map(function (_a, i) {
+                var currSegment = _a.segment, currH2 = _a.handleOut;
+                var next = data[(i + 1) % data.length];
+                var nextSegment = next.segment, nextH1 = next.handleIn;
+                return 'C ' + [currH2 || currSegment, nextH1 || nextSegment, nextSegment].join(' ');
+            })
+                .join(' ');
+            return "M " + data[0].segment + " " + cmds + 'Z';
+        },
+    });
+}
+function isDataTransition(s) {
+    return 'selection' in s;
+}
+//# sourceMappingURL=dom.js.map
+
+function runShapeToShape(options) {
+    var vpOpts = options.viewportOptions, fromData = options.fromData, toData = options.toData, strokeDashArray = options.strokeDashArray;
+    var viewport = create$1(vpOpts);
+    var fromContainer = viewport.append('g.from');
+    var fromPath = fromContainer.append('path.shape');
+    fromPath.datum(fromData).call(pathOutlinedAttrs, strokeDashArray);
+    var toContainer = viewport.append('g.to');
+    var toPath = toContainer.append('path.shape');
+    toPath.datum(toData).call(pathOutlinedAttrs, strokeDashArray);
+    // The initial display.
+    update(options, fromContainer, fromData);
+    update(options, toContainer, toData);
+}
+function runShapeToShapeMorph(options) {
+    var vpOpts = options.viewportOptions, fromData = options.fromData, toData = options.toData, strokeDashArray = options.strokeDashArray;
+    var viewport = create$1(vpOpts);
+    var toContainer = viewport.append('g.to');
+    var toPath = toContainer.append('path.shape').call(pathOutlinedAttrs, strokeDashArray);
+    var fromContainer = viewport.append('g.from');
+    var fromPath = fromContainer.append('path.shape').call(pathFilledAttrs, strokeDashArray);
+    // The initial display.
+    update(options, fromContainer, fromData);
+    update(options, toContainer, toData);
+    // Morph the shapes.
+    update(options, fromContainer, toData);
+}
+function update(options, container, data) {
+    var vpOpts = options.viewportOptions;
+    var pixelRatio = vpOpts.size / Math.max(vpOpts.viewportWidth, vpOpts.viewportHeight);
+    var t = transition(undefined).duration(2000);
+    container
+        .select('path.shape')
+        .datum(data)
+        .transition(t)
+        .call(toPathDataAttr);
+    // JOIN new data with old elements.
+    var keyFn = function (d) { return d.position.toString(); };
+    var handleInLines = container.selectAll('line.handleIn').data(data, keyFn);
+    var handleOutLines = container.selectAll('line.handleOut').data(data, keyFn);
+    var handleInSegments = container.selectAll('circle.handleIn').data(data, keyFn);
+    var handleOutSegments = container.selectAll('circle.handleOut').data(data, keyFn);
+    var segments = container.selectAll('circle.segment').data(data, keyFn);
+    var labels = container.selectAll('text.label').data(data, keyFn);
+    // EXIT old elements not present in new data.
+    if (!options.hideHandles) {
+        handleInLines.exit().remove();
+        handleOutLines.exit().remove();
+        handleInSegments.exit().remove();
+        handleOutSegments.exit().remove();
+    }
+    segments.exit().remove();
+    if (!options.hideLabels) {
+        labels.exit().remove();
+    }
+    // UPDATE old elements present in new data.
+    if (!options.hideHandles) {
+        handleInLines.transition(t).call(lineHandleInAttrs);
+        handleOutLines.transition(t).call(lineHandleOutAttrs);
+        handleInSegments.transition(t).call(circleHandleInAttrs);
+        handleOutSegments.transition(t).call(circleHandleOutAttrs);
+    }
+    segments.transition(t).call(circleSegmentAttrs);
+    if (!options.hideLabels) {
+        labels
+            .transition(t)
+            .text(function (d) { return d.position + 1; })
+            .call(textLabelAttrs, pixelRatio);
+    }
+    // ENTER new elements present in new data.
+    if (!options.hideHandles) {
+        handleInLines
+            .enter()
+            .append('line.handleIn')
+            .call(lineHandleInAttrs);
+        handleOutLines
+            .enter()
+            .append('line.handleOut')
+            .call(lineHandleOutAttrs);
+        handleInSegments
+            .enter()
+            .append('circle.handleIn')
+            .call(circleHandleInAttrs);
+        handleOutSegments
+            .enter()
+            .append('circle.handleOut')
+            .call(circleHandleOutAttrs);
+    }
+    segments
+        .enter()
+        .append('circle.segment')
+        .call(circleSegmentAttrs);
+    if (!options.hideLabels) {
+        labels
+            .enter()
+            .append('text.label')
+            .text(function (d) { return d.position + 1; })
+            .call(textLabelAttrs, pixelRatio);
+    }
+}
+//# sourceMappingURL=demo.js.map
+
+function run$2() {
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newSquareData([3, 3], [6, 6]),
+        toData: newSquareData([15, 3], [18, 6]),
+    });
+}
+//# sourceMappingURL=sq-to-sq.js.map
+
+function run$3() {
+    runShapeToShapeMorph({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newSquareData([3, 3], [6, 6]),
+        toData: newSquareData([15, 3], [18, 6]),
+    });
+}
+//# sourceMappingURL=sq-to-sq-morph.js.map
+
+function run$4() {
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newSquareData([3, 3], [6, 6]),
+        toData: newOctagonData([13, 1], [18, 6]),
+    });
+}
+//# sourceMappingURL=sq-to-oct.js.map
+
+function run$5() {
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newSquareDataWithDummyPoints([3, 3], [6, 6]),
+        toData: newOctagonData([13, 1], [18, 6]),
+    });
+}
+//# sourceMappingURL=sq-with-dummies-to-oct.js.map
+
+function run$6() {
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newLineData([3, 3], [6, 6]),
+        toData: newCurveData([13, 1], [18, 6]),
+        strokeDashArray: 15,
+    });
+}
+//# sourceMappingURL=line-to-curve.js.map
+
+function run$7() {
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newCurveData([3, 3], [6, 6]),
+        toData: newCurveData([13, 1], [18, 6]),
+        strokeDashArray: 15,
+    });
+}
+//# sourceMappingURL=curve-to-curve.js.map
+
+function run$8() {
+    runShapeToShapeMorph({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newCurveData([3, 3], [6, 6]),
+        toData: newCurveData([13, 1], [18, 6]),
+        hideLabels: true,
+        strokeDashArray: 15,
+    });
+}
+//# sourceMappingURL=curve-to-curve-morph.js.map
+
+function run$9() {
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newOctagonData([3, 3], [6, 6]),
+        toData: newCircleData([13, 1], [18, 6]),
+    });
+}
+//# sourceMappingURL=oct-to-circle.js.map
+
+function run$10() {
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newOctagonData([3, 3], [6, 6]),
+        toData: newCircleDataWithDummyPoints([13, 1], [18, 6]),
+    });
+}
+//# sourceMappingURL=oct-to-circle-with-dummies.js.map
+
+function run$11() {
+    runShapeToShapeMorph({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newOctagonData([3, 3], [6, 6]),
+        toData: newCircleDataWithDummyPoints([13, 1], [18, 6]),
+        hideLabels: true,
+    });
+}
+//# sourceMappingURL=oct-to-circle-with-dummies-morph.js.map
+
+function run$12() {
+    runShapeToShapeMorph({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newSquareDataWithDummyPoints([3, 3], [6, 6]),
+        toData: newOctagonData([13, 1], [18, 6]),
+        hideLabels: true,
+    });
+}
+
+function run$13() {
+    console.log('asdf');
+}
+//# sourceMappingURL=morph-sq-to-oct-reversed.js.map
+
+function run$14() {
+    console.log('asdf');
+}
+//# sourceMappingURL=morph-sq-to-oct-shifted.js.map
+
+var options$1 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
+var pixelRatio = options$1.size / Math.max(options$1.viewportWidth, options$1.viewportHeight);
+function run$15() {
+    var viewport = create$1(options$1);
+    var squareData = newSquareData([3, 3], [6, 6]);
+    var octagonData = newOctagonData([13, 1], [18, 6]);
+    var fromContainer = viewport.append('g.from');
+    var toContainer = viewport.append('g.to');
+    fromContainer
+        .append('path.from')
+        .datum(squareData)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
+    toContainer
+        .append('path.to')
+        .datum(octagonData)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
+    // The initial display.
+    update$1(fromContainer, squareData);
+    update$1(toContainer, octagonData);
+    var shiftOffset = 0;
+    timeout$1(function recurseFn() {
+        shiftOffset = (shiftOffset + 1) % octagonData.length;
+        var data = octagonData.map(function (d, i) {
+            var _a = octagonData[(i + shiftOffset) % octagonData.length], segment = _a.segment, label = _a.label;
+            return {
+                segment: segment,
+                label: label,
+                position: d.position,
+            };
+        });
+        update$1(fromContainer, squareData);
+        update$1(toContainer, data);
+        if (shiftOffset !== 0) {
+            timeout$1(recurseFn, 1000);
+        }
+    }, 1000);
+}
+function update$1(container, data) {
+    var t = transition(undefined).duration(500);
+    // JOIN new data with old elements.
+    var keyFn = function (d) { return d.position.toString(); };
+    var segments = container.selectAll('circle.segment').data(data, keyFn);
+    var labels = container.selectAll('text.label').data(data, keyFn);
+    // EXIT old elements not present in new data.
+    segments.exit().remove();
+    labels.exit().remove();
+    // UPDATE old elements present in new data.
+    segments.transition(t).attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels.transition(t).attrs({ x: function (d) { return d.label[0]; }, y: function (d) { return d.label[1]; } });
+    // ENTER new elements present in new data.
+    segments
+        .enter()
+        .append('circle.segment')
+        .attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        r: function () { return 0.2; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels
+        .enter()
+        .append('text.label')
+        .text(function (d) { return d.position + 1; })
+        .attrs({
+        x: function (d) { return d.label[0]; },
+        y: function (d) { return d.label[1]; },
+        'font-family': 'Roboto',
+        'alignment-baseline': 'middle',
+        'text-anchor': 'middle',
+        'font-size': 36 / pixelRatio,
+    });
+}
+
+//# sourceMappingURL=shift-octagon-points.js.map
 
 //# sourceMappingURL=index.js.map
 
@@ -11441,7 +12063,7 @@ earcut.flatten = function (data) {
     return result;
 };
 
-function run$2() {
+function run$16() {
     var width = 960;
     var height = 500;
     var svg = select('body')
@@ -11627,7 +12249,7 @@ function getBounds(ring) {
 }
 //# sourceMappingURL=states-multiple-shapes.js.map
 
-function run$3() {
+function run$17() {
     var svg = select('body')
         .append('svg')
         .attrs({ width: 960, height: 500 });
@@ -11684,7 +12306,7 @@ function updateCircles$1(sel) {
 }
 //# sourceMappingURL=states-single-shape.js.map
 
-function run$4() {
+function run$18() {
     var svg = select('body')
         .append('svg')
         .attrs({ width: 960, height: 500 });
@@ -13344,7 +13966,7 @@ var elephant$2 = "\nM450.43,65.291c13.394,0,26.387,7.755,39.017,23.247c12.6,15.4
 var buffalo$1 = "\nM526.991,49.247c17.28,0,39.159,1.076,65.703,3.161c37.488,2.966,61.505,9.949,72.025,20.933\nc5.478,5.518,12.228,16.322,20.221,32.36c8.019,17.345,14.755,29.185,20.234,35.506c4.624-5.894,8.394-9.909,11.373-11.982\nc8.848-6.761,15.35-11.192,19.547-13.265c0,10.946,0.752,17.152,2.242,18.628c1.45,1.451,7.487,2.617,18.006,3.459\nc34.51,2.124,51.803,33.278,51.803,93.515c0,11.373-0.622,24.223-1.891,38.551c-3.355,37.878-12.242,64.253-26.53,78.994\nc-2.552,2.487-9.392,5.116-20.571,7.863c-11.128,2.733-18.201,7.046-21.128,12.94c-3.822,7.178-7.59,21.063-11.36,41.738\nc-3.835,23.59-6.996,38.707-9.495,45.456l-9.496-12.604c-10.933-21.517-19.158-37.489-24.638-48.047\nc-11.387-20.221-22.747-30.74-34.12-31.594c-7.993-0.842-20.416,2.124-37.244,8.834c-12.668,5.493-25.079,10.96-37.294,16.426\nl-32.85,8.886c-11.375,4.612-19.16,13.019-23.382,25.247c-1.671,15.156-1.258,26.75,1.27,34.743\nc1.243,3.782,5.79,8.563,13.575,14.223c7.798,5.675,11.71,10.221,11.71,13.577c0,7.603-5.673,13.926-17.06,18.938\nc-9.301,4.235-18.369,6.322-27.177,6.322c-14.315-3.77-24.64-7.565-30.987-11.335c-5.039-1.698-7.538-7.605-7.538-17.695\nc0-4.637,0.375-11.373,1.23-20.248c0.842-8.796,1.269-15.584,1.269-20.221c0-5.466-0.427-10.182-1.269-14.184\nc-0.854-4.003-5.363-6.866-13.562-8.562c-8.214-1.658-12.98-3.536-14.211-5.661c-7.164-12.216-9.703-32.657-7.578-61.285h-79.603\nc-26.154-0.454-51.829-9.47-77.076-27.177c-2.979,4.637-8.874,9.145-17.695,13.614c-8.874,4.392-13.692,7.682-14.548,9.755\nc-0.856,4.21-4.21,10.454-10.104,18.628c-5.895,8.264-9.055,14.896-9.483,19.897c-3.355,33.318,19.82,71.416,69.524,114.37\nc-16.853,6.749-32.889,10.105-48.046,10.105c-3.77,0-7.605-0.195-11.373-0.609c0-3.368,0.22-9.872,0.647-19.6\nc0.427-7.979,0-13.874-1.269-17.656c-3.783-11.413-11.789-25.714-24.017-43.008c-13.459-18.913-22.099-32.812-25.881-41.673\nl6.943-45.508l-15.156,14.509c-8.433,13.886-17.087,27.748-25.908,41.633c-8.446,15.972-13.265,31.324-14.548,46.013\nc-1.683,22.281,12.009,46.039,41.077,71.247c-1.697-0.415-4.612,0.117-8.834,1.593c-4.21,1.464-6.322,2.811-6.322,4.08\nc-22.306-3.782-35.584-7.798-39.795-11.995c-5.48-7.538-9.068-18.693-10.751-33.421c-0.44-12.19-0.856-24.405-1.269-36.634\nc-0.44-5.466-1.244-15.727-2.527-30.935c-1.269-13.42-1.878-23.938-1.878-31.529c0-7.565,5.234-17.981,15.779-31.246\nc10.519-13.265,16.646-22.591,18.356-28.071c1.231-5.48-1.076-19.133-6.983-41.026c-7.19-25.649-10.726-43.343-10.726-52.981\nc0-5.907,0.816-10.726,2.487-14.534c-5.453,39.6-12.825,65.897-22.073,78.967C74,321.722,51.072,337.682,27.885,337.682\nc-6.749,0-11.607-2.073-14.534-6.322c-3.343-5.001-3.044-10.959,0.958-17.695c3.977-6.762,15.779-12.773,35.378-18.019\nc19.587-5.271,31.479-10.634,35.701-16.114c5.895-8.019,11.375-26.802,16.413-56.299c4.651-25.766,12.424-42.606,23.382-50.624\nc38.332-27.009,78.54-46.712,120.642-59.16c42.113-12.449,73.734-21.634,94.796-27.489\nC410.948,61.501,473.076,49.247,526.991,49.247z\n";
 var circle$3 = "\nM490.1,280.649c0,44.459-36.041,80.5-80.5,80.5s-80.5-36.041-80.5-80.5s36.041-80.5,80.5-80.5\nS490.1,236.19,490.1,280.649z\n";
 var star$1 = "\nM409.6,198.066l26.833,54.369l60,8.719l-43.417,42.321l10.249,59.758L409.6,335.019\nl-53.666,28.214l10.249-59.758l-43.417-42.321l60-8.719L409.6,198.066z\n";
-function run$5() {
+function run$19() {
     var svg = select('body')
         .append('svg')
         .attrs({ width: 820, height: 600 });
@@ -13400,504 +14022,31 @@ function updateCircles$2(sel) {
 
 //# sourceMappingURL=index.js.map
 
-function newSquareData(topLeft, center) {
-    return newSquareDataWithDummyPoints(topLeft, center)
-        .map(function (d, i) { return (i % 2 === 0 ? d : undefined); })
-        .filter(function (d) { return d; })
-        .map(function (d, i) { return ({
-        segment: d.segment,
-        handleIn: d.handleIn,
-        handeOut: d.handleOut,
-        label: d.label,
-        position: i,
-    }); });
-}
-function newSquareDataWithDummyPoints(topLeft, center) {
-    return newSquareRing(topLeft, center).map(function (p, i) {
-        var label = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
-        return { segment: p, label: label, position: i };
-    });
-}
-function newSquareRing(topLeft, center) {
-    var tx = topLeft[0], ty = topLeft[1];
-    var cx = center[0], cy = center[1];
-    var sx = (cx - tx) * 2;
-    var sy = (cy - ty) * 2;
-    return [
-        [0.5, 0],
-        [0.75, 0.25],
-        [1, 0.5],
-        [0.75, 0.75],
-        [0.5, 1],
-        [0.25, 0.75],
-        [0, 0.5],
-        [0.25, 0.25],
-    ].map(function (_a) {
-        var x = _a[0], y = _a[1];
-        return [x * sx + tx, y * sy + ty];
-    });
-}
-function newOctagonData(topLeft, center) {
-    return newOctagonRing(topLeft, center).map(function (p, i) {
-        var label = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
-        return { segment: p, label: label, position: i };
-    });
-}
-function newOctagonRing(topLeft, center) {
-    var tx = topLeft[0], ty = topLeft[1];
-    var cx = center[0], cy = center[1];
-    var sx = (cx - tx) * 2;
-    var sy = (cy - ty) * 2;
-    return [
-        [0.5, 0],
-        [0.854, 0.146],
-        [1, 0.5],
-        [0.854, 0.854],
-        [0.5, 1],
-        [0.146, 0.854],
-        [0, 0.5],
-        [0.146, 0.146],
-    ].map(function (_a) {
-        var x = _a[0], y = _a[1];
-        return [x * sx + tx, y * sy + ty];
-    });
-}
-function newCircleData(topLeft, center) {
-    return newCircleDataWithDummyPoints(topLeft, center)
-        .map(function (d, i) { return (i % 2 === 0 ? d : undefined); })
-        .filter(function (d) { return d; })
-        .map(function (d, i) { return ({
-        segment: d.segment,
-        handleIn: d.handleIn,
-        handeOut: d.handleOut,
-        label: d.label,
-        position: i,
-    }); });
-}
-function newCircleDataWithDummyPoints(topLeft, center) {
-    var tx = topLeft[0], ty = topLeft[1];
-    var cx = center[0], cy = center[1];
-    var sx = (cx - tx) * 2;
-    var sy = (cy - ty) * 2;
-    var segments = [
-        [0.5, 0],
-        [0.853553391, 0.146446609],
-        [1, 0.5],
-        [0.853553391, 0.853553391],
-        [0.5, 1],
-        [0.146446609, 0.853553391],
-        [0, 0.5],
-        [0.146446609, 0.146446609],
-    ].map(function (_a) {
-        var x = _a[0], y = _a[1];
-        return [x * sx + tx, y * sy + ty];
-    });
-    var handleIns = [
-        [0.361928813, 0],
-        [0.763071187, 0.0559644063],
-        [1, 0.361928813],
-        [0.944035594, 0.763071187],
-        [0.638071187, 1],
-        [0.236928813, 0.944035594],
-        [0, 0.638071187],
-        [0.0559644063, 0.236928813],
-    ].map(function (_a) {
-        var x = _a[0], y = _a[1];
-        return [x * sx + tx, y * sy + ty];
-    });
-    var handleOuts = [
-        [0.638071187, 0],
-        [0.944035594, 0.236928813],
-        [1, 0.638071187],
-        [0.763071187, 0.944035594],
-        [0.361928813, 1],
-        [0.0559644063, 0.763071187],
-        [0, 0.361928813],
-        [0.236928813, 0.0559644063],
-    ].map(function (_a) {
-        var x = _a[0], y = _a[1];
-        return [x * sx + tx, y * sy + ty];
-    });
-    return segments.map(function (p, i) {
-        var label = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
-        return {
-            segment: p,
-            handleIn: handleIns[i],
-            handleOut: handleOuts[i],
-            label: label,
-            position: i,
-        };
-    });
-}
-function getLabelOffsetX(i) {
-    return i === 1 || i === 3 ? 0.4 : i === 2 ? 0.6 : i === 5 || i === 7 ? -0.4 : i === 6 ? -0.6 : 0;
-}
-function getLabelOffsetY(i) {
-    return i === 1 || i === 7 ? -0.4 : i === 0 ? -0.5 : i === 3 || i === 5 ? 0.4 : i === 4 ? 0.6 : 0;
-}
-//# sourceMappingURL=data.js.map
-
-function runShapeToShape(options) {
-    var viewportOptions = options.viewportOptions, fromData = options.fromData, toData = options.toData;
-    var pixelRatio = viewportOptions.size / Math.max(viewportOptions.viewportWidth, viewportOptions.viewportHeight);
-    var viewport = create$1(viewportOptions);
-    var fromContainer = viewport.append('g.from');
-    var toContainer = viewport.append('g.to');
-    fromContainer
-        .append('path.outlined')
-        .datum(fromData)
-        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
-            var segment = _a.segment;
-            return segment;
-        }).join('L') + 'Z'; } });
-    toContainer
-        .append('path.outlined')
-        .datum(toData)
-        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
-            var segment = _a.segment;
-            return segment;
-        }).join('L') + 'Z'; } });
-    // The initial display.
-    update(fromContainer, fromData);
-    update(toContainer, toData);
-    function update(container, data) {
-        var t = transition(undefined).duration(500);
-        // JOIN new data with old elements.
-        var keyFn = function (d) { return d.position.toString(); };
-        var segments = container.selectAll('circle.segment').data(data, keyFn);
-        var labels = container.selectAll('text.label').data(data, keyFn);
-        // EXIT old elements not present in new data.
-        segments.exit().remove();
-        labels.exit().remove();
-        // UPDATE old elements present in new data.
-        segments.transition(t).attrs({
-            cx: function (d) { return d.segment[0]; },
-            cy: function (d) { return d.segment[1]; },
-            fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
-        });
-        labels.transition(t).attrs({ x: function (d) { return d.label[0]; }, y: function (d) { return d.label[1]; } });
-        // ENTER new elements present in new data.
-        segments
-            .enter()
-            .append('circle.segment')
-            .attrs({
-            cx: function (d) { return d.segment[0]; },
-            cy: function (d) { return d.segment[1]; },
-            r: function () { return 0.2; },
-            fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
-        });
-        labels
-            .enter()
-            .append('text.label')
-            .text(function (d) { return d.position + 1; })
-            .attrs({
-            x: function (d) { return d.label[0]; },
-            y: function (d) { return d.label[1]; },
-            'font-family': 'Roboto',
-            'alignment-baseline': 'middle',
-            'text-anchor': 'middle',
-            'font-size': 36 / pixelRatio,
-        });
-    }
-}
-//# sourceMappingURL=shape-to-shape.js.map
-
-function run$6() {
-    runShapeToShape({
-        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newSquareData([3, 3], [6, 6]),
-        toData: newSquareData([15, 3], [18, 6]),
-    });
-}
-//# sourceMappingURL=sq-to-sq.js.map
-
-function runShapeToShapeMorph(options) {
-    var viewportOptions = options.viewportOptions, fromData = options.fromData, toData = options.toData;
-    var viewport = create$1(viewportOptions);
-    var toContainer = viewport.append('g.to');
-    var toPath = toContainer.append('path.outlined');
-    var fromContainer = viewport.append('g.from');
-    var fromPath = fromContainer.append('path.filled');
-    // The initial display.
-    update(fromContainer, fromPath, fromData);
-    update(toContainer, toPath, toData);
-    // Morph the shapes.
-    update(fromContainer, fromPath, toData);
-}
-function update(container, path, data) {
-    var t = transition(undefined).duration(2000);
-    path
-        .datum(data)
-        .transition(t)
-        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
-            var segment = _a.segment;
-            return segment;
-        }).join('L') + 'Z'; } });
-    // JOIN new data with old elements.
-    var keyFn = function (d) { return d.position.toString(); };
-    var segments = container.selectAll('circle.segment').data(data, keyFn);
-    var labels = container.selectAll('text.label').data(data, keyFn);
-    // EXIT old elements not present in new data.
-    segments.exit().remove();
-    labels.exit().remove();
-    // UPDATE old elements present in new data.
-    segments.transition(t).attrs({
-        cx: function (d) { return d.segment[0]; },
-        cy: function (d) { return d.segment[1]; },
-        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
-    });
-    labels.transition(t).attrs({ x: function (d) { return d.label[0]; }, y: function (d) { return d.label[1]; } });
-    // ENTER new elements present in new data.
-    segments
-        .enter()
-        .append('circle.segment')
-        .attrs({
-        cx: function (d) { return d.segment[0]; },
-        cy: function (d) { return d.segment[1]; },
-        r: function () { return 0.2; },
-        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
-    });
-    // labels
-    //   .enter()
-    //   .append('text.label')
-    //   .text(d => d.position + 1)
-    //   .attrs({
-    //     x: d => d.label[0],
-    //     y: d => d.label[1],
-    //     'font-family': 'Roboto',
-    //     'alignment-baseline': 'middle',
-    //     'text-anchor': 'middle',
-    //     'font-size': 36 / pixelRatio,
-    //   });
-}
-//# sourceMappingURL=shape-to-shape-morph.js.map
-
-function run$7() {
-    runShapeToShapeMorph({
-        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newSquareData([3, 3], [6, 6]),
-        toData: newSquareData([15, 3], [18, 6]),
-    });
-}
-//# sourceMappingURL=sq-to-sq-morph.js.map
-
-function run$8() {
-    runShapeToShape({
-        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newSquareData([3, 3], [6, 6]),
-        toData: newOctagonData([13, 1], [18, 6]),
-    });
-}
-//# sourceMappingURL=sq-to-oct.js.map
-
-function run$9() {
-    runShapeToShape({
-        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newSquareDataWithDummyPoints([3, 3], [6, 6]),
-        toData: newOctagonData([13, 1], [18, 6]),
-    });
-}
-//# sourceMappingURL=sq-with-dummies-to-oct.js.map
-
-var options$1 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
-var pixelRatio = options$1.size / Math.max(options$1.viewportWidth, options$1.viewportHeight);
-function run$10() {
-    var viewport = create$1(options$1);
-    var fromData = newOctagonData([3, 3], [6, 6]);
-    var toData = newCircleData([15, 3], [18, 6]);
-    var fromContainer = viewport.append('g.from');
-    var toContainer = viewport.append('g.to');
-    fromContainer
-        .append('path.outlined')
-        .datum(fromData)
-        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
-            var segment = _a.segment;
-            return segment;
-        }).join('L') + 'Z'; } });
-    toContainer
-        .append('path.outlined')
-        .datum(toData)
-        .call(segmentsToPathDataAttr);
-    // The initial display.
-    update$1(fromContainer, fromData);
-    update$1(toContainer, toData);
-}
-function update$1(container, data) {
-    var t = transition(undefined).duration(500);
-    // JOIN new data with old elements.
-    var keyFn = function (d) { return d.position.toString(); };
-    var segments = container.selectAll('circle.segment').data(data, keyFn);
-    var labels = container.selectAll('text.label').data(data, keyFn);
-    // EXIT old elements not present in new data.
-    segments.exit().remove();
-    labels.exit().remove();
-    // UPDATE old elements present in new data.
-    segments.transition(t).attrs({
-        cx: function (d) { return d.segment[0]; },
-        cy: function (d) { return d.segment[1]; },
-        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
-    });
-    labels.transition(t).attrs({ x: function (d) { return d.label[0]; }, y: function (d) { return d.label[1]; } });
-    // ENTER new elements present in new data.
-    segments
-        .enter()
-        .append('circle.segment')
-        .attrs({
-        cx: function (d) { return d.segment[0]; },
-        cy: function (d) { return d.segment[1]; },
-        r: function () { return 0.2; },
-        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
-    });
-    labels
-        .enter()
-        .append('text.label')
-        .text(function (d) { return d.position + 1; })
-        .attrs({
-        x: function (d) { return d.label[0]; },
-        y: function (d) { return d.label[1]; },
-        'font-family': 'Roboto',
-        'alignment-baseline': 'middle',
-        'text-anchor': 'middle',
-        'font-size': 36 / pixelRatio,
-    });
-}
-function segmentsToPathDataAttr(selection) {
-    selection.attr('d', function (data) {
-        var bezierCommands = data
-            .map(function (_a, i) {
-            var h2 = _a.handleOut;
-            var _b = data[(i + 1) % data.length], p = _b.segment, h1 = _b.handleIn;
-            return 'C' + [h2, h1, p].join(' ');
-        })
-            .join(' ');
-        console.log(bezierCommands);
-        return "M " + data[0].segment + bezierCommands + 'Z';
-    });
-}
-//# sourceMappingURL=oct-to-circle.js.map
-
-function run$11() {
-    runShapeToShapeMorph({
-        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newSquareDataWithDummyPoints([3, 3], [6, 6]),
-        toData: newOctagonData([13, 1], [18, 6]),
-    });
-}
-
-function run$12() {
-    console.log('asdf');
-}
-//# sourceMappingURL=morph-sq-to-oct-reversed.js.map
-
-function run$13() {
-    console.log('asdf');
-}
-//# sourceMappingURL=morph-sq-to-oct-shifted.js.map
-
-var options$2 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
-var pixelRatio$1 = options$2.size / Math.max(options$2.viewportWidth, options$2.viewportHeight);
-function run$14() {
-    var viewport = create$1(options$2);
-    var squareData = newSquareData([3, 3], [6, 6]);
-    var octagonData = newOctagonData([13, 1], [18, 6]);
-    var fromContainer = viewport.append('g.from');
-    var toContainer = viewport.append('g.to');
-    fromContainer
-        .append('path.from')
-        .datum(squareData)
-        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
-            var segment = _a.segment;
-            return segment;
-        }).join('L') + 'Z'; } });
-    toContainer
-        .append('path.to')
-        .datum(octagonData)
-        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
-            var segment = _a.segment;
-            return segment;
-        }).join('L') + 'Z'; } });
-    // The initial display.
-    update$2(fromContainer, squareData);
-    update$2(toContainer, octagonData);
-    var shiftOffset = 0;
-    timeout$1(function recurseFn() {
-        shiftOffset = (shiftOffset + 1) % octagonData.length;
-        var data = octagonData.map(function (d, i) {
-            var _a = octagonData[(i + shiftOffset) % octagonData.length], segment = _a.segment, label = _a.label;
-            return {
-                segment: segment,
-                label: label,
-                position: d.position,
-            };
-        });
-        update$2(fromContainer, squareData);
-        update$2(toContainer, data);
-        if (shiftOffset !== 0) {
-            timeout$1(recurseFn, 1000);
-        }
-    }, 1000);
-}
-function update$2(container, data) {
-    var t = transition(undefined).duration(500);
-    // JOIN new data with old elements.
-    var keyFn = function (d) { return d.position.toString(); };
-    var segments = container.selectAll('circle.segment').data(data, keyFn);
-    var labels = container.selectAll('text.label').data(data, keyFn);
-    // EXIT old elements not present in new data.
-    segments.exit().remove();
-    labels.exit().remove();
-    // UPDATE old elements present in new data.
-    segments.transition(t).attrs({
-        cx: function (d) { return d.segment[0]; },
-        cy: function (d) { return d.segment[1]; },
-        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
-    });
-    labels.transition(t).attrs({ x: function (d) { return d.label[0]; }, y: function (d) { return d.label[1]; } });
-    // ENTER new elements present in new data.
-    segments
-        .enter()
-        .append('circle.segment')
-        .attrs({
-        cx: function (d) { return d.segment[0]; },
-        cy: function (d) { return d.segment[1]; },
-        r: function () { return 0.2; },
-        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
-    });
-    labels
-        .enter()
-        .append('text.label')
-        .text(function (d) { return d.position + 1; })
-        .attrs({
-        x: function (d) { return d.label[0]; },
-        y: function (d) { return d.label[1]; },
-        'font-family': 'Roboto',
-        'alignment-baseline': 'middle',
-        'text-anchor': 'middle',
-        'font-size': 36 / pixelRatio$1,
-    });
-}
-
-//# sourceMappingURL=shift-octagon-points.js.map
-
-//# sourceMappingURL=index.js.map
-
 // Importing with side-effects is necessary to ensure the add-ons are loaded properly.
 var demoMap = new Map([
-    ['/demos/intro-to-path-morphing/sq-to-sq.html', run$6],
-    ['/demos/intro-to-path-morphing/sq-to-sq-morph.html', run$7],
-    ['/demos/intro-to-path-morphing/sq-to-oct.html', run$8],
-    ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct.html', run$9],
-    ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct-morph.html', run$11],
-    ['/demos/intro-to-path-morphing/oct-to-circle.html', run$10],
-    ['/demos/intro-to-path-morphing/shift-octagon-points.html', run$14],
-    ['/demos/intro-to-path-morphing/morph-sq-to-oct-reversed.html', run$12],
-    ['/demos/intro-to-path-morphing/morph-sq-to-oct-shifted.html', run$13],
+    ['/demos/intro-to-path-morphing/sq-to-sq.html', run$2],
+    ['/demos/intro-to-path-morphing/sq-to-sq-morph.html', run$3],
+    ['/demos/intro-to-path-morphing/sq-to-oct.html', run$4],
+    ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct.html', run$5],
+    ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct-morph.html', run$12],
+    ['/demos/intro-to-path-morphing/line-to-curve.html', run$6],
+    ['/demos/intro-to-path-morphing/curve-to-curve.html', run$7],
+    ['/demos/intro-to-path-morphing/curve-to-curve-morph.html', run$8],
+    ['/demos/intro-to-path-morphing/oct-to-circle.html', run$9],
+    ['/demos/intro-to-path-morphing/oct-to-circle-with-dummies.html', run$10],
+    [
+        '/demos/intro-to-path-morphing/oct-to-circle-with-dummies-morph.html',
+        run$11,
+    ],
+    ['/demos/intro-to-path-morphing/shift-octagon-points.html', run$15],
+    ['/demos/intro-to-path-morphing/morph-sq-to-oct-reversed.html', run$13],
+    ['/demos/intro-to-path-morphing/morph-sq-to-oct-shifted.html', run$14],
     ['/demos/needleman-wunsch/animals-single-shape.html', run$1],
     ['/demos/needleman-wunsch/add-points-to-animals.html', run],
-    ['/demos/flubber/states-single-shape.html', run$3],
-    ['/demos/flubber/states-multiple-shapes.html', run$2],
-    ['/demos/flubber/texas-to-hawaii.html', run$4],
-    ['/demos/flubber/animals-single-shape.html', run$5],
+    ['/demos/flubber/states-single-shape.html', run$17],
+    ['/demos/flubber/states-multiple-shapes.html', run$16],
+    ['/demos/flubber/texas-to-hawaii.html', run$18],
+    ['/demos/flubber/animals-single-shape.html', run$19],
 ]);
 var demoPath = window.location.pathname.slice(window.location.pathname.indexOf('/demos'));
 if (demoMap.has(demoPath)) {
