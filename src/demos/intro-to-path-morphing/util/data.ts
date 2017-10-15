@@ -8,6 +8,56 @@ export interface Datum {
   readonly position: number;
 }
 
+export function newLineData(topLeft: Point, center: Point): Datum[] {
+  const [tx, ty] = topLeft;
+  const [cx, cy] = center;
+  const sx = (cx - tx) * 2;
+  const sy = (cy - ty) * 2;
+  const segments: Point[] = [[0, 1], [1, 0], [0, 1]].map(
+    ([x, y]) => [x * sx + tx, y * sy + ty] as Point,
+  );
+  const handleIns: Point[] = [[0, 1], [1, 0], [0, 1]].map(
+    ([x, y]) => [x * sx + tx, y * sy + ty] as Point,
+  );
+  const handleOuts: Point[] = [[0, 1], [1, 0], [0, 1]].map(
+    ([x, y]) => [x * sx + tx, y * sy + ty] as Point,
+  );
+  return segments.map((p, i) => {
+    return {
+      segment: p,
+      handleIn: handleIns[i],
+      handleOut: handleOuts[i],
+      label: p,
+      position: i,
+    };
+  });
+}
+
+export function newCurveData(topLeft: Point, center: Point): Datum[] {
+  const [tx, ty] = topLeft;
+  const [cx, cy] = center;
+  const sx = (cx - tx) * 2;
+  const sy = (cy - ty) * 2;
+  const segments: Point[] = [[0, 1], [1, 0], [0, 1]].map(
+    ([x, y]) => [x * sx + tx, y * sy + ty] as Point,
+  );
+  const handleIns: Point[] = [[0, 1], [0.2, 0], [0.4, 1]].map(
+    ([x, y]) => [x * sx + tx, y * sy + ty] as Point,
+  );
+  const handleOuts: Point[] = [[0.4, 1], [0.2, 0], [0, 1]].map(
+    ([x, y]) => [x * sx + tx, y * sy + ty] as Point,
+  );
+  return segments.map((p, i) => {
+    return {
+      segment: p,
+      handleIn: handleIns[i],
+      handleOut: handleOuts[i],
+      label: p,
+      position: i,
+    };
+  });
+}
+
 export function newSquareData(topLeft: Point, center: Point): Datum[] {
   return newSquareDataWithDummyPoints(topLeft, center)
     .map((d, i) => (i % 2 === 0 ? d : undefined))
@@ -69,17 +119,30 @@ function newOctagonRing(topLeft: Point, center: Point) {
   ].map(([x, y]) => [x * sx + tx, y * sy + ty] as Point);
 }
 
-export function newCircleData(topLeft: Point, center: Point) {
-  return newCircleDataWithDummyPoints(topLeft, center)
-    .map((d, i) => (i % 2 === 0 ? d : undefined))
-    .filter(d => d)
-    .map((d, i) => ({
-      segment: d.segment,
-      handleIn: d.handleIn,
-      handeOut: d.handleOut,
-      label: d.label,
+export function newCircleData(topLeft: Point, center: Point): Datum[] {
+  const [tx, ty] = topLeft;
+  const [cx, cy] = center;
+  const sx = (cx - tx) * 2;
+  const sy = (cy - ty) * 2;
+  const segments: Point[] = [[0.5, 0], [1, 0.5], [0.5, 1], [0, 0.5]].map(
+    ([x, y]) => [x * sx + tx, y * sy + ty] as Point,
+  );
+  const handleIns: Point[] = [[0.224, 0], [1, 0.224], [0.776, 1], [0, 0.776]].map(
+    ([x, y]) => [x * sx + tx, y * sy + ty] as Point,
+  );
+  const handleOuts: Point[] = [[0.776, 0], [1, 0.776], [0.224, 1], [0, 0.224]].map(
+    ([x, y]) => [x * sx + tx, y * sy + ty] as Point,
+  );
+  return segments.map((p, i) => {
+    const label: Point = [p[0] + getLabelOffsetX(i * 2), p[1] + getLabelOffsetY(i * 2)];
+    return {
+      segment: p,
+      handleIn: handleIns[i],
+      handleOut: handleOuts[i],
+      label,
       position: i,
-    }));
+    };
+  });
 }
 
 export function newCircleDataWithDummyPoints(topLeft: Point, center: Point): Datum[] {
@@ -89,33 +152,33 @@ export function newCircleDataWithDummyPoints(topLeft: Point, center: Point): Dat
   const sy = (cy - ty) * 2;
   const segments: Point[] = [
     [0.5, 0],
-    [0.853553391, 0.146446609],
+    [0.854, 0.146],
     [1, 0.5],
-    [0.853553391, 0.853553391],
+    [0.854, 0.854],
     [0.5, 1],
-    [0.146446609, 0.853553391],
+    [0.146, 0.854],
     [0, 0.5],
-    [0.146446609, 0.146446609],
+    [0.146, 0.146],
   ].map(([x, y]) => [x * sx + tx, y * sy + ty] as Point);
   const handleIns: Point[] = [
-    [0.361928813, 0],
-    [0.763071187, 0.0559644063],
-    [1, 0.361928813],
-    [0.944035594, 0.763071187],
-    [0.638071187, 1],
-    [0.236928813, 0.944035594],
-    [0, 0.638071187],
-    [0.0559644063, 0.236928813],
+    [0.362, 0],
+    [0.763, 0.056],
+    [1, 0.362],
+    [0.944, 0.763],
+    [0.638, 1],
+    [0.237, 0.944],
+    [0, 0.638],
+    [0.056, 0.237],
   ].map(([x, y]) => [x * sx + tx, y * sy + ty] as Point);
   const handleOuts: Point[] = [
-    [0.638071187, 0],
-    [0.944035594, 0.236928813],
-    [1, 0.638071187],
-    [0.763071187, 0.944035594],
-    [0.361928813, 1],
-    [0.0559644063, 0.763071187],
-    [0, 0.361928813],
-    [0.236928813, 0.0559644063],
+    [0.638, 0],
+    [0.944, 0.237],
+    [1, 0.638],
+    [0.763, 0.944],
+    [0.362, 1],
+    [0.056, 0.763],
+    [0, 0.362],
+    [0.237, 0.056],
   ].map(([x, y]) => [x * sx + tx, y * sy + ty] as Point);
   return segments.map((p, i) => {
     const label: Point = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];

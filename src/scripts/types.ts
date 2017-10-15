@@ -17,3 +17,19 @@ type DefaultSelection<
 > = Selection<GElement, Datum, PElement, PDatum>;
 
 export type DataSelection<D = {}> = DefaultSelection<BaseType, D, BaseType, any>;
+
+type Transition<
+  GElement extends BaseType,
+  Datum,
+  PElement extends BaseType,
+  PDatum
+> = d3.Transition<GElement, Datum, PElement, PDatum>;
+
+type DefaultTransition<
+  GElement extends BaseType = BaseType,
+  Datum = any,
+  PElement extends BaseType = BaseType,
+  PDatum = any
+> = Transition<GElement, Datum, PElement, PDatum>;
+
+export type DataTransition<D = {}> = DefaultTransition<BaseType, D, BaseType, any>;

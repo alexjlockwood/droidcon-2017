@@ -7,15 +7,14 @@ import {
   runNeedlemanWunschAnimalsSingleShape,
 } from './demos/needleman-wunsch';
 import {
-  runFlubberAnimalsSingleShape,
-  runFlubberStatesMultipleShapes,
-  runFlubberStatesSingleShape,
-  runFlubberTexasToHawaii,
-} from './demos/flubber';
-import {
+  runCurveToCurve,
+  runCurveToCurveMorph,
+  runLineToCurve,
   runMorphSquareToOctagonReversed,
   runMorphSquareToOctagonShifted,
   runOctToCircle,
+  runOctToCircleWithDummyPoints,
+  runOctToCircleWithDummyPointsMorph,
   runShiftOctagonPoints,
   runSqToOct,
   runSqToSq,
@@ -23,6 +22,12 @@ import {
   runSqWithDummiesToOct,
   runSqWithDummiesToOctMorph,
 } from './demos/intro-to-path-morphing';
+import {
+  runFlubberAnimalsSingleShape,
+  runFlubberStatesMultipleShapes,
+  runFlubberStatesSingleShape,
+  runFlubberTexasToHawaii,
+} from './demos/flubber';
 
 const demoMap = new Map<string, () => void>([
   ['/demos/intro-to-path-morphing/sq-to-sq.html', runSqToSq],
@@ -30,7 +35,15 @@ const demoMap = new Map<string, () => void>([
   ['/demos/intro-to-path-morphing/sq-to-oct.html', runSqToOct],
   ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct.html', runSqWithDummiesToOct],
   ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct-morph.html', runSqWithDummiesToOctMorph],
+  ['/demos/intro-to-path-morphing/line-to-curve.html', runLineToCurve],
+  ['/demos/intro-to-path-morphing/curve-to-curve.html', runCurveToCurve],
+  ['/demos/intro-to-path-morphing/curve-to-curve-morph.html', runCurveToCurveMorph],
   ['/demos/intro-to-path-morphing/oct-to-circle.html', runOctToCircle],
+  ['/demos/intro-to-path-morphing/oct-to-circle-with-dummies.html', runOctToCircleWithDummyPoints],
+  [
+    '/demos/intro-to-path-morphing/oct-to-circle-with-dummies-morph.html',
+    runOctToCircleWithDummyPointsMorph,
+  ],
   ['/demos/intro-to-path-morphing/shift-octagon-points.html', runShiftOctagonPoints],
   ['/demos/intro-to-path-morphing/morph-sq-to-oct-reversed.html', runMorphSquareToOctagonReversed],
   ['/demos/intro-to-path-morphing/morph-sq-to-oct-shifted.html', runMorphSquareToOctagonShifted],

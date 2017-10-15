@@ -1,6 +1,6 @@
 import { newOctagonData, newSquareDataWithDummyPoints } from './util/data';
 
-import { runShapeToShape } from './shape-to-shape';
+import { runShapeToShape } from './util/demo';
 
 export function run() {
   runShapeToShape({
