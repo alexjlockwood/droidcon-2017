@@ -30,40 +30,44 @@ import {
   runFlubberTexasToHawaii,
 } from './demos/flubber';
 
-const demoMap = new Map<string, () => void>([
-  ['/demos/intro-to-path-morphing/sq-to-sq.html', runSqToSq],
-  ['/demos/intro-to-path-morphing/sq-to-sq-morph.html', runSqToSqMorph],
-  ['/demos/intro-to-path-morphing/sq-to-oct.html', runSqToOct],
-  ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct.html', runSqWithDummiesToOct],
-  ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct-morph.html', runSqWithDummiesToOctMorph],
-  ['/demos/intro-to-path-morphing/line-to-curve.html', runLineToCurve],
-  ['/demos/intro-to-path-morphing/curve-to-curve.html', runCurveToCurve],
-  ['/demos/intro-to-path-morphing/curve-to-curve-morph.html', runCurveToCurveMorph],
-  ['/demos/intro-to-path-morphing/oct-to-circle.html', runOctToCircle],
-  [
-    '/demos/intro-to-path-morphing/oct-to-circle-with-dummies.html',
-    runOctToCircleWithDummyPoints,
-  ],
-  [
-    '/demos/intro-to-path-morphing/oct-with-handles-to-circle-with-dummies.html',
-    runOctWithHandlesToCircleWithDummyPoints,
-  ],
-  [
-    '/demos/intro-to-path-morphing/oct-with-handles-to-circle-with-dummies-morph.html',
-    runOctWithHandlesToCircleWithDummyPointsMorph,
-  ],
-  ['/demos/intro-to-path-morphing/shift-octagon-points.html', runShiftOctagonPoints],
-  ['/demos/intro-to-path-morphing/morph-sq-to-oct-reversed.html', runMorphSquareToOctagonReversed],
-  ['/demos/intro-to-path-morphing/morph-sq-to-oct-shifted.html', runMorphSquareToOctagonShifted],
-  ['/demos/needleman-wunsch/animals-single-shape.html', runNeedlemanWunschAnimalsSingleShape],
-  ['/demos/needleman-wunsch/add-points-to-animals.html', runAddPointsToAnimals],
-  ['/demos/flubber/states-single-shape.html', runFlubberStatesSingleShape],
-  ['/demos/flubber/states-multiple-shapes.html', runFlubberStatesMultipleShapes],
-  ['/demos/flubber/texas-to-hawaii.html', runFlubberTexasToHawaii],
-  ['/demos/flubber/animals-single-shape.html', runFlubberAnimalsSingleShape],
+const introToPathMorphingMap = new Map<string, () => void>([
+  ['?sq-to-sq', runSqToSq],
+  ['?sq-to-sq-morph', runSqToSqMorph],
+  ['?sq-to-oct', runSqToOct],
+  ['?sq-with-dummies-to-oct', runSqWithDummiesToOct],
+  ['?sq-with-dummies-to-oct-morph', runSqWithDummiesToOctMorph],
+  ['?line-to-curve', runLineToCurve],
+  ['?curve-to-curve', runCurveToCurve],
+  ['?curve-to-curve-morph', runCurveToCurveMorph],
+  ['?oct-to-circle', runOctToCircle],
+  ['?oct-to-circle-with-dummies', runOctToCircleWithDummyPoints],
+  ['?oct-with-handles-to-circle-with-dummies', runOctWithHandlesToCircleWithDummyPoints],
+  ['?oct-with-handles-to-circle-with-dummies-morph', runOctWithHandlesToCircleWithDummyPointsMorph],
+  ['?shift-octagon-points', runShiftOctagonPoints],
+  ['?morph-sq-to-oct-reversed', runMorphSquareToOctagonReversed],
+  ['?morph-sq-to-oct-shifted', runMorphSquareToOctagonShifted],
 ]);
 
-const demoPath = window.location.pathname.slice(window.location.pathname.indexOf('/demos'));
-if (demoMap.has(demoPath)) {
-  demoMap.get(demoPath)();
+const flubberMap = new Map<string, () => void>([
+  ['?states-single-shape', runFlubberStatesSingleShape],
+  ['?states-multiple-shapes', runFlubberStatesMultipleShapes],
+  ['?texas-to-hawaii', runFlubberTexasToHawaii],
+  ['?animals-single-shape', runFlubberAnimalsSingleShape],
+]);
+
+const needlemanWunschMap = new Map<string, () => void>([
+  ['?animals-single-shape', runNeedlemanWunschAnimalsSingleShape],
+  ['?add-points-to-animals', runAddPointsToAnimals],
+]);
+
+const sectionMap = new Map<string, Map<string, () => void>>([
+  ['/demos/intro-to-path-morphing/index.html', introToPathMorphingMap],
+]);
+
+const sectionPath = window.location.pathname.slice(window.location.pathname.indexOf('/demos'));
+if (sectionMap.has(sectionPath)) {
+  const demoMap = sectionMap.get(sectionPath);
+  if (demoMap.has(window.location.search)) {
+    demoMap.get(window.location.search)();
+  }
 }
