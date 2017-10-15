@@ -5216,7 +5216,7 @@ var length$2 = function(polygon) {
   return perimeter;
 };
 
-function newViewport(options) {
+function create$1(options) {
     var size = options.size, viewportWidth = options.viewportWidth, viewportHeight = options.viewportHeight;
     var width = viewportWidth >= viewportHeight ? size : size * viewportWidth / viewportHeight;
     var height = viewportWidth >= viewportHeight ? size * viewportHeight / viewportWidth : size;
@@ -5254,7 +5254,7 @@ function newViewport(options) {
     }
     return viewport;
 }
-//# sourceMappingURL=elements.js.map
+//# sourceMappingURL=viewport.js.map
 
 /**
  * The base implementation of `_.clamp` which doesn't coerce arguments.
@@ -10172,8 +10172,7 @@ function isClockwise(cmds) {
 
 var options = { size: 1440, viewportWidth: 1600, viewportHeight: 800 };
 function run() {
-    console.log('asdf');
-    var viewport = newViewport(options);
+    var viewport = create$1(options);
     var hippoCmds = Command.fromPathData(hippo);
     var elephantCmds = Command.fromPathData(elephant);
     var fixResult = fix({ from: hippoCmds, to: elephantCmds });
@@ -10287,6 +10286,7 @@ function updateCircles(sel) {
     });
     circles.exit().remove();
 }
+//# sourceMappingURL=animals-single-shape.js.map
 
 //# sourceMappingURL=index.js.map
 
@@ -13400,31 +13400,18 @@ function updateCircles$2(sel) {
 
 //# sourceMappingURL=index.js.map
 
-function run$6() {
-    console.log('asdf');
+function newSquareData(topLeft, center) {
+    return newSquareDataWithDummyPoints(topLeft, center)
+        .map(function (d, i) { return (i % 2 === 0 ? d : undefined); })
+        .filter(function (d) { return d; })
+        .map(function (d, i) { return ({ segment: d.segment, label: d.label, position: i }); });
 }
-//# sourceMappingURL=morph-sq-to-oct.js.map
-
-function run$7() {
-    console.log('asdf');
+function newSquareDataWithDummyPoints(topLeft, center) {
+    return newSquareRing(topLeft, center).map(function (p, i) {
+        var label = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
+        return { segment: p, label: label, position: i };
+    });
 }
-//# sourceMappingURL=morph-sq-to-oct-reversed.js.map
-
-function run$8() {
-    console.log('asdf');
-}
-//# sourceMappingURL=morph-sq-to-oct-shifted.js.map
-
-function run$9() {
-    console.log('asdf');
-}
-//# sourceMappingURL=morph-sq-to-sq.js.map
-
-function ringToPathData(selection) {
-    selection.attr('d', function (ring) { return 'M' + ring.join('L') + 'Z'; });
-}
-//# sourceMappingURL=callable.js.map
-
 function newSquareRing(topLeft, center) {
     var tx = topLeft[0], ty = topLeft[1];
     var cx = center[0], cy = center[1];
@@ -13442,6 +13429,12 @@ function newSquareRing(topLeft, center) {
     ].map(function (_a) {
         var x = _a[0], y = _a[1];
         return [x * sx + tx, y * sy + ty];
+    });
+}
+function newOctagonData(topLeft, center) {
+    return newOctagonRing(topLeft, center).map(function (p, i) {
+        var label = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
+        return { segment: p, label: label, position: i };
     });
 }
 function newOctagonRing(topLeft, center) {
@@ -13463,58 +13456,39 @@ function newOctagonRing(topLeft, center) {
         return [x * sx + tx, y * sy + ty];
     });
 }
+function getLabelOffsetX(i) {
+    return i === 1 || i === 3 ? 0.4 : i === 2 ? 0.6 : i === 5 || i === 7 ? -0.4 : i === 6 ? -0.6 : 0;
+}
+function getLabelOffsetY(i) {
+    return i === 1 || i === 7 ? -0.4 : i === 0 ? -0.5 : i === 3 || i === 5 ? 0.4 : i === 4 ? 0.6 : 0;
+}
 //# sourceMappingURL=data.js.map
 
 var options$1 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
-var pixelRatio$1 = options$1.size / Math.max(options$1.viewportWidth, options$1.viewportHeight);
-function run$10() {
-    var viewport = newViewport(options$1);
-    var squareRing = newSquareRing([3, 3], [6, 6]);
-    var octagonRing = newOctagonRing([13, 1], [18, 6]);
+var pixelRatio = options$1.size / Math.max(options$1.viewportWidth, options$1.viewportHeight);
+function run$6() {
+    var viewport = create$1(options$1);
+    var fromData = newSquareData([3, 3], [6, 6]);
+    var toData = newOctagonData([13, 1], [18, 6]);
     var fromContainer = viewport.append('g.from');
     var toContainer = viewport.append('g.to');
     fromContainer
-        .append('path.from')
-        .datum(squareRing)
-        .call(ringToPathData);
+        .append('path.outlined')
+        .datum(fromData)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
     toContainer
-        .append('path.to')
-        .datum(octagonRing)
-        .call(ringToPathData);
-    var squareData = squareRing.map(function (segmentPoint, position) {
-        var labelPoint = [
-            segmentPoint[0] + getLabelOffsetX(position),
-            segmentPoint[1] + getLabelOffsetY(position),
-        ];
-        return { segmentPoint: segmentPoint, labelPoint: labelPoint, position: position };
-    });
-    var octagonData = octagonRing.map(function (segmentPoint, position) {
-        var labelPoint = [
-            segmentPoint[0] + getLabelOffsetX(position),
-            segmentPoint[1] + getLabelOffsetY(position),
-        ];
-        return { segmentPoint: segmentPoint, labelPoint: labelPoint, position: position };
-    });
+        .append('path.outlined')
+        .datum(toData)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
     // The initial display.
-    update(fromContainer, squareData);
-    update(toContainer, octagonData);
-    var shiftOffset = 0;
-    timeout$1(function recurseFn() {
-        shiftOffset = (shiftOffset + 1) % octagonData.length;
-        var data = octagonData.map(function (d, i) {
-            var _a = octagonData[(i + shiftOffset) % octagonData.length], segmentPoint = _a.segmentPoint, labelPoint = _a.labelPoint;
-            return {
-                segmentPoint: segmentPoint,
-                labelPoint: labelPoint,
-                position: d.position,
-            };
-        });
-        update(fromContainer, squareData);
-        update(toContainer, data);
-        if (shiftOffset !== 0) {
-            timeout$1(recurseFn, 1000);
-        }
-    }, 1000);
+    update(fromContainer, fromData);
+    update(toContainer, toData);
 }
 function update(container, data) {
     var t = transition(undefined).duration(500);
@@ -13527,18 +13501,18 @@ function update(container, data) {
     labels.exit().remove();
     // UPDATE old elements present in new data.
     segments.transition(t).attrs({
-        cx: function (d) { return d.segmentPoint[0]; },
-        cy: function (d) { return d.segmentPoint[1]; },
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
         fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
     });
-    labels.transition(t).attrs({ x: function (d) { return d.labelPoint[0]; }, y: function (d) { return d.labelPoint[1]; } });
+    labels.transition(t).attrs({ x: function (d) { return d.label[0]; }, y: function (d) { return d.label[1]; } });
     // ENTER new elements present in new data.
     segments
         .enter()
         .append('circle.segment')
         .attrs({
-        cx: function (d) { return d.segmentPoint[0]; },
-        cy: function (d) { return d.segmentPoint[1]; },
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
         r: function () { return 0.2; },
         fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
     });
@@ -13547,31 +13521,382 @@ function update(container, data) {
         .append('text.label')
         .text(function (d) { return d.position + 1; })
         .attrs({
-        x: function (d) { return d.labelPoint[0]; },
-        y: function (d) { return d.labelPoint[1]; },
+        x: function (d) { return d.label[0]; },
+        y: function (d) { return d.label[1]; },
+        'font-family': 'Roboto',
+        'alignment-baseline': 'middle',
+        'text-anchor': 'middle',
+        'font-size': 36 / pixelRatio,
+    });
+}
+//# sourceMappingURL=sq-to-oct.js.map
+
+var options$2 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
+var pixelRatio$1 = options$2.size / Math.max(options$2.viewportWidth, options$2.viewportHeight);
+function run$7() {
+    var viewport = create$1(options$2);
+    var fromData = newSquareDataWithDummyPoints([3, 3], [6, 6]);
+    var toData = newOctagonData([13, 1], [18, 6]);
+    var fromContainer = viewport.append('g.from');
+    var toContainer = viewport.append('g.to');
+    fromContainer
+        .append('path.outlined')
+        .datum(fromData)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
+    toContainer
+        .append('path.outlined')
+        .datum(toData)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
+    // The initial display.
+    update$1(fromContainer, fromData);
+    update$1(toContainer, toData);
+}
+function update$1(container, data) {
+    var t = transition(undefined).duration(500);
+    // JOIN new data with old elements.
+    var keyFn = function (d) { return d.position.toString(); };
+    var segments = container.selectAll('circle.segment').data(data, keyFn);
+    var labels = container.selectAll('text.label').data(data, keyFn);
+    // EXIT old elements not present in new data.
+    segments.exit().remove();
+    labels.exit().remove();
+    // UPDATE old elements present in new data.
+    segments.transition(t).attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels.transition(t).attrs({ x: function (d) { return d.label[0]; }, y: function (d) { return d.label[1]; } });
+    // ENTER new elements present in new data.
+    segments
+        .enter()
+        .append('circle.segment')
+        .attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        r: function () { return 0.2; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels
+        .enter()
+        .append('text.label')
+        .text(function (d) { return d.position + 1; })
+        .attrs({
+        x: function (d) { return d.label[0]; },
+        y: function (d) { return d.label[1]; },
         'font-family': 'Roboto',
         'alignment-baseline': 'middle',
         'text-anchor': 'middle',
         'font-size': 36 / pixelRatio$1,
     });
 }
-function getLabelOffsetX(i) {
-    return i === 1 || i === 3 ? 0.4 : i === 2 ? 0.6 : i === 5 || i === 7 ? -0.4 : i === 6 ? -0.6 : 0;
+//# sourceMappingURL=sq-with-dummies-to-oct.js.map
+
+var options$3 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
+function run$8() {
+    var viewport = create$1(options$3);
+    var toData = newOctagonData([13, 1], [18, 6]);
+    var toContainer = viewport.append('g.to');
+    var toPath = toContainer.append('path.outlined');
+    var fromData = newSquareDataWithDummyPoints([3, 3], [6, 6]);
+    var fromContainer = viewport.append('g.from');
+    var fromPath = fromContainer.append('path.filled');
+    // The initial display.
+    update$2(fromContainer, fromPath, fromData);
+    update$2(toContainer, toPath, toData);
+    // Morph the shapes.
+    update$2(fromContainer, fromPath, toData);
 }
-function getLabelOffsetY(i) {
-    return i === 1 || i === 7 ? -0.4 : i === 0 ? -0.5 : i === 3 || i === 5 ? 0.4 : i === 4 ? 0.6 : 0;
+function update$2(container, path, data) {
+    var t = transition(undefined).duration(2000);
+    path
+        .datum(data)
+        .transition(t)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
+    // JOIN new data with old elements.
+    var keyFn = function (d) { return d.position.toString(); };
+    var segments = container.selectAll('circle.segment').data(data, keyFn);
+    var labels = container.selectAll('text.label').data(data, keyFn);
+    // EXIT old elements not present in new data.
+    segments.exit().remove();
+    labels.exit().remove();
+    // UPDATE old elements present in new data.
+    segments.transition(t).attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels.transition(t).attrs({ x: function (d) { return d.label[0]; }, y: function (d) { return d.label[1]; } });
+    // ENTER new elements present in new data.
+    segments
+        .enter()
+        .append('circle.segment')
+        .attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        r: function () { return 0.2; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    // labels
+    //   .enter()
+    //   .append('text.label')
+    //   .text(d => d.position + 1)
+    //   .attrs({
+    //     x: d => d.label[0],
+    //     y: d => d.label[1],
+    //     'font-family': 'Roboto',
+    //     'alignment-baseline': 'middle',
+    //     'text-anchor': 'middle',
+    //     'font-size': 36 / pixelRatio,
+    //   });
 }
+
+function run$9() {
+    console.log('asdf');
+}
+//# sourceMappingURL=morph-sq-to-oct-reversed.js.map
+
+function run$10() {
+    console.log('asdf');
+}
+//# sourceMappingURL=morph-sq-to-oct-shifted.js.map
+
+var options$4 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
+function run$11() {
+    var viewport = create$1(options$4);
+    var toData = newSquareData([15, 3], [18, 6]);
+    var toContainer = viewport.append('g.to');
+    var toPath = toContainer.append('path.outlined');
+    var fromData = newSquareData([3, 3], [6, 6]);
+    var fromContainer = viewport.append('g.from');
+    var fromPath = fromContainer.append('path.filled');
+    // The initial display.
+    update$3(fromContainer, fromPath, fromData);
+    update$3(toContainer, toPath, toData);
+    // Morph the shapes.
+    update$3(fromContainer, fromPath, toData);
+}
+function update$3(container, path, data) {
+    var t = transition(undefined).duration(2000);
+    path
+        .datum(data)
+        .transition(t)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
+    // JOIN new data with old elements.
+    var keyFn = function (d) { return d.position.toString(); };
+    var segments = container.selectAll('circle.segment').data(data, keyFn);
+    var labels = container.selectAll('text.label').data(data, keyFn);
+    // EXIT old elements not present in new data.
+    segments.exit().remove();
+    labels.exit().remove();
+    // UPDATE old elements present in new data.
+    segments.transition(t).attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels.transition(t).attrs({ x: function (d) { return d.label[0]; }, y: function (d) { return d.label[1]; } });
+    // ENTER new elements present in new data.
+    segments
+        .enter()
+        .append('circle.segment')
+        .attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        r: function () { return 0.2; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    // labels
+    //   .enter()
+    //   .append('text.label')
+    //   .text(d => d.position + 1)
+    //   .attrs({
+    //     x: d => d.label[0],
+    //     y: d => d.label[1],
+    //     'font-family': 'Roboto',
+    //     'alignment-baseline': 'middle',
+    //     'text-anchor': 'middle',
+    //     'font-size': 36 / pixelRatio,
+    //   });
+}
+//# sourceMappingURL=sq-to-sq-morph.js.map
+
+var options$5 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
+var pixelRatio$4 = options$5.size / Math.max(options$5.viewportWidth, options$5.viewportHeight);
+function run$12() {
+    var viewport = create$1(options$5);
+    var fromData = newSquareData([3, 3], [6, 6]);
+    var toData = newSquareData([15, 3], [18, 6]);
+    var fromContainer = viewport.append('g.from');
+    var toContainer = viewport.append('g.to');
+    fromContainer
+        .append('path.outlined')
+        .datum(fromData)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
+    toContainer
+        .append('path.outlined')
+        .datum(toData)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
+    // The initial display.
+    update$4(fromContainer, fromData);
+    update$4(toContainer, toData);
+}
+function update$4(container, data) {
+    var t = transition(undefined).duration(500);
+    // JOIN new data with old elements.
+    var keyFn = function (d) { return d.position.toString(); };
+    var segments = container.selectAll('circle.segment').data(data, keyFn);
+    var labels = container.selectAll('text.label').data(data, keyFn);
+    // EXIT old elements not present in new data.
+    segments.exit().remove();
+    labels.exit().remove();
+    // UPDATE old elements present in new data.
+    segments.transition(t).attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels.transition(t).attrs({ x: function (d) { return d.label[0]; }, y: function (d) { return d.label[1]; } });
+    // ENTER new elements present in new data.
+    segments
+        .enter()
+        .append('circle.segment')
+        .attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        r: function () { return 0.2; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels
+        .enter()
+        .append('text.label')
+        .text(function (d) { return d.position + 1; })
+        .attrs({
+        x: function (d) { return d.label[0]; },
+        y: function (d) { return d.label[1]; },
+        'font-family': 'Roboto',
+        'alignment-baseline': 'middle',
+        'text-anchor': 'middle',
+        'font-size': 36 / pixelRatio$4,
+    });
+}
+//# sourceMappingURL=sq-to-sq.js.map
+
+var options$6 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
+var pixelRatio$5 = options$6.size / Math.max(options$6.viewportWidth, options$6.viewportHeight);
+function run$13() {
+    var viewport = create$1(options$6);
+    var squareData = newSquareData([3, 3], [6, 6]);
+    var octagonData = newOctagonData([13, 1], [18, 6]);
+    var fromContainer = viewport.append('g.from');
+    var toContainer = viewport.append('g.to');
+    fromContainer
+        .append('path.from')
+        .datum(squareData)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
+    toContainer
+        .append('path.to')
+        .datum(octagonData)
+        .attrs({ d: function (d) { return 'M' + d.map(function (_a) {
+            var segment = _a.segment;
+            return segment;
+        }).join('L') + 'Z'; } });
+    // The initial display.
+    update$5(fromContainer, squareData);
+    update$5(toContainer, octagonData);
+    var shiftOffset = 0;
+    timeout$1(function recurseFn() {
+        shiftOffset = (shiftOffset + 1) % octagonData.length;
+        var data = octagonData.map(function (d, i) {
+            var _a = octagonData[(i + shiftOffset) % octagonData.length], segment = _a.segment, label = _a.label;
+            return {
+                segment: segment,
+                label: label,
+                position: d.position,
+            };
+        });
+        update$5(fromContainer, squareData);
+        update$5(toContainer, data);
+        if (shiftOffset !== 0) {
+            timeout$1(recurseFn, 1000);
+        }
+    }, 1000);
+}
+function update$5(container, data) {
+    var t = transition(undefined).duration(500);
+    // JOIN new data with old elements.
+    var keyFn = function (d) { return d.position.toString(); };
+    var segments = container.selectAll('circle.segment').data(data, keyFn);
+    var labels = container.selectAll('text.label').data(data, keyFn);
+    // EXIT old elements not present in new data.
+    segments.exit().remove();
+    labels.exit().remove();
+    // UPDATE old elements present in new data.
+    segments.transition(t).attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels.transition(t).attrs({ x: function (d) { return d.label[0]; }, y: function (d) { return d.label[1]; } });
+    // ENTER new elements present in new data.
+    segments
+        .enter()
+        .append('circle.segment')
+        .attrs({
+        cx: function (d) { return d.segment[0]; },
+        cy: function (d) { return d.segment[1]; },
+        r: function () { return 0.2; },
+        fill: function (d, i) { return cool(i / data.length * 0.7 + 0.15); },
+    });
+    labels
+        .enter()
+        .append('text.label')
+        .text(function (d) { return d.position + 1; })
+        .attrs({
+        x: function (d) { return d.label[0]; },
+        y: function (d) { return d.label[1]; },
+        'font-family': 'Roboto',
+        'alignment-baseline': 'middle',
+        'text-anchor': 'middle',
+        'font-size': 36 / pixelRatio$5,
+    });
+}
+
 //# sourceMappingURL=shift-octagon-points.js.map
 
 //# sourceMappingURL=index.js.map
 
 // Importing with side-effects is necessary to ensure the add-ons are loaded properly.
 var demoMap = new Map([
-    ['/demos/intro-to-path-morphing/shift-octagon-points.html', run$10],
-    ['/demos/intro-to-path-morphing/morph-sq-to-sq.html', run$9],
-    ['/demos/intro-to-path-morphing/morph-sq-to-oct.html', run$6],
-    ['/demos/intro-to-path-morphing/morph-sq-to-oct-reversed.html', run$7],
-    ['/demos/intro-to-path-morphing/morph-sq-to-oct-shifted.html', run$8],
+    ['/demos/intro-to-path-morphing/sq-to-sq.html', run$12],
+    ['/demos/intro-to-path-morphing/sq-to-sq-morph.html', run$11],
+    ['/demos/intro-to-path-morphing/sq-to-oct.html', run$6],
+    ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct.html', run$7],
+    ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct-morph.html', run$8],
+    ['/demos/intro-to-path-morphing/shift-octagon-points.html', run$13],
+    ['/demos/intro-to-path-morphing/morph-sq-to-oct-reversed.html', run$9],
+    ['/demos/intro-to-path-morphing/morph-sq-to-oct-shifted.html', run$10],
     ['/demos/needleman-wunsch/animals-single-shape.html', run$1],
     ['/demos/needleman-wunsch/add-points-to-animals.html', run],
     ['/demos/flubber/states-single-shape.html', run$3],

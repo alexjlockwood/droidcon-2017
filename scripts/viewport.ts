@@ -1,8 +1,8 @@
-import * as d3 from '../lib/d3';
+import * as d3 from 'lib/d3';
 
 import { Point } from './math';
 
-export function newViewport(options: Options) {
+export function create(options: Options) {
   const { size, viewportWidth, viewportHeight } = options;
   const width = viewportWidth >= viewportHeight ? size : size * viewportWidth / viewportHeight;
   const height = viewportWidth >= viewportHeight ? size * viewportHeight / viewportWidth : size;
