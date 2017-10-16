@@ -15,6 +15,7 @@ export function runOctToCircle() {
     viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
     fromData: newOctagonData([3, 3], [6, 6]),
     toData: newCircleData([13, 1], [18, 6]),
+    hideHandles: true,
   });
 }
 
@@ -27,18 +28,19 @@ export function runOctToCircleWithDummyPoints() {
 }
 
 export function runOctWithHandlesToCircleWithDummyPoints() {
-  runShapeToShape({
-    viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-    fromData: newOctagonDataWithHandles([3, 3], [6, 6]),
-    toData: newCircleDataWithDummyPoints([13, 1], [18, 6]),
-  });
+  octWithHandlesToCircleWithDummyPoints(false);
 }
 
 export function runOctWithHandlesToCircleWithDummyPointsMorph() {
-  runShapeToShapeMorph({
+  octWithHandlesToCircleWithDummyPoints(true);
+}
+
+function octWithHandlesToCircleWithDummyPoints(shouldMorph: boolean) {
+  const fn = shouldMorph ? runShapeToShapeMorph : runShapeToShape;
+  fn({
     viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
     fromData: newOctagonDataWithHandles([3, 3], [6, 6]),
     toData: newCircleDataWithDummyPoints([13, 1], [18, 6]),
-    hideLabels: true,
+    hideLabels: shouldMorph,
   });
 }
