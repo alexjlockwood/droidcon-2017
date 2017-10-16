@@ -87,7 +87,6 @@
       }
     ],
     "prefer-for-of": true,
-    "no-null-keyword": true,
-    "prefer-object-spread": true
+    "no-null-keyword": true
   }
 }

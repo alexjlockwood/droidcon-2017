@@ -4,6 +4,10 @@ export {
   runSqToOctMorph,
   runSqWithDummyPointsToOct,
   runSqWithDummyPointsToOctMorph,
+  runSqWithDummyPointsToReversedOct,
+  runSqWithDummyPointsToReversedOctMorph,
+  runSqWithDummyPointsToShiftedOct,
+  runSqWithDummyPointsToShiftedOctMorph,
 } from './sq-to-oct';
 export { runLineToCurve } from './line-to-curve';
 export { runCurveToCurve, runCurveToCurveMorph } from './curve-to-curve';
@@ -13,7 +17,3 @@ export {
   runOctWithHandlesToCircleWithDummyPoints,
   runOctWithHandlesToCircleWithDummyPointsMorph,
 } from './oct-to-circle';
-
-// export { run as runMorphSquareToOctagonReversed } from './morph-sq-to-oct-reversed';
-// export { run as runMorphSquareToOctagonShifted } from './morph-sq-to-oct-shifted';
-// export { run as runShiftOctagonPoints } from './shift-octagon-points';

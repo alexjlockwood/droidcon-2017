@@ -18,8 +18,12 @@ import {
   runSqToOctMorph,
   runSqToSq,
   runSqToSqMorph,
-  runSqWithDummiesToOct,
-  runSqWithDummiesToOctMorph,
+  runSqWithDummyPointsToOct,
+  runSqWithDummyPointsToOctMorph,
+  runSqWithDummyPointsToReversedOct,
+  runSqWithDummyPointsToReversedOctMorph,
+  runSqWithDummyPointsToShiftedOct,
+  runSqWithDummyPointsToShiftedOctMorph,
 } from './demos/intro-to-path-morphing';
 import {
   runFlubberAnimalsSingleShape,
@@ -33,15 +37,22 @@ const introToPathMorphingMap = new Map<string, () => void>([
   ['?sq-to-sq-morph', runSqToSqMorph],
   ['?sq-to-oct', runSqToOct],
   ['?sq-to-oct-morph', runSqToOctMorph],
-  ['?sq-with-dummies-to-oct', runSqWithDummiesToOct],
-  ['?sq-with-dummies-to-oct-morph', runSqWithDummiesToOctMorph],
+  ['?sq-with-dummy-points-to-oct', runSqWithDummyPointsToOct],
+  ['?sq-with-dummy-points-to-oct-morph', runSqWithDummyPointsToOctMorph],
+  ['?sq-with-dummy-points-to-reversed-oct', runSqWithDummyPointsToReversedOct],
+  ['?sq-with-dummy-points-to-reversed-oct-morph', runSqWithDummyPointsToReversedOctMorph],
+  ['?sq-with-dummy-points-to-shifted-oct', runSqWithDummyPointsToShiftedOct],
+  ['?sq-with-dummy-points-to-shifted-oct-morph', runSqWithDummyPointsToShiftedOctMorph],
   ['?line-to-curve', runLineToCurve],
   ['?curve-to-curve', runCurveToCurve],
   ['?curve-to-curve-morph', runCurveToCurveMorph],
   ['?oct-to-circle', runOctToCircle],
-  ['?oct-to-circle-with-dummies', runOctToCircleWithDummyPoints],
-  ['?oct-with-handles-to-circle-with-dummies', runOctWithHandlesToCircleWithDummyPoints],
-  ['?oct-with-handles-to-circle-with-dummies-morph', runOctWithHandlesToCircleWithDummyPointsMorph],
+  ['?oct-to-circle-with-dummy-points', runOctToCircleWithDummyPoints],
+  ['?oct-with-handles-to-circle-with-dummy-points', runOctWithHandlesToCircleWithDummyPoints],
+  [
+    '?oct-with-handles-to-circle-with-dummy-points-morph',
+    runOctWithHandlesToCircleWithDummyPointsMorph,
+  ],
 ]);
 
 const flubberMap = new Map<string, () => void>([

@@ -1,10 +1,11 @@
-import { Point, lerp } from 'scripts/math';
+import { Point, floorMod, lerp } from 'scripts/math';
 
 export interface Datum {
   readonly segment: Point;
   readonly handleIn?: Point;
   readonly handleOut?: Point;
   readonly label: Point;
+  readonly labelText: string;
   readonly position: number;
 }
 
@@ -28,6 +29,7 @@ export function newLineData(topLeft: Point, center: Point): Datum[] {
       handleIn: handleIns[i],
       handleOut: handleOuts[i],
       label: p,
+      labelText: (i + 1).toString(),
       position: i,
     };
   });
@@ -53,6 +55,7 @@ export function newCurveData(topLeft: Point, center: Point): Datum[] {
       handleIn: handleIns[i],
       handleOut: handleOuts[i],
       label: p,
+      labelText: (i + 1).toString(),
       position: i,
     };
   });
@@ -67,6 +70,7 @@ export function newSquareData(topLeft: Point, center: Point): Datum[] {
       handleIn: d.handleIn,
       handeOut: d.handleOut,
       label: d.label,
+      labelText: (i + 1).toString(),
       position: i,
     }));
 }
@@ -74,7 +78,7 @@ export function newSquareData(topLeft: Point, center: Point): Datum[] {
 export function newSquareDataWithDummyPoints(topLeft: Point, center: Point): Datum[] {
   return newSquareRing(topLeft, center).map((p, i) => {
     const label: Point = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
-    return { segment: p, label, position: i };
+    return { segment: p, label, labelText: (i + 1).toString(), position: i };
   });
 }
 
@@ -98,7 +102,7 @@ function newSquareRing(topLeft: Point, center: Point) {
 export function newOctagonData(topLeft: Point, center: Point): Datum[] {
   return newOctagonRing(topLeft, center).map((p, i) => {
     const label: Point = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
-    return { segment: p, label, position: i };
+    return { segment: p, label, labelText: (i + 1).toString(), position: i };
   });
 }
 
@@ -123,6 +127,7 @@ export function newOctagonDataWithHandles(topLeft: Point, center: Point): Datum[
       handleIn: handleIns[i],
       handleOut: handleOuts[i],
       label,
+      labelText: (i + 1).toString(),
       position: i,
     };
   });
@@ -166,6 +171,7 @@ export function newCircleData(topLeft: Point, center: Point): Datum[] {
       handleIn: handleIns[i],
       handleOut: handleOuts[i],
       label,
+      labelText: (i + 1).toString(),
       position: i,
     };
   });
@@ -213,6 +219,7 @@ export function newCircleDataWithDummyPoints(topLeft: Point, center: Point): Dat
       handleIn: handleIns[i],
       handleOut: handleOuts[i],
       label,
+      labelText: (i + 1).toString(),
       position: i,
     };
   });
@@ -224,4 +231,21 @@ function getLabelOffsetX(i: number) {
 
 function getLabelOffsetY(i: number) {
   return i === 1 || i === 7 ? -0.4 : i === 0 ? -0.5 : i === 3 || i === 5 ? 0.4 : i === 4 ? 0.6 : 0;
+}
+
+export function reverseData(data: Datum[]): Datum[] {
+  data = [...data];
+  const first = data.shift();
+  data.reverse();
+  data.unshift(first);
+  return data;
+}
+
+export function shiftData(data: Datum[], numShifts = 0): Datum[] {
+  numShifts = floorMod(numShifts, data.length);
+  data = [...data];
+  for (let i = 0; i < numShifts; i++) {
+    data.unshift(data.pop());
+  }
+  return data;
 }

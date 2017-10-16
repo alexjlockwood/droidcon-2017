@@ -27,3 +27,8 @@ export function samePoint(p1: Point, p2: Point) {
 export function isFiniteNumber(num: any) {
   return typeof num === 'number' && isFinite(num);
 }
+
+/** Returns the floor mod of the given arguments. */
+export function floorMod(n: number, mod: number) {
+  return (n % mod + mod) % mod;
+}
