@@ -146,6 +146,7 @@ function updateCircles(sel: DataSelection<Command[]>) {
     .enter()
     .append('circle')
     .attr('r', 2)
+    .attr('fill', '#fc0')
     .merge(circles);
 
   merged.classed('added', (d: Command & { added: boolean }) => d.isSplit).attrs({

@@ -50,7 +50,7 @@ export function run() {
     }
     svg
       .call(updatePaths, pairs)
-      .selectAll('path')
+      .selectAll('path.state')
       .transition()
       .delay(from.length > 1 ? 0 : 400)
       .duration(2500)
@@ -60,7 +60,7 @@ export function run() {
         if (to.length === 1) {
           svg
             .call(updatePaths, to)
-            .selectAll('path')
+            .selectAll('path.state')
             .attr('d', join);
         }
         setTimeout(cb, 0);
@@ -108,8 +108,8 @@ export function run() {
 }
 
 function updatePaths(selection: DataSelection, pairs: [Ring, Ring][]) {
-  const paths = selection.selectAll('path').data(pairs);
-  paths.enter().append('path');
+  const paths = selection.selectAll('path.state').data(pairs);
+  paths.enter().append('path.state');
   paths.exit().remove();
 }
 

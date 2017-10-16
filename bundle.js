@@ -10283,6 +10283,7 @@ function updateCircles(sel) {
         .enter()
         .append('circle')
         .attr('r', 2)
+        .attr('fill', '#fc0')
         .merge(circles);
     merged.classed('added', function (d) { return d.isSplit; }).attrs({
         cx: function (d) { return d.end[0]; },
@@ -10290,7 +10291,6 @@ function updateCircles(sel) {
     });
     circles.exit().remove();
 }
-//# sourceMappingURL=animals-single-shape.js.map
 
 //# sourceMappingURL=index.js.map
 
@@ -10389,6 +10389,27 @@ function newOctagonData(topLeft, center) {
     return newOctagonRing(topLeft, center).map(function (p, i) {
         var label = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
         return { segment: p, label: label, position: i };
+    });
+}
+function newOctagonDataWithHandles(topLeft, center) {
+    var segments = newOctagonRing(topLeft, center);
+    var handleIns = segments.map(function (point, i) {
+        var prevPoint = segments[(i + segments.length - 1) % segments.length];
+        return lerp(prevPoint, point, 2 / 3);
+    });
+    var handleOuts = segments.map(function (point, i) {
+        var nextPoint = segments[(i + 1) % segments.length];
+        return lerp(point, nextPoint, 1 / 3);
+    });
+    return segments.map(function (p, i) {
+        var label = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
+        return {
+            segment: p,
+            handleIn: handleIns[i],
+            handleOut: handleOuts[i],
+            label: label,
+            position: i,
+        };
     });
 }
 function newOctagonRing(topLeft, center) {
@@ -10797,16 +10818,25 @@ function run$10() {
 //# sourceMappingURL=oct-to-circle-with-dummies.js.map
 
 function run$11() {
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        fromData: newOctagonDataWithHandles([3, 3], [6, 6]),
+        toData: newCircleDataWithDummyPoints([13, 1], [18, 6]),
+    });
+}
+//# sourceMappingURL=oct-with-handles-to-circle-with-dummies.js.map
+
+function run$12() {
     runShapeToShapeMorph({
         viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newOctagonData([3, 3], [6, 6]),
+        fromData: newOctagonDataWithHandles([3, 3], [6, 6]),
         toData: newCircleDataWithDummyPoints([13, 1], [18, 6]),
         hideLabels: true,
     });
 }
-//# sourceMappingURL=oct-to-circle-with-dummies-morph.js.map
+//# sourceMappingURL=oct-with-handles-to-circle-with-dummies-morph.js.map
 
-function run$12() {
+function run$13() {
     runShapeToShapeMorph({
         viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
         fromData: newSquareDataWithDummyPoints([3, 3], [6, 6]),
@@ -10814,20 +10844,21 @@ function run$12() {
         hideLabels: true,
     });
 }
+//# sourceMappingURL=sq-with-dummies-to-oct-morph.js.map
 
-function run$13() {
+function run$14() {
     console.log('asdf');
 }
 //# sourceMappingURL=morph-sq-to-oct-reversed.js.map
 
-function run$14() {
+function run$15() {
     console.log('asdf');
 }
 //# sourceMappingURL=morph-sq-to-oct-shifted.js.map
 
 var options$1 = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
 var pixelRatio = options$1.size / Math.max(options$1.viewportWidth, options$1.viewportHeight);
-function run$15() {
+function run$16() {
     var viewport = create$1(options$1);
     var squareData = newSquareData([3, 3], [6, 6]);
     var octagonData = newOctagonData([13, 1], [18, 6]);
@@ -12063,7 +12094,7 @@ earcut.flatten = function (data) {
     return result;
 };
 
-function run$16() {
+function run$17() {
     var width = 960;
     var height = 500;
     var svg = select('body')
@@ -12100,7 +12131,7 @@ function run$16() {
         }
         svg
             .call(updatePaths, pairs)
-            .selectAll('path')
+            .selectAll('path.state')
             .transition()
             .delay(from.length > 1 ? 0 : 400)
             .duration(2500)
@@ -12110,7 +12141,7 @@ function run$16() {
             if (to.length === 1) {
                 svg
                     .call(updatePaths, to)
-                    .selectAll('path')
+                    .selectAll('path.state')
                     .attr('d', join);
             }
             setTimeout(cb, 0);
@@ -12160,8 +12191,8 @@ function run$16() {
     }
 }
 function updatePaths(selection, pairs) {
-    var paths = selection.selectAll('path').data(pairs);
-    paths.enter().append('path');
+    var paths = selection.selectAll('path.state').data(pairs);
+    paths.enter().append('path.state');
     paths.exit().remove();
 }
 function triangulate(ring, numPieces) {
@@ -12249,7 +12280,7 @@ function getBounds(ring) {
 }
 //# sourceMappingURL=states-multiple-shapes.js.map
 
-function run$17() {
+function run$18() {
     var svg = select('body')
         .append('svg')
         .attrs({ width: 960, height: 500 });
@@ -12306,7 +12337,7 @@ function updateCircles$1(sel) {
 }
 //# sourceMappingURL=states-single-shape.js.map
 
-function run$18() {
+function run$19() {
     var svg = select('body')
         .append('svg')
         .attrs({ width: 960, height: 500 });
@@ -13966,7 +13997,7 @@ var elephant$2 = "\nM450.43,65.291c13.394,0,26.387,7.755,39.017,23.247c12.6,15.4
 var buffalo$1 = "\nM526.991,49.247c17.28,0,39.159,1.076,65.703,3.161c37.488,2.966,61.505,9.949,72.025,20.933\nc5.478,5.518,12.228,16.322,20.221,32.36c8.019,17.345,14.755,29.185,20.234,35.506c4.624-5.894,8.394-9.909,11.373-11.982\nc8.848-6.761,15.35-11.192,19.547-13.265c0,10.946,0.752,17.152,2.242,18.628c1.45,1.451,7.487,2.617,18.006,3.459\nc34.51,2.124,51.803,33.278,51.803,93.515c0,11.373-0.622,24.223-1.891,38.551c-3.355,37.878-12.242,64.253-26.53,78.994\nc-2.552,2.487-9.392,5.116-20.571,7.863c-11.128,2.733-18.201,7.046-21.128,12.94c-3.822,7.178-7.59,21.063-11.36,41.738\nc-3.835,23.59-6.996,38.707-9.495,45.456l-9.496-12.604c-10.933-21.517-19.158-37.489-24.638-48.047\nc-11.387-20.221-22.747-30.74-34.12-31.594c-7.993-0.842-20.416,2.124-37.244,8.834c-12.668,5.493-25.079,10.96-37.294,16.426\nl-32.85,8.886c-11.375,4.612-19.16,13.019-23.382,25.247c-1.671,15.156-1.258,26.75,1.27,34.743\nc1.243,3.782,5.79,8.563,13.575,14.223c7.798,5.675,11.71,10.221,11.71,13.577c0,7.603-5.673,13.926-17.06,18.938\nc-9.301,4.235-18.369,6.322-27.177,6.322c-14.315-3.77-24.64-7.565-30.987-11.335c-5.039-1.698-7.538-7.605-7.538-17.695\nc0-4.637,0.375-11.373,1.23-20.248c0.842-8.796,1.269-15.584,1.269-20.221c0-5.466-0.427-10.182-1.269-14.184\nc-0.854-4.003-5.363-6.866-13.562-8.562c-8.214-1.658-12.98-3.536-14.211-5.661c-7.164-12.216-9.703-32.657-7.578-61.285h-79.603\nc-26.154-0.454-51.829-9.47-77.076-27.177c-2.979,4.637-8.874,9.145-17.695,13.614c-8.874,4.392-13.692,7.682-14.548,9.755\nc-0.856,4.21-4.21,10.454-10.104,18.628c-5.895,8.264-9.055,14.896-9.483,19.897c-3.355,33.318,19.82,71.416,69.524,114.37\nc-16.853,6.749-32.889,10.105-48.046,10.105c-3.77,0-7.605-0.195-11.373-0.609c0-3.368,0.22-9.872,0.647-19.6\nc0.427-7.979,0-13.874-1.269-17.656c-3.783-11.413-11.789-25.714-24.017-43.008c-13.459-18.913-22.099-32.812-25.881-41.673\nl6.943-45.508l-15.156,14.509c-8.433,13.886-17.087,27.748-25.908,41.633c-8.446,15.972-13.265,31.324-14.548,46.013\nc-1.683,22.281,12.009,46.039,41.077,71.247c-1.697-0.415-4.612,0.117-8.834,1.593c-4.21,1.464-6.322,2.811-6.322,4.08\nc-22.306-3.782-35.584-7.798-39.795-11.995c-5.48-7.538-9.068-18.693-10.751-33.421c-0.44-12.19-0.856-24.405-1.269-36.634\nc-0.44-5.466-1.244-15.727-2.527-30.935c-1.269-13.42-1.878-23.938-1.878-31.529c0-7.565,5.234-17.981,15.779-31.246\nc10.519-13.265,16.646-22.591,18.356-28.071c1.231-5.48-1.076-19.133-6.983-41.026c-7.19-25.649-10.726-43.343-10.726-52.981\nc0-5.907,0.816-10.726,2.487-14.534c-5.453,39.6-12.825,65.897-22.073,78.967C74,321.722,51.072,337.682,27.885,337.682\nc-6.749,0-11.607-2.073-14.534-6.322c-3.343-5.001-3.044-10.959,0.958-17.695c3.977-6.762,15.779-12.773,35.378-18.019\nc19.587-5.271,31.479-10.634,35.701-16.114c5.895-8.019,11.375-26.802,16.413-56.299c4.651-25.766,12.424-42.606,23.382-50.624\nc38.332-27.009,78.54-46.712,120.642-59.16c42.113-12.449,73.734-21.634,94.796-27.489\nC410.948,61.501,473.076,49.247,526.991,49.247z\n";
 var circle$3 = "\nM490.1,280.649c0,44.459-36.041,80.5-80.5,80.5s-80.5-36.041-80.5-80.5s36.041-80.5,80.5-80.5\nS490.1,236.19,490.1,280.649z\n";
 var star$1 = "\nM409.6,198.066l26.833,54.369l60,8.719l-43.417,42.321l10.249,59.758L409.6,335.019\nl-53.666,28.214l10.249-59.758l-43.417-42.321l60-8.719L409.6,198.066z\n";
-function run$19() {
+function run$20() {
     var svg = select('body')
         .append('svg')
         .attrs({ width: 820, height: 600 });
@@ -14023,34 +14054,44 @@ function updateCircles$2(sel) {
 //# sourceMappingURL=index.js.map
 
 // Importing with side-effects is necessary to ensure the add-ons are loaded properly.
-var demoMap = new Map([
-    ['/demos/intro-to-path-morphing/sq-to-sq.html', run$2],
-    ['/demos/intro-to-path-morphing/sq-to-sq-morph.html', run$3],
-    ['/demos/intro-to-path-morphing/sq-to-oct.html', run$4],
-    ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct.html', run$5],
-    ['/demos/intro-to-path-morphing/sq-with-dummies-to-oct-morph.html', run$12],
-    ['/demos/intro-to-path-morphing/line-to-curve.html', run$6],
-    ['/demos/intro-to-path-morphing/curve-to-curve.html', run$7],
-    ['/demos/intro-to-path-morphing/curve-to-curve-morph.html', run$8],
-    ['/demos/intro-to-path-morphing/oct-to-circle.html', run$9],
-    ['/demos/intro-to-path-morphing/oct-to-circle-with-dummies.html', run$10],
-    [
-        '/demos/intro-to-path-morphing/oct-to-circle-with-dummies-morph.html',
-        run$11,
-    ],
-    ['/demos/intro-to-path-morphing/shift-octagon-points.html', run$15],
-    ['/demos/intro-to-path-morphing/morph-sq-to-oct-reversed.html', run$13],
-    ['/demos/intro-to-path-morphing/morph-sq-to-oct-shifted.html', run$14],
-    ['/demos/needleman-wunsch/animals-single-shape.html', run$1],
-    ['/demos/needleman-wunsch/add-points-to-animals.html', run],
-    ['/demos/flubber/states-single-shape.html', run$17],
-    ['/demos/flubber/states-multiple-shapes.html', run$16],
-    ['/demos/flubber/texas-to-hawaii.html', run$18],
-    ['/demos/flubber/animals-single-shape.html', run$19],
+var introToPathMorphingMap = new Map([
+    ['?sq-to-sq', run$2],
+    ['?sq-to-sq-morph', run$3],
+    ['?sq-to-oct', run$4],
+    ['?sq-with-dummies-to-oct', run$5],
+    ['?sq-with-dummies-to-oct-morph', run$13],
+    ['?line-to-curve', run$6],
+    ['?curve-to-curve', run$7],
+    ['?curve-to-curve-morph', run$8],
+    ['?oct-to-circle', run$9],
+    ['?oct-to-circle-with-dummies', run$10],
+    ['?oct-with-handles-to-circle-with-dummies', run$11],
+    ['?oct-with-handles-to-circle-with-dummies-morph', run$12],
+    ['?shift-octagon-points', run$16],
+    ['?morph-sq-to-oct-reversed', run$14],
+    ['?morph-sq-to-oct-shifted', run$15],
 ]);
-var demoPath = window.location.pathname.slice(window.location.pathname.indexOf('/demos'));
-if (demoMap.has(demoPath)) {
-    demoMap.get(demoPath)();
+var flubberMap = new Map([
+    ['?states-single-shape', run$18],
+    ['?states-multiple-shapes', run$17],
+    ['?texas-to-hawaii', run$19],
+    ['?animals-single-shape', run$20],
+]);
+var needlemanWunschMap = new Map([
+    ['?animals-single-shape', run$1],
+    ['?add-points-to-animals', run],
+]);
+var sectionMap = new Map([
+    ['/demos/intro-to-path-morphing/index.html', introToPathMorphingMap],
+    ['/demos/flubber/index.html', flubberMap],
+    ['/demos/needleman-wunsch/index.html', needlemanWunschMap],
+]);
+var sectionPath = window.location.pathname.slice(window.location.pathname.indexOf('/demos'));
+if (sectionMap.has(sectionPath)) {
+    var demoMap = sectionMap.get(sectionPath);
+    if (demoMap.has(window.location.search)) {
+        demoMap.get(window.location.search)();
+    }
 }
 //# sourceMappingURL=main.js.map
 

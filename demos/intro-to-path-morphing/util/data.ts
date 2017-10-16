@@ -1,4 +1,4 @@
-import { Point } from 'scripts/math';
+import { Point, lerp } from 'scripts/math';
 
 export interface Datum {
   readonly segment: Point;
@@ -99,6 +99,32 @@ export function newOctagonData(topLeft: Point, center: Point): Datum[] {
   return newOctagonRing(topLeft, center).map((p, i) => {
     const label: Point = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
     return { segment: p, label, position: i };
+  });
+}
+
+export function newOctagonDataWithHandles(topLeft: Point, center: Point): Datum[] {
+  const [tx, ty] = topLeft;
+  const [cx, cy] = center;
+  const sx = (cx - tx) * 2;
+  const sy = (cy - ty) * 2;
+  const segments = newOctagonRing(topLeft, center);
+  const handleIns = segments.map((point, i) => {
+    const prevPoint = segments[(i + segments.length - 1) % segments.length];
+    return lerp(prevPoint, point, 2 / 3);
+  });
+  const handleOuts = segments.map((point, i) => {
+    const nextPoint = segments[(i + 1) % segments.length];
+    return lerp(point, nextPoint, 1 / 3);
+  });
+  return segments.map((p, i) => {
+    const label: Point = [p[0] + getLabelOffsetX(i), p[1] + getLabelOffsetY(i)];
+    return {
+      segment: p,
+      handleIn: handleIns[i],
+      handleOut: handleOuts[i],
+      label,
+      position: i,
+    };
   });
 }
 
