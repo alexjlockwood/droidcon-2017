@@ -62,6 +62,8 @@ const needlemanWunschMap = new Map<string, () => void>([
 
 const sectionMap = new Map<string, Map<string, () => void>>([
   ['/demos/intro-to-path-morphing/index.html', introToPathMorphingMap],
+  ['/demos/flubber/index.html', flubberMap],
+  ['/demos/needleman-wunsch/index.html', needlemanWunschMap],
 ]);
 
 const sectionPath = window.location.pathname.slice(window.location.pathname.indexOf('/demos'));
