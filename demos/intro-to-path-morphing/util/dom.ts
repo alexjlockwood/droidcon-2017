@@ -46,9 +46,7 @@ function lineHandleAttrs(
     y2: d => d.segment[1],
     fill: 'none',
     stroke: (d, i) =>
-      d3.interpolateCool(
-        ((i + (type === 'handleIn' ? 0 : 1)) % numSegments) / numSegments * 0.7 + 0.15,
-      ),
+      interpolateColor((i + (type === 'handleIn' ? 0 : 1)) % numSegments, numSegments),
     'stroke-width': 3,
     'vector-effect': 'non-scaling-stroke',
   });
@@ -75,9 +73,7 @@ function circleHandleAttrs(
     cy: d => (d[type] || d.segment)[1],
     r: () => 0.1,
     fill: (d, i) =>
-      d3.interpolateCool(
-        ((i + (type === 'handleIn' ? 0 : 1)) % numSegments) / numSegments * 0.7 + 0.15,
-      ),
+      interpolateColor((i + (type === 'handleIn' ? 0 : 1)) % numSegments, numSegments),
     'stroke-width': 2,
     'vector-effect': 'non-scaling-stroke',
   });
@@ -91,7 +87,7 @@ export function circleSegmentAttrs(selection: DataSelection<Datum> | DataTransit
     cx: d => d.segment[0],
     cy: d => d.segment[1],
     r: () => 0.2,
-    fill: (d, i) => d3.interpolateCool(i / dataSelection.data().length * 0.7 + 0.15),
+    fill: (d, i) => interpolateColor(i, dataSelection.data().length),
     'stroke-width': 2,
     'vector-effect': 'non-scaling-stroke',
   });
@@ -129,4 +125,9 @@ export function toPathDataAttr(selection: DataSelection<Datum[]> | DataTransitio
 
 function isDataTransition<T>(s: DataSelection<T> | DataTransition<T>): s is DataTransition<T> {
   return 'selection' in s;
+}
+
+function interpolateColor(index: number, length: number) {
+  index = (index + length) % length;
+  return d3.interpolateCool(index / length * 0.7 + 0.15);
 }

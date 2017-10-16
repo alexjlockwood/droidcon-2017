@@ -104,7 +104,7 @@ function update(options: Options, container: DataSelection, data: Datum[]) {
   if (!options.hideLabels) {
     labels
       .transition(t)
-      .text(d => d.position + 1)
+      .text(d => d.labelText)
       .call(textLabelAttrs, pixelRatio);
   }
 
@@ -135,7 +135,7 @@ function update(options: Options, container: DataSelection, data: Datum[]) {
     labels
       .enter()
       .append('text.label')
-      .text(d => d.position + 1)
+      .text(d => d.labelText)
       .call(textLabelAttrs, pixelRatio);
   }
 }

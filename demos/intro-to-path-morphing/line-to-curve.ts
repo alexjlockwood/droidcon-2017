@@ -1,8 +1,8 @@
 import { newCurveData, newLineData } from './util/data';
 
-import { runShapeToShape } from './util/demo';
+import { runShapeToShape } from './util/shape-to-shape';
 
-export function run() {
+export function runLineToCurve() {
   runShapeToShape({
     viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
     fromData: newLineData([3, 3], [6, 6]),
