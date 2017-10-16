@@ -45,10 +45,18 @@ export function runSqWithDummyPointsToOctMorph() {
 }
 
 export function runSqWithDummyPointsToReversedOct() {
+  const origToData = newOctagonData([13, 1], [18, 6]);
+  const reversedToData = reverseData(origToData).map((d, i) => {
+    const position = d.position === 0 ? 0 : origToData.length - 1 - (i - 1);
+    return Object.assign({}, d, {
+      position: position,
+      labelText: (i + 1).toString(),
+    });
+  });
   runShapeToShape({
     viewportOptions,
     fromData: newSquareDataWithDummyPoints([3, 3], [6, 6]),
-    toData: reverseData(newOctagonData([13, 1], [18, 6])),
+    toData: reversedToData,
   });
 }
 
@@ -85,8 +93,9 @@ export function runSqWithDummyPointsToShiftedOct() {
     });
   });
   const origToData = newOctagonData([13, 1], [18, 6]);
-  const shiftedToData = shiftData(origToData, -numShifts).map(d => {
+  const shiftedToData = shiftData(origToData, numShifts).map(d => {
     return Object.assign({}, d, {
+      labelText: (floorMod(d.position + numShifts, origToData.length) + 1).toString(),
       position: floorMod(d.position - numShifts, origToData.length),
     });
   });
