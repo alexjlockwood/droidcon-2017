@@ -1,7 +1,7 @@
 import * as d3 from 'lib/d3';
 
-import { AutoAwesome } from './util';
-import { Command } from 'scripts/paths';
+import { AutoAwesome, Command } from 'scripts/paths';
+
 import { DataSelection } from 'scripts/types';
 import { Point } from 'scripts/math';
 
