@@ -10886,11 +10886,10 @@ function curveToCurve(shouldMorph) {
         viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
         fromData: newCurveData([3, 3], [6, 6]),
         toData: newCurveData([13, 1], [18, 6]),
-        hideLabels: shouldMorph,
+        hideLabels: true,
         strokeDashArray: 15,
     });
 }
-//# sourceMappingURL=curve-to-curve.js.map
 
 function runOctToCircle() {
     runShapeToShape({
@@ -10922,6 +10921,7 @@ function octWithHandlesToCircleWithDummyPoints(shouldMorph) {
         hideLabels: shouldMorph,
     });
 }
+//# sourceMappingURL=oct-to-circle.js.map
 
 //# sourceMappingURL=index.js.map
 
