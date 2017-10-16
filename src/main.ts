@@ -10,14 +10,12 @@ import {
   runCurveToCurve,
   runCurveToCurveMorph,
   runLineToCurve,
-  runMorphSquareToOctagonReversed,
-  runMorphSquareToOctagonShifted,
   runOctToCircle,
   runOctToCircleWithDummyPoints,
   runOctWithHandlesToCircleWithDummyPoints,
   runOctWithHandlesToCircleWithDummyPointsMorph,
-  runShiftOctagonPoints,
   runSqToOct,
+  runSqToOctMorph,
   runSqToSq,
   runSqToSqMorph,
   runSqWithDummiesToOct,
@@ -34,6 +32,7 @@ const introToPathMorphingMap = new Map<string, () => void>([
   ['?sq-to-sq', runSqToSq],
   ['?sq-to-sq-morph', runSqToSqMorph],
   ['?sq-to-oct', runSqToOct],
+  ['?sq-to-oct-morph', runSqToOctMorph],
   ['?sq-with-dummies-to-oct', runSqWithDummiesToOct],
   ['?sq-with-dummies-to-oct-morph', runSqWithDummiesToOctMorph],
   ['?line-to-curve', runLineToCurve],
@@ -43,9 +42,6 @@ const introToPathMorphingMap = new Map<string, () => void>([
   ['?oct-to-circle-with-dummies', runOctToCircleWithDummyPoints],
   ['?oct-with-handles-to-circle-with-dummies', runOctWithHandlesToCircleWithDummyPoints],
   ['?oct-with-handles-to-circle-with-dummies-morph', runOctWithHandlesToCircleWithDummyPointsMorph],
-  ['?shift-octagon-points', runShiftOctagonPoints],
-  ['?morph-sq-to-oct-reversed', runMorphSquareToOctagonReversed],
-  ['?morph-sq-to-oct-shifted', runMorphSquareToOctagonShifted],
 ]);
 
 const flubberMap = new Map<string, () => void>([
