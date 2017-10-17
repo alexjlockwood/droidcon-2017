@@ -35,6 +35,34 @@ export function newLineData(topLeft: Point, center: Point): Datum[] {
   });
 }
 
+export function newLineDataWithHandles(topLeft: Point, center: Point): Datum[] {
+  const [tx, ty] = topLeft;
+  const [cx, cy] = center;
+  const sx = (cx - tx) * 2;
+  const sy = (cy - ty) * 2;
+  const segments: Point[] = [[0, 1], [1, 0], [0, 1]].map(
+    ([x, y]) => [x * sx + tx, y * sy + ty] as Point,
+  );
+  const handleIns = segments.map((point, i) => {
+    const prevPoint = segments[(i + segments.length - 1) % segments.length];
+    return lerp(prevPoint, point, 2 / 3);
+  });
+  const handleOuts = segments.map((point, i) => {
+    const nextPoint = segments[(i + 1) % segments.length];
+    return lerp(point, nextPoint, 1 / 3);
+  });
+  return segments.map((p, i) => {
+    return {
+      segment: p,
+      handleIn: handleIns[i],
+      handleOut: handleOuts[i],
+      label: p,
+      labelText: (i + 1).toString(),
+      position: i,
+    };
+  });
+}
+
 export function newCurveData(topLeft: Point, center: Point): Datum[] {
   const [tx, ty] = topLeft;
   const [cx, cy] = center;

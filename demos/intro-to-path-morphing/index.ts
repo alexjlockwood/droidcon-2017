@@ -9,8 +9,16 @@ export {
   runSqWithDummyPointsToShiftedOct,
   runSqWithDummyPointsToShiftedOctMorph,
 } from './sq-to-oct';
-export { runLineToCurve } from './line-to-curve';
-export { runCurveToCurve, runCurveToCurveMorph } from './curve-to-curve';
+export {
+  runLineToCurve,
+  runLineWithHandlesToCurve,
+  runLineWithHandlesToCurveMorph,
+} from './line-to-curve';
+export {
+  runCurveToCurve,
+  runCurveWithHandlesToCurveWithHandles,
+  runCurveWithHandlesToCurveWithHandlesMorph,
+} from './curve-to-curve';
 export {
   runOctToCircle,
   runOctToCircleWithDummyPoints,

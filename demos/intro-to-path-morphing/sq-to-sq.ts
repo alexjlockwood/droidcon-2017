@@ -1,4 +1,4 @@
-import { runShapeToShape, runShapeToShapeMorph } from './util/shape-to-shape';
+import { ShapeOptions, runShapeToShape } from './util/shape-to-shape';
 
 import { newSquareData } from './util/data';
 
@@ -11,11 +11,24 @@ export function runSqToSqMorph() {
 }
 
 function sqToSq(shouldMorph: boolean) {
-  const fn = shouldMorph ? runShapeToShapeMorph : runShapeToShape;
-  fn({
-    viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-    fromData: newSquareData([3, 3], [6, 6]),
-    toData: newSquareData([15, 3], [18, 6]),
+  const baseShapeOptions: Partial<ShapeOptions> = {
     hideLabels: shouldMorph,
+    stroke: '#d8d8d8',
+  };
+  runShapeToShape({
+    viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+    from: Object.assign({}, baseShapeOptions, {
+      data: newSquareData([3, 3], [6, 6]),
+      fill: shouldMorph ? '#d8d8d8' : 'none',
+      stroke: shouldMorph ? '#000' : '#d8d8d8',
+      strokeDasharray: shouldMorph ? 0 : 10,
+    }),
+    to: Object.assign({}, baseShapeOptions, {
+      data: newSquareData([15, 3], [18, 6]),
+      fill: 'none',
+      stroke: '#d8d8d8',
+      strokeDasharray: 10,
+    }),
+    shouldMorph,
   });
 }

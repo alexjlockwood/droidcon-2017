@@ -5243,7 +5243,7 @@ function create$1(options) {
         viewport
             .append('g')
             .selectAll('line.grid')
-            .data(range(viewportWidth + 1).map(function (x) { return [[x, 0], [x, viewportHeight]]; }).concat(range(viewportHeight + 1).map(function (y) { return [[0, y], [viewportWidth, y]]; })))
+            .data(range(1, viewportWidth).map(function (x) { return [[x, 0], [x, viewportHeight]]; }).concat(range(1, viewportHeight).map(function (y) { return [[0, y], [viewportWidth, y]]; })))
             .enter()
             .append('line.grid')
             .attrs({
@@ -10297,31 +10297,28 @@ function updateCircles(sel) {
 
 //# sourceMappingURL=index.js.map
 
-function pathFilledAttrs(selection) {
+function pathAttrs(selection, attrs) {
+    if (attrs === void 0) { attrs = {}; }
+    var fill = 'fill' in attrs ? attrs.fill : 'none';
+    var stroke = 'stroke' in attrs ? attrs.stroke : 'none';
+    var strokeWidth = 'strokeWidth' in attrs ? attrs.strokeWidth : 3;
+    var strokeDasharray = 'strokeDasharray' in attrs ? attrs.strokeDasharray : 0;
     selection.attrs({
-        fill: '#d8d8d8',
-        stroke: '#d8d8d8',
-        'stroke-width': 3,
+        fill: fill,
+        stroke: stroke,
+        'stroke-width': strokeWidth,
+        'stroke-dasharray': strokeDasharray,
         'vector-effect': 'non-scaling-stroke',
     });
 }
-function pathOutlinedAttrs(selection, strokeDashArray) {
-    if (strokeDashArray === void 0) { strokeDashArray = 10; }
-    selection.attrs({
-        fill: 'none',
-        stroke: '#d8d8d8',
-        'stroke-width': 3,
-        'stroke-dasharray': strokeDashArray,
-        'vector-effect': 'non-scaling-stroke',
-    });
+function lineHandleInAttrs(selection, colorAttrs) {
+    lineHandleAttrs(selection, colorAttrs, 'handleIn');
 }
-function lineHandleInAttrs(selection) {
-    lineHandleAttrs(selection, 'handleIn');
+function lineHandleOutAttrs(selection, colorAttrs) {
+    lineHandleAttrs(selection, colorAttrs, 'handleOut');
 }
-function lineHandleOutAttrs(selection) {
-    lineHandleAttrs(selection, 'handleOut');
-}
-function lineHandleAttrs(selection, type) {
+function lineHandleAttrs(selection, colorAttrs, type) {
+    var interpolateColorFn = 'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor;
     var dataSelection = isDataTransition(selection)
         ? selection.selection()
         : selection;
@@ -10333,19 +10330,20 @@ function lineHandleAttrs(selection, type) {
         y2: function (d) { return d.segment[1]; },
         fill: 'none',
         stroke: function (d, i) {
-            return interpolateColor((i + (type === 'handleIn' ? 0 : 1)) % numSegments, numSegments);
+            return interpolateColorFn((i + (type === 'handleIn' ? 0 : 1)) % numSegments, numSegments);
         },
         'stroke-width': 3,
         'vector-effect': 'non-scaling-stroke',
     });
 }
-function circleHandleInAttrs(selection) {
-    circleHandleAttrs(selection, 'handleIn');
+function circleHandleInAttrs(selection, colorAttrs) {
+    circleHandleAttrs(selection, colorAttrs, 'handleIn');
 }
-function circleHandleOutAttrs(selection) {
-    circleHandleAttrs(selection, 'handleOut');
+function circleHandleOutAttrs(selection, colorAttrs) {
+    circleHandleAttrs(selection, colorAttrs, 'handleOut');
 }
-function circleHandleAttrs(selection, type) {
+function circleHandleAttrs(selection, colorAttrs, type) {
+    var interpolateColorFn = 'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor;
     var dataSelection = isDataTransition(selection)
         ? selection.selection()
         : selection;
@@ -10355,22 +10353,22 @@ function circleHandleAttrs(selection, type) {
         cy: function (d) { return (d[type] || d.segment)[1]; },
         r: function () { return 0.1; },
         fill: function (d, i) {
-            return interpolateColor((i + (type === 'handleIn' ? 0 : 1)) % numSegments, numSegments);
+            return interpolateColorFn((i + (type === 'handleIn' ? 0 : 1)) % numSegments, numSegments);
         },
-        'stroke-width': 2,
-        'vector-effect': 'non-scaling-stroke',
     });
 }
-function circleSegmentAttrs(selection) {
+function circleSegmentAttrs(selection, colorAttrs) {
+    var interpolateColorFn = 'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor;
     var dataSelection = isDataTransition(selection)
         ? selection.selection()
         : selection;
     selection.attrs({
         cx: function (d) { return d.segment[0]; },
         cy: function (d) { return d.segment[1]; },
-        r: function () { return 0.2; },
-        fill: function (d, i) { return interpolateColor(i, dataSelection.data().length); },
-        'stroke-width': 2,
+        r: function () { return 0.225; },
+        fill: function (d, i) { return interpolateColorFn(i, dataSelection.data().length); },
+        stroke: '#000',
+        'stroke-width': 2.25,
         'vector-effect': 'non-scaling-stroke',
     });
 }
@@ -10389,6 +10387,9 @@ function textLabelAttrs(selection, pixelRatio) {
 function toPathDataAttr(selection) {
     selection.attrs({
         d: function (data) {
+            if (data.every(function (d) { return !d.handleIn && !d.handleOut; })) {
+                return "M " + data[0].segment + " " + data.map(function (d) { return d.segment; }) + 'Z';
+            }
             var cmds = data
                 .map(function (_a, i) {
                 var currSegment = _a.segment, currH2 = _a.handleOut;
@@ -10411,34 +10412,24 @@ function interpolateColor(index, length) {
 //# sourceMappingURL=dom.js.map
 
 function runShapeToShape(options) {
-    var vpOpts = options.viewportOptions, fromData = options.fromData, toData = options.toData, strokeDashArray = options.strokeDashArray;
-    var viewport = create$1(vpOpts);
-    var fromContainer = viewport.append('g.from');
-    var fromPath = fromContainer.append('path.shape');
-    fromPath.datum(fromData).call(pathOutlinedAttrs, strokeDashArray);
-    var toContainer = viewport.append('g.to');
-    var toPath = toContainer.append('path.shape');
-    toPath.datum(toData).call(pathOutlinedAttrs, strokeDashArray);
-    // The initial display.
-    update(options, fromContainer, fromData);
-    update(options, toContainer, toData);
-}
-function runShapeToShapeMorph(options) {
-    var vpOpts = options.viewportOptions, fromData = options.fromData, toData = options.toData, strokeDashArray = options.strokeDashArray;
+    var vpOpts = options.viewportOptions, from = options.from, to = options.to;
     var viewport = create$1(vpOpts);
     var toContainer = viewport.append('g.to');
-    var toPath = toContainer.append('path.shape').call(pathOutlinedAttrs, strokeDashArray);
+    toContainer.append('path.shape').call(pathAttrs, to);
     var fromContainer = viewport.append('g.from');
-    var fromPath = fromContainer.append('path.shape').call(pathFilledAttrs, strokeDashArray);
+    fromContainer.append('path.shape').call(pathAttrs, from);
     // The initial display.
-    update(options, fromContainer, fromData);
-    update(options, toContainer, toData);
-    // Morph the shapes.
-    update(options, fromContainer, toData);
+    update(fromContainer, options, from);
+    update(toContainer, options, to);
+    if (options.shouldMorph) {
+        // Morph the shapes.
+        update(fromContainer, options, to);
+    }
 }
-function update(options, container, data) {
+function update(container, options, shapeOptions) {
     var vpOpts = options.viewportOptions;
     var pixelRatio = vpOpts.size / Math.max(vpOpts.viewportWidth, vpOpts.viewportHeight);
+    var data = shapeOptions.data;
     var t = transition(undefined).duration(2000);
     container
         .select('path.shape')
@@ -10454,54 +10445,54 @@ function update(options, container, data) {
     var segments = container.selectAll('circle.segment').data(data, keyFn);
     var labels = container.selectAll('text.label').data(data, keyFn);
     // EXIT old elements not present in new data.
-    if (!options.hideHandles) {
+    if (!shapeOptions.hideHandles) {
         handleInLines.exit().remove();
         handleOutLines.exit().remove();
         handleInSegments.exit().remove();
         handleOutSegments.exit().remove();
     }
     segments.exit().remove();
-    if (!options.hideLabels) {
+    if (!shapeOptions.hideLabels) {
         labels.exit().remove();
     }
     // UPDATE old elements present in new data.
-    if (!options.hideHandles) {
-        handleInLines.transition(t).call(lineHandleInAttrs);
-        handleOutLines.transition(t).call(lineHandleOutAttrs);
-        handleInSegments.transition(t).call(circleHandleInAttrs);
-        handleOutSegments.transition(t).call(circleHandleOutAttrs);
+    if (!shapeOptions.hideHandles) {
+        handleInLines.transition(t).call(lineHandleInAttrs, shapeOptions);
+        handleOutLines.transition(t).call(lineHandleOutAttrs, shapeOptions);
+        handleInSegments.transition(t).call(circleHandleInAttrs, shapeOptions);
+        handleOutSegments.transition(t).call(circleHandleOutAttrs, shapeOptions);
     }
-    segments.transition(t).call(circleSegmentAttrs);
-    if (!options.hideLabels) {
+    segments.transition(t).call(circleSegmentAttrs, shapeOptions);
+    if (!shapeOptions.hideLabels) {
         labels
             .transition(t)
             .text(function (d) { return d.labelText; })
             .call(textLabelAttrs, pixelRatio);
     }
     // ENTER new elements present in new data.
-    if (!options.hideHandles) {
+    if (!shapeOptions.hideHandles) {
         handleInLines
             .enter()
             .append('line.handleIn')
-            .call(lineHandleInAttrs);
+            .call(lineHandleInAttrs, shapeOptions);
         handleOutLines
             .enter()
             .append('line.handleOut')
-            .call(lineHandleOutAttrs);
+            .call(lineHandleOutAttrs, shapeOptions);
         handleInSegments
             .enter()
             .append('circle.handleIn')
-            .call(circleHandleInAttrs);
+            .call(circleHandleInAttrs, shapeOptions);
         handleOutSegments
             .enter()
             .append('circle.handleOut')
-            .call(circleHandleOutAttrs);
+            .call(circleHandleOutAttrs, shapeOptions);
     }
     segments
         .enter()
         .append('circle.segment')
-        .call(circleSegmentAttrs);
-    if (!options.hideLabels) {
+        .call(circleSegmentAttrs, shapeOptions);
+    if (!shapeOptions.hideLabels) {
         labels
             .enter()
             .append('text.label')
@@ -10527,6 +10518,34 @@ function newLineData(topLeft, center) {
     var handleOuts = [[0, 1], [1, 0], [0, 1]].map(function (_a) {
         var x = _a[0], y = _a[1];
         return [x * sx + tx, y * sy + ty];
+    });
+    return segments.map(function (p, i) {
+        return {
+            segment: p,
+            handleIn: handleIns[i],
+            handleOut: handleOuts[i],
+            label: p,
+            labelText: (i + 1).toString(),
+            position: i,
+        };
+    });
+}
+function newLineDataWithHandles(topLeft, center) {
+    var tx = topLeft[0], ty = topLeft[1];
+    var cx = center[0], cy = center[1];
+    var sx = (cx - tx) * 2;
+    var sy = (cy - ty) * 2;
+    var segments = [[0, 1], [1, 0], [0, 1]].map(function (_a) {
+        var x = _a[0], y = _a[1];
+        return [x * sx + tx, y * sy + ty];
+    });
+    var handleIns = segments.map(function (point, i) {
+        var prevPoint = segments[(i + segments.length - 1) % segments.length];
+        return lerp(prevPoint, point, 2 / 3);
+    });
+    var handleOuts = segments.map(function (point, i) {
+        var nextPoint = segments[(i + 1) % segments.length];
+        return lerp(point, nextPoint, 1 / 3);
     });
     return segments.map(function (p, i) {
         return {
@@ -10768,12 +10787,25 @@ function runSqToSqMorph() {
     sqToSq(true);
 }
 function sqToSq(shouldMorph) {
-    var fn = shouldMorph ? runShapeToShapeMorph : runShapeToShape;
-    fn({
-        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newSquareData([3, 3], [6, 6]),
-        toData: newSquareData([15, 3], [18, 6]),
+    var baseShapeOptions = {
         hideLabels: shouldMorph,
+        stroke: '#d8d8d8',
+    };
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        from: Object.assign({}, baseShapeOptions, {
+            data: newSquareData([3, 3], [6, 6]),
+            fill: shouldMorph ? '#d8d8d8' : 'none',
+            stroke: shouldMorph ? '#000' : '#d8d8d8',
+            strokeDasharray: shouldMorph ? 0 : 10,
+        }),
+        to: Object.assign({}, baseShapeOptions, {
+            data: newSquareData([15, 3], [18, 6]),
+            fill: 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: 10,
+        }),
+        shouldMorph: shouldMorph,
     });
 }
 //# sourceMappingURL=sq-to-sq.js.map
@@ -10786,12 +10818,32 @@ function runSqToOctMorph() {
     sqToOct(true);
 }
 function sqToOct(shouldMorph) {
-    var fn = shouldMorph ? runShapeToShapeMorph : runShapeToShape;
-    fn({
+    runShapeToShape({
         viewportOptions: viewportOptions,
-        fromData: newSquareData([3, 3], [6, 6]),
-        toData: newOctagonData([13, 1], [18, 6]),
-        hideLabels: shouldMorph,
+        from: {
+            data: newSquareData([3, 3], [6, 6]),
+            hideLabels: shouldMorph,
+            fill: shouldMorph ? '#d8d8d8' : 'none',
+            stroke: shouldMorph ? '#000' : '#d8d8d8',
+            strokeDasharray: shouldMorph ? 0 : 10,
+            interpolateColor: function (i) {
+                return cool(i / 8 * 0.7 + 0.15);
+            },
+        },
+        to: {
+            data: newOctagonData([13, 1], [18, 6]),
+            hideLabels: shouldMorph,
+            fill: 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: 10,
+            interpolateColor: function (i) {
+                if (i >= 4) {
+                    return '#F44336';
+                }
+                return cool(i / 8 * 0.7 + 0.15);
+            },
+        },
+        shouldMorph: shouldMorph,
     });
 }
 function runSqWithDummyPointsToOct() {
@@ -10801,23 +10853,48 @@ function runSqWithDummyPointsToOctMorph() {
     sqWithDummyPointsToOct(true);
 }
 function sqWithDummyPointsToOct(shouldMorph) {
-    runShapeToShapeMorph({
+    runShapeToShape({
         viewportOptions: viewportOptions,
-        fromData: newSquareDataWithDummyPoints([3, 3], [6, 6]),
-        toData: newOctagonData([13, 1], [18, 6]),
-        hideLabels: shouldMorph,
+        from: {
+            data: newSquareDataWithDummyPoints([3, 3], [6, 6]),
+            hideLabels: shouldMorph,
+            fill: shouldMorph ? '#d8d8d8' : 'none',
+            stroke: shouldMorph ? '#000' : '#d8d8d8',
+            strokeDasharray: shouldMorph ? 0 : 10,
+        },
+        to: {
+            data: newOctagonData([13, 1], [18, 6]),
+            hideLabels: shouldMorph,
+            fill: 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: 10,
+        },
+        shouldMorph: shouldMorph,
     });
 }
 function runSqWithDummyPointsToReversedOct() {
+    var shouldMorph = false;
     runShapeToShape({
         viewportOptions: viewportOptions,
-        fromData: newSquareDataWithDummyPoints([3, 3], [6, 6]),
-        toData: reverseData(newOctagonData([13, 1], [18, 6])).map(function (d, i) {
-            return Object.assign({}, d, { labelText: (i + 1).toString() });
-        }),
+        from: {
+            data: newSquareDataWithDummyPoints([3, 3], [6, 6]),
+            fill: shouldMorph ? '#d8d8d8' : 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: shouldMorph ? 0 : 10,
+        },
+        to: {
+            data: reverseData(newOctagonData([13, 1], [18, 6])).map(function (d, i) {
+                return Object.assign({}, d, { labelText: (i + 1).toString() });
+            }),
+            fill: 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: 10,
+        },
+        shouldMorph: false,
     });
 }
 function runSqWithDummyPointsToReversedOctMorph() {
+    var shouldMorph = true;
     var origFromData = newSquareDataWithDummyPoints([3, 3], [6, 6]);
     var reversedFromData = origFromData.map(function (d, i) {
         var position = d.position === 0 ? 0 : origFromData.length - 1 - (i - 1);
@@ -10827,27 +10904,53 @@ function runSqWithDummyPointsToReversedOctMorph() {
         var position = d.position;
         return Object.assign({}, d, { position: position, labelText: (position + 1).toString() });
     });
-    runShapeToShapeMorph({
+    runShapeToShape({
         viewportOptions: viewportOptions,
-        fromData: reversedFromData,
-        toData: reversedToData,
-        hideLabels: true,
+        from: {
+            data: reversedFromData,
+            hideLabels: true,
+            fill: shouldMorph ? '#d8d8d8' : 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: shouldMorph ? 0 : 10,
+        },
+        to: {
+            data: reversedToData,
+            hideLabels: true,
+            fill: 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: 10,
+        },
+        shouldMorph: true,
     });
 }
 function runSqWithDummyPointsToShiftedOct() {
+    var numShifts = -1;
+    var shouldMorph = false;
     var origToData = newOctagonData([13, 1], [18, 6]);
-    var shiftedToData = shiftData(origToData, 1).map(function (d) {
+    var shiftedToData = shiftData(origToData, numShifts).map(function (d) {
         return Object.assign({}, d, {
-            labelText: (floorMod(d.position + 1, origToData.length) + 1).toString(),
+            labelText: (floorMod(d.position + numShifts, origToData.length) + 1).toString(),
         });
     });
     runShapeToShape({
         viewportOptions: viewportOptions,
-        fromData: newSquareDataWithDummyPoints([3, 3], [6, 6]),
-        toData: shiftedToData,
+        from: {
+            data: newSquareDataWithDummyPoints([3, 3], [6, 6]),
+            fill: shouldMorph ? '#d8d8d8' : 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: shouldMorph ? 0 : 10,
+        },
+        to: {
+            data: shiftedToData,
+            fill: 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: 10,
+        },
+        shouldMorph: false,
     });
 }
 function runSqWithDummyPointsToShiftedOctMorph() {
+    var shouldMorph = true;
     var numShifts = -1;
     var origFromData = newSquareDataWithDummyPoints([3, 3], [6, 6]);
     var shiftedFromData = origFromData.map(function (d, i) {
@@ -10855,55 +10958,154 @@ function runSqWithDummyPointsToShiftedOctMorph() {
             position: floorMod(d.position - numShifts, origFromData.length),
         });
     });
-    runShapeToShapeMorph({
+    runShapeToShape({
         viewportOptions: viewportOptions,
-        fromData: shiftedFromData,
-        toData: shiftData(newOctagonData([13, 1], [18, 6]), numShifts),
-        hideLabels: true,
+        from: {
+            data: shiftedFromData,
+            hideLabels: true,
+            fill: shouldMorph ? '#d8d8d8' : 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: shouldMorph ? 0 : 10,
+        },
+        to: {
+            data: shiftData(newOctagonData([13, 1], [18, 6]), numShifts),
+            hideLabels: true,
+            fill: 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: 10,
+        },
+        shouldMorph: true,
     });
 }
-//# sourceMappingURL=sq-to-oct.js.map
 
 function runLineToCurve() {
     runShapeToShape({
         viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newLineData([3, 3], [6, 6]),
-        toData: newCurveData([13, 1], [18, 6]),
-        strokeDashArray: 15,
+        from: {
+            data: newLineData([3, 3], [6, 6]),
+            hideLabels: true,
+            stroke: '#d8d8d8',
+            interpolateColor: function () { return '#F44336'; },
+        },
+        to: {
+            data: newCurveData([13, 1], [18, 6]),
+            hideLabels: true,
+            stroke: '#d8d8d8',
+            interpolateColor: function () { return '#26A6DB'; },
+        },
+        shouldMorph: false,
+    });
+}
+function runLineWithHandlesToCurve() {
+    lineWithHandlesToCurve(false);
+}
+function runLineWithHandlesToCurveMorph() {
+    lineWithHandlesToCurve(true);
+}
+function lineWithHandlesToCurve(shouldMorph) {
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        from: {
+            data: newLineDataWithHandles([3, 3], [6, 6]),
+            hideLabels: true,
+            stroke: '#d8d8d8',
+            interpolateColor: function () { return '#26A6DB'; },
+        },
+        to: {
+            data: newCurveData([13, 1], [18, 6]),
+            hideLabels: true,
+            stroke: '#d8d8d8',
+            interpolateColor: function () { return '#26A6DB'; },
+        },
+        shouldMorph: shouldMorph,
     });
 }
 //# sourceMappingURL=line-to-curve.js.map
 
 function runCurveToCurve() {
-    curveToCurve(false);
-}
-function runCurveToCurveMorph() {
-    curveToCurve(true);
-}
-function curveToCurve(shouldMorph) {
-    var fn = shouldMorph ? runShapeToShapeMorph : runShapeToShape;
-    fn({
-        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newCurveData([3, 3], [6, 6]),
-        toData: newCurveData([13, 1], [18, 6]),
-        hideLabels: true,
-        strokeDashArray: 15,
-    });
-}
-
-function runOctToCircle() {
     runShapeToShape({
         viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newOctagonData([3, 3], [6, 6]),
-        toData: newCircleData([13, 1], [18, 6]),
-        hideHandles: true,
+        from: {
+            data: newCurveData([3, 3], [6, 6]),
+            hideLabels: true,
+            hideHandles: true,
+            stroke: '#d8d8d8',
+            interpolateColor: function () { return '#26A6DB'; },
+        },
+        to: {
+            data: newCurveData([13, 1], [18, 6]),
+            hideLabels: true,
+            hideHandles: true,
+            stroke: '#d8d8d8',
+            interpolateColor: function () { return '#26A6DB'; },
+        },
+        shouldMorph: false,
+    });
+}
+function runCurveWithHandlesToCurveWithHandles() {
+    curveWithHandlesToCurveWithHandles(false);
+}
+function runCurveWithHandlesToCurveWithHandlesMorph() {
+    curveWithHandlesToCurveWithHandles(true);
+}
+function curveWithHandlesToCurveWithHandles(shouldMorph) {
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        from: {
+            data: newCurveData([3, 3], [6, 6]),
+            hideLabels: true,
+            stroke: '#d8d8d8',
+            interpolateColor: function () { return '#26A6DB'; },
+        },
+        to: {
+            data: newCurveData([13, 1], [18, 6]),
+            hideLabels: true,
+            stroke: '#d8d8d8',
+            interpolateColor: function () { return '#26A6DB'; },
+        },
+        shouldMorph: shouldMorph,
+    });
+}
+//# sourceMappingURL=curve-to-curve.js.map
+
+function runOctToCircle() {
+    var shouldMorph = false;
+    runShapeToShape({
+        viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
+        from: {
+            data: newOctagonData([3, 3], [6, 6]),
+            fill: shouldMorph ? '#d8d8d8' : 'none',
+            stroke: shouldMorph ? '#000' : '#d8d8d8',
+            strokeDasharray: shouldMorph ? 0 : 10,
+            interpolateColor: function () { return '#F44336'; },
+        },
+        to: {
+            data: newCircleData([13, 1], [18, 6]),
+            fill: 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: 10,
+        },
+        shouldMorph: shouldMorph,
     });
 }
 function runOctToCircleWithDummyPoints() {
+    var shouldMorph = false;
     runShapeToShape({
         viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newOctagonData([3, 3], [6, 6]),
-        toData: newCircleDataWithDummyPoints([13, 1], [18, 6]),
+        from: {
+            data: newOctagonData([3, 3], [6, 6]),
+            fill: shouldMorph ? '#d8d8d8' : 'none',
+            stroke: shouldMorph ? '#000' : '#d8d8d8',
+            strokeDasharray: shouldMorph ? 0 : 10,
+            interpolateColor: function () { return '#F44336'; },
+        },
+        to: {
+            data: newCircleDataWithDummyPoints([13, 1], [18, 6]),
+            fill: 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: 10,
+        },
+        shouldMorph: shouldMorph,
     });
 }
 function runOctWithHandlesToCircleWithDummyPoints() {
@@ -10913,12 +11115,23 @@ function runOctWithHandlesToCircleWithDummyPointsMorph() {
     octWithHandlesToCircleWithDummyPoints(true);
 }
 function octWithHandlesToCircleWithDummyPoints(shouldMorph) {
-    var fn = shouldMorph ? runShapeToShapeMorph : runShapeToShape;
-    fn({
+    runShapeToShape({
         viewportOptions: { size: 1440, viewportWidth: 24, viewportHeight: 12 },
-        fromData: newOctagonDataWithHandles([3, 3], [6, 6]),
-        toData: newCircleDataWithDummyPoints([13, 1], [18, 6]),
-        hideLabels: shouldMorph,
+        from: {
+            data: newOctagonDataWithHandles([3, 3], [6, 6]),
+            hideLabels: shouldMorph,
+            fill: shouldMorph ? '#d8d8d8' : 'none',
+            stroke: shouldMorph ? '#000' : '#d8d8d8',
+            strokeDasharray: shouldMorph ? 0 : 10,
+        },
+        to: {
+            data: newCircleDataWithDummyPoints([13, 1], [18, 6]),
+            hideLabels: shouldMorph,
+            fill: 'none',
+            stroke: '#d8d8d8',
+            strokeDasharray: 10,
+        },
+        shouldMorph: shouldMorph,
     });
 }
 //# sourceMappingURL=oct-to-circle.js.map
@@ -14048,8 +14261,11 @@ var introToPathMorphingMap = new Map([
     ['?sq-with-dummy-points-to-shifted-oct', runSqWithDummyPointsToShiftedOct],
     ['?sq-with-dummy-points-to-shifted-oct-morph', runSqWithDummyPointsToShiftedOctMorph],
     ['?line-to-curve', runLineToCurve],
+    ['?line-with-handles-to-curve', runLineWithHandlesToCurve],
+    ['?line-with-handles-to-curve-morph', runLineWithHandlesToCurveMorph],
     ['?curve-to-curve', runCurveToCurve],
-    ['?curve-to-curve-morph', runCurveToCurveMorph],
+    ['?curve-with-handles-to-curve-with-handles', runCurveWithHandlesToCurveWithHandles],
+    ['?curve-with-handles-to-curve-with-handles-morph', runCurveWithHandlesToCurveWithHandlesMorph],
     ['?oct-to-circle', runOctToCircle],
     ['?oct-to-circle-with-dummy-points', runOctToCircleWithDummyPoints],
     ['?oct-with-handles-to-circle-with-dummy-points', runOctWithHandlesToCircleWithDummyPoints],

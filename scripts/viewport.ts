@@ -40,8 +40,8 @@ export function create(options: Options) {
       .append('g')
       .selectAll('line.grid')
       .data([
-        ...d3.range(viewportWidth + 1).map(x => [[x, 0], [x, viewportHeight]] as [Point, Point]),
-        ...d3.range(viewportHeight + 1).map(y => [[0, y], [viewportWidth, y]] as [Point, Point]),
+        ...d3.range(1, viewportWidth).map(x => [[x, 0], [x, viewportHeight]] as [Point, Point]),
+        ...d3.range(1, viewportHeight).map(y => [[0, y], [viewportWidth, y]] as [Point, Point]),
       ])
       .enter()
       .append('line.grid')
