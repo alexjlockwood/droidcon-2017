@@ -4,37 +4,55 @@ import { DataSelection, DataTransition } from 'scripts/types';
 
 import { Datum } from './data';
 
-export function pathFilledAttrs(selection: DataSelection | DataTransition) {
+export interface PathAttrs {
+  readonly fill: string;
+  readonly stroke: string;
+  readonly strokeWidth: number;
+  readonly strokeDasharray: number;
+}
+
+export function pathAttrs(
+  selection: DataSelection | DataTransition,
+  attrs: Partial<PathAttrs> = {},
+) {
+  const fill = 'fill' in attrs ? attrs.fill : 'none';
+  const stroke = 'stroke' in attrs ? attrs.stroke : 'none';
+  const strokeWidth = 'strokeWidth' in attrs ? attrs.strokeWidth : 3;
+  const strokeDasharray = 'strokeDasharray' in attrs ? attrs.strokeDasharray : 0;
   selection.attrs({
-    fill: '#d8d8d8',
-    stroke: '#d8d8d8',
-    'stroke-width': 3,
+    fill,
+    stroke,
+    'stroke-width': strokeWidth,
+    'stroke-dasharray': strokeDasharray,
     'vector-effect': 'non-scaling-stroke',
   });
 }
 
-export function pathOutlinedAttrs(selection: DataSelection | DataTransition, strokeDashArray = 10) {
-  selection.attrs({
-    fill: 'none',
-    stroke: '#d8d8d8',
-    'stroke-width': 3,
-    'stroke-dasharray': strokeDashArray,
-    'vector-effect': 'non-scaling-stroke',
-  });
+export interface ColorAttrs {
+  interpolateColor?: (index: number, length: number) => string;
 }
 
-export function lineHandleInAttrs(selection: DataSelection<Datum> | DataTransition<Datum>) {
-  lineHandleAttrs(selection, 'handleIn');
+export function lineHandleInAttrs(
+  selection: DataSelection<Datum> | DataTransition<Datum>,
+  colorAttrs: ColorAttrs,
+) {
+  lineHandleAttrs(selection, colorAttrs, 'handleIn');
 }
 
-export function lineHandleOutAttrs(selection: DataSelection<Datum> | DataTransition<Datum>) {
-  lineHandleAttrs(selection, 'handleOut');
+export function lineHandleOutAttrs(
+  selection: DataSelection<Datum> | DataTransition<Datum>,
+  colorAttrs: ColorAttrs,
+) {
+  lineHandleAttrs(selection, colorAttrs, 'handleOut');
 }
 
 function lineHandleAttrs(
   selection: DataSelection<Datum> | DataTransition<Datum>,
+  colorAttrs: ColorAttrs,
   type: 'handleIn' | 'handleOut',
 ) {
+  const interpolateColorFn =
+    'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor;
   const dataSelection: DataSelection<Datum> = isDataTransition(selection)
     ? selection.selection()
     : selection;
@@ -46,24 +64,33 @@ function lineHandleAttrs(
     y2: d => d.segment[1],
     fill: 'none',
     stroke: (d, i) =>
-      interpolateColor((i + (type === 'handleIn' ? 0 : 1)) % numSegments, numSegments),
+      interpolateColorFn((i + (type === 'handleIn' ? 0 : 1)) % numSegments, numSegments),
     'stroke-width': 3,
     'vector-effect': 'non-scaling-stroke',
   });
 }
 
-export function circleHandleInAttrs(selection: DataSelection<Datum> | DataTransition<Datum>) {
-  circleHandleAttrs(selection, 'handleIn');
+export function circleHandleInAttrs(
+  selection: DataSelection<Datum> | DataTransition<Datum>,
+  colorAttrs: ColorAttrs,
+) {
+  circleHandleAttrs(selection, colorAttrs, 'handleIn');
 }
 
-export function circleHandleOutAttrs(selection: DataSelection<Datum> | DataTransition<Datum>) {
-  circleHandleAttrs(selection, 'handleOut');
+export function circleHandleOutAttrs(
+  selection: DataSelection<Datum> | DataTransition<Datum>,
+  colorAttrs: ColorAttrs,
+) {
+  circleHandleAttrs(selection, colorAttrs, 'handleOut');
 }
 
 function circleHandleAttrs(
   selection: DataSelection<Datum> | DataTransition<Datum>,
+  colorAttrs: ColorAttrs,
   type: 'handleIn' | 'handleOut',
 ) {
+  const interpolateColorFn =
+    'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor;
   const dataSelection: DataSelection<Datum> = isDataTransition(selection)
     ? selection.selection()
     : selection;
@@ -73,22 +100,26 @@ function circleHandleAttrs(
     cy: d => (d[type] || d.segment)[1],
     r: () => 0.1,
     fill: (d, i) =>
-      interpolateColor((i + (type === 'handleIn' ? 0 : 1)) % numSegments, numSegments),
-    'stroke-width': 2,
-    'vector-effect': 'non-scaling-stroke',
+      interpolateColorFn((i + (type === 'handleIn' ? 0 : 1)) % numSegments, numSegments),
   });
 }
 
-export function circleSegmentAttrs(selection: DataSelection<Datum> | DataTransition<Datum>) {
+export function circleSegmentAttrs(
+  selection: DataSelection<Datum> | DataTransition<Datum>,
+  colorAttrs: ColorAttrs,
+) {
+  const interpolateColorFn =
+    'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor;
   const dataSelection: DataSelection<Datum> = isDataTransition(selection)
     ? selection.selection()
     : selection;
   selection.attrs({
     cx: d => d.segment[0],
     cy: d => d.segment[1],
-    r: () => 0.2,
-    fill: (d, i) => interpolateColor(i, dataSelection.data().length),
-    'stroke-width': 2,
+    r: () => 0.225,
+    fill: (d, i) => interpolateColorFn(i, dataSelection.data().length),
+    stroke: '#000',
+    'stroke-width': 2.25,
     'vector-effect': 'non-scaling-stroke',
   });
 }
@@ -111,6 +142,9 @@ export function textLabelAttrs(
 export function toPathDataAttr(selection: DataSelection<Datum[]> | DataTransition<Datum[]>) {
   selection.attrs({
     d: data => {
+      if (data.every(d => !d.handleIn && !d.handleOut)) {
+        return `M ${data[0].segment} ` + data.map(d => d.segment) + 'Z';
+      }
       const cmds = data
         .map(({ segment: currSegment, handleOut: currH2 }, i) => {
           const next = data[(i + 1) % data.length];

@@ -8,8 +8,7 @@ import {
   circleSegmentAttrs,
   lineHandleInAttrs,
   lineHandleOutAttrs,
-  pathFilledAttrs,
-  pathOutlinedAttrs,
+  pathAttrs,
   textLabelAttrs,
   toPathDataAttr,
 } from './dom';
@@ -19,50 +18,45 @@ import { Point } from 'scripts/math';
 
 export interface Options {
   readonly viewportOptions: ViewportOptions;
-  readonly fromData: Datum[];
-  readonly toData: Datum[];
+  readonly from: ShapeOptions;
+  readonly to: ShapeOptions;
+  readonly shouldMorph: boolean;
+}
+
+export interface ShapeOptions {
+  readonly data: Datum[];
   readonly hideLabels?: boolean;
   readonly hideHandles?: boolean;
-  readonly strokeDashArray?: number;
+  readonly fill?: string;
+  readonly stroke?: string;
+  readonly strokeWidth?: number;
+  readonly strokeDasharray?: number;
+  readonly interpolateColor?: (index: number, len: number) => string;
 }
 
 export function runShapeToShape(options: Options) {
-  const { viewportOptions: vpOpts, fromData, toData, strokeDashArray } = options;
-
-  const viewport = createViewport(vpOpts);
-  const fromContainer = viewport.append('g.from');
-  const fromPath = fromContainer.append('path.shape');
-  fromPath.datum(fromData).call(pathOutlinedAttrs, strokeDashArray);
-
-  const toContainer = viewport.append('g.to');
-  const toPath = toContainer.append('path.shape');
-  toPath.datum(toData).call(pathOutlinedAttrs, strokeDashArray);
-
-  // The initial display.
-  update(options, fromContainer, fromData);
-  update(options, toContainer, toData);
-}
-
-export function runShapeToShapeMorph(options: Options) {
-  const { viewportOptions: vpOpts, fromData, toData, strokeDashArray } = options;
+  const { viewportOptions: vpOpts, from, to } = options;
 
   const viewport = createViewport(vpOpts);
   const toContainer = viewport.append('g.to');
-  const toPath = toContainer.append('path.shape').call(pathOutlinedAttrs, strokeDashArray);
+  toContainer.append('path.shape').call(pathAttrs, to);
   const fromContainer = viewport.append('g.from');
-  const fromPath = fromContainer.append('path.shape').call(pathFilledAttrs, strokeDashArray);
+  fromContainer.append('path.shape').call(pathAttrs, from);
 
   // The initial display.
-  update(options, fromContainer, fromData);
-  update(options, toContainer, toData);
+  update(fromContainer, options, from);
+  update(toContainer, options, to);
 
-  // Morph the shapes.
-  update(options, fromContainer, toData);
+  if (options.shouldMorph) {
+    // Morph the shapes.
+    update(fromContainer, options, to);
+  }
 }
 
-function update(options: Options, container: DataSelection, data: Datum[]) {
+function update(container: DataSelection, options: Options, shapeOptions: ShapeOptions) {
   const { viewportOptions: vpOpts } = options;
   const pixelRatio = vpOpts.size / Math.max(vpOpts.viewportWidth, vpOpts.viewportHeight);
+  const { data } = shapeOptions;
 
   const t = d3.transition(undefined).duration(2000);
 
@@ -82,26 +76,26 @@ function update(options: Options, container: DataSelection, data: Datum[]) {
   const labels = container.selectAll('text.label').data(data, keyFn);
 
   // EXIT old elements not present in new data.
-  if (!options.hideHandles) {
+  if (!shapeOptions.hideHandles) {
     handleInLines.exit().remove();
     handleOutLines.exit().remove();
     handleInSegments.exit().remove();
     handleOutSegments.exit().remove();
   }
   segments.exit().remove();
-  if (!options.hideLabels) {
+  if (!shapeOptions.hideLabels) {
     labels.exit().remove();
   }
 
   // UPDATE old elements present in new data.
-  if (!options.hideHandles) {
-    handleInLines.transition(t).call(lineHandleInAttrs);
-    handleOutLines.transition(t).call(lineHandleOutAttrs);
-    handleInSegments.transition(t).call(circleHandleInAttrs);
-    handleOutSegments.transition(t).call(circleHandleOutAttrs);
+  if (!shapeOptions.hideHandles) {
+    handleInLines.transition(t).call(lineHandleInAttrs, shapeOptions);
+    handleOutLines.transition(t).call(lineHandleOutAttrs, shapeOptions);
+    handleInSegments.transition(t).call(circleHandleInAttrs, shapeOptions);
+    handleOutSegments.transition(t).call(circleHandleOutAttrs, shapeOptions);
   }
-  segments.transition(t).call(circleSegmentAttrs);
-  if (!options.hideLabels) {
+  segments.transition(t).call(circleSegmentAttrs, shapeOptions);
+  if (!shapeOptions.hideLabels) {
     labels
       .transition(t)
       .text(d => d.labelText)
@@ -109,29 +103,29 @@ function update(options: Options, container: DataSelection, data: Datum[]) {
   }
 
   // ENTER new elements present in new data.
-  if (!options.hideHandles) {
+  if (!shapeOptions.hideHandles) {
     handleInLines
       .enter()
       .append('line.handleIn')
-      .call(lineHandleInAttrs);
+      .call(lineHandleInAttrs, shapeOptions);
     handleOutLines
       .enter()
       .append('line.handleOut')
-      .call(lineHandleOutAttrs);
+      .call(lineHandleOutAttrs, shapeOptions);
     handleInSegments
       .enter()
       .append('circle.handleIn')
-      .call(circleHandleInAttrs);
+      .call(circleHandleInAttrs, shapeOptions);
     handleOutSegments
       .enter()
       .append('circle.handleOut')
-      .call(circleHandleOutAttrs);
+      .call(circleHandleOutAttrs, shapeOptions);
   }
   segments
     .enter()
     .append('circle.segment')
-    .call(circleSegmentAttrs);
-  if (!options.hideLabels) {
+    .call(circleSegmentAttrs, shapeOptions);
+  if (!shapeOptions.hideLabels) {
     labels
       .enter()
       .append('text.label')
