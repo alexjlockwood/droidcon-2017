@@ -86,22 +86,20 @@ C410.948,61.501,473.076,49.247,526.991,49.247z
 
 export function run() {
   const viewport = createViewport({
-    size: 720,
+    size: 1440,
     viewportWidth: 820,
-    viewportHeight: 600,
+    viewportHeight: 570,
   });
   const path = viewport.append('path');
   const circles = viewport.append('g');
   const shapes = [hippo, elephant, buffalo].map(d => Command.fromPathData(d));
 
   (function draw() {
-    let a = [...shapes[0]];
-    let b = [...shapes[1]];
-    const fixResult = AutoAwesome.fix({ from: a, to: b });
-    a = fixResult.from;
-    b = fixResult.to;
+    const fixResult = AutoAwesome.fix({ from: [...shapes[0]], to: [...shapes[1]] });
+    const b: Datum[] = fixResult.to.map(cmd => ({ point: cmd.end, isSplit: cmd.isSplit }));
+    const a: Datum[] = fixResult.from.map((cmd, i) => ({ point: cmd.end, isSplit: b[i].isSplit }));
 
-    path.attrs({ d: Command.toPathData(a) });
+    path.attrs({ d: Command.toPathData(fixResult.from) });
     circles.datum(a).call(updateCircles);
 
     const t = d3.transition(undefined).duration(800);
@@ -118,23 +116,28 @@ export function run() {
       .data(b)
       .transition(t)
       .attrs({
-        cx: d => d.end[0],
-        cy: d => d.end[1],
+        cx: d => d.point[0],
+        cy: d => d.point[1],
       });
   })();
 }
 
-function updateCircles(sel: DataSelection<Command[]>) {
+function updateCircles(sel: DataSelection<Datum[]>) {
   const circles = sel.selectAll('circle').data(d => d);
   const merged = circles
     .enter()
     .append('circle')
-    .attrs({ r: 4 })
+    .attrs({ r: 3 })
     .merge(circles)
     .attrs({
-      cx: d => d.end[0],
-      cy: d => d.end[1],
-      fill: d => (d.isSplit ? '#F44336' : '#FFEB3B'),
+      cx: d => d.point[0],
+      cy: d => d.point[1],
+      fill: d => (d.isSplit ? '#44f470' : '#5761d3'),
     });
   circles.exit().remove();
+}
+
+interface Datum {
+  readonly point: Point;
+  readonly isSplit?: boolean;
 }
