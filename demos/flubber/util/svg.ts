@@ -67,7 +67,7 @@ function approximateRing(parsed: SvgPath, maxSegmentLength: number) {
   }
 
   for (let i = 0; i < numPoints; i++) {
-    let p = m.getPointAtLength(len * i / numPoints);
+    const p = m.getPointAtLength(len * i / numPoints);
     ring.push([p.x, p.y]);
   }
 
@@ -75,7 +75,6 @@ function approximateRing(parsed: SvgPath, maxSegmentLength: number) {
 }
 
 function measure(d: string) {
-  const svg = window.document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   const path = window.document.createElementNS('http://www.w3.org/2000/svg', 'path');
   path.setAttributeNS(undefined, 'd', d);
   return path;

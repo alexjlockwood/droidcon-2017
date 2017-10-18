@@ -273,11 +273,9 @@ function isClosed(cmds: Path) {
 }
 
 function isClockwise(cmds: Path) {
-  const closed = isClosed(cmds);
   let area = 0;
-  for (let i = 0; i < cmds.length; i++) {
-    const last = i + 1 === cmds.length;
-    area += cmds[i].area();
+  for (const cmd of cmds) {
+    area += cmd.area();
   }
   return area >= 0;
 }

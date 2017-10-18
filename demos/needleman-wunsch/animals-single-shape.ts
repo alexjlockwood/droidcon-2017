@@ -4,6 +4,7 @@ import { AutoAwesome, Command } from 'scripts/paths';
 
 import { DataSelection } from 'scripts/types';
 import { Point } from 'scripts/math';
+import { create as createViewport } from 'scripts/viewport';
 
 const hippo = `
 M13.833,231.876c4.154-55.746,24.442-104.83,60.85-147.292
@@ -83,48 +84,32 @@ c38.332-27.009,78.54-46.712,120.642-59.16c42.113-12.449,73.734-21.634,94.796-27.
 C410.948,61.501,473.076,49.247,526.991,49.247z
 `;
 
-const circle = `
-M490.1,280.649c0,44.459-36.041,80.5-80.5,80.5s-80.5-36.041-80.5-80.5s36.041-80.5,80.5-80.5
-S490.1,236.19,490.1,280.649z
-`;
-
-const star = `
-M409.6,198.066l26.833,54.369l60,8.719l-43.417,42.321l10.249,59.758L409.6,335.019
-l-53.666,28.214l10.249-59.758l-43.417-42.321l60-8.719L409.6,198.066z
-`;
-
 export function run() {
-  const svg = d3
-    .select('body')
-    .append('svg')
-    .attrs({ width: 820, height: 600 });
-  const path = svg.append('path');
-  const circles = svg.append('g');
-
-  const shapes = [hippo, elephant, buffalo /*, circle, star*/].map(d => Command.fromPathData(d));
-
-  d3.shuffle(shapes);
+  const viewport = createViewport({
+    size: 720,
+    viewportWidth: 820,
+    viewportHeight: 600,
+  });
+  const path = viewport.append('path');
+  const circles = viewport.append('g');
+  const shapes = [hippo, elephant, buffalo].map(d => Command.fromPathData(d));
 
   (function draw() {
-    let a = shapes[0].slice(0);
-    let b = shapes[1].slice(0);
+    let a = [...shapes[0]];
+    let b = [...shapes[1]];
     const fixResult = AutoAwesome.fix({ from: a, to: b });
     a = fixResult.from;
     b = fixResult.to;
 
     path.attrs({ d: Command.toPathData(a) });
-
-    // Redraw points.
     circles.datum(a).call(updateCircles);
 
-    // Morph.
     const t = d3.transition(undefined).duration(800);
-
     path
       .transition(t)
       .on('end', () => {
         shapes.push(shapes.shift());
-        setTimeout(draw, 100);
+        setTimeout(draw, 200);
       })
       .attrs({ d: Command.toPathData(fixResult.to) });
 
@@ -141,18 +126,15 @@ export function run() {
 
 function updateCircles(sel: DataSelection<Command[]>) {
   const circles = sel.selectAll('circle').data(d => d);
-
   const merged = circles
     .enter()
     .append('circle')
-    .attr('r', 2)
-    .attr('fill', '#fc0')
-    .merge(circles);
-
-  merged.classed('added', (d: Command & { added: boolean }) => d.isSplit).attrs({
-    cx: d => d.end[0],
-    cy: d => d.end[1],
-  });
-
+    .attrs({ r: 4 })
+    .merge(circles)
+    .attrs({
+      cx: d => d.end[0],
+      cy: d => d.end[1],
+      fill: d => (d.isSplit ? '#F44336' : '#FFEB3B'),
+    });
   circles.exit().remove();
 }

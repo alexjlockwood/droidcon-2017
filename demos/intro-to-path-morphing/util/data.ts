@@ -253,6 +253,66 @@ export function newCircleDataWithDummyPoints(topLeft: Point, center: Point): Dat
   });
 }
 
+const SEGMENTS_FOUR = [
+  [[9.18, 8.7], [9.18, 8.7], [7.2, 8.7]],
+  [[3.24, 8.7], [5.22, 8.7], [3.24, 8.7]],
+  [[3.24, 8.7], [3.24, 8.7], [3.24, 8.7]],
+  [[7.8, 2.28], [7.8, 2.28], [7.8, 2.28]],
+  [[7.8, 10.452], [7.8, 10.452], [7.8, 10.452]],
+];
+
+const SEGMENTS_FIVE = [
+  [[3, 8.884], [3, 8.884], [4.372, 11.217]],
+  [[8.946, 7.548], [8.65, 10.424], [9.206, 5.15]],
+  [[4.601, 4.841], [6.094, 4.204], [4.601, 4.841]],
+  [[5.731, 1.75], [5.731, 1.75], [5.731, 1.75]],
+  [[9, 1.75], [9, 1.75], [9, 1.75]],
+];
+
+const SEGMENTS_FIVE_REVERSED = [...SEGMENTS_FIVE].reverse().map(([p, h1, h2]) => [p, h2, h1]);
+
+export function newPlusData(): Datum[] {
+  const plusRing: Point[] = [
+    [9.5, 6.5],
+    [6.5, 6.5],
+    [6.5, 9.5],
+    [5.5, 9.5],
+    [5.5, 6.5],
+    [2.5, 6.5],
+    [2.5, 5.5],
+    [5.5, 5.5],
+    [5.5, 2.5],
+    [6.5, 2.5],
+    [6.5, 5.5],
+    [9.5, 5.5],
+    [9.5, 6.5],
+  ];
+  return plusRing.map((p, i) => {
+    return { segment: p, label: p, labelText: (i + 1).toString(), position: i };
+  });
+}
+
+export function newMinusData(): Datum[] {
+  const minusRing: Point[] = [
+    [9.5, 6.5],
+    [6.5, 6.5],
+    [6.5, 6.5],
+    [5.5, 6.5],
+    [5.5, 6.5],
+    [2.5, 6.5],
+    [2.5, 5.5],
+    [5.5, 5.5],
+    [5.5, 5.5],
+    [6.5, 5.5],
+    [6.5, 5.5],
+    [9.5, 5.5],
+    [9.5, 6.5],
+  ];
+  return minusRing.map((p, i) => {
+    return { segment: p, label: p, labelText: (i + 1).toString(), position: i };
+  });
+}
+
 function getLabelOffsetX(i: number) {
   return i === 1 || i === 3 ? 0.4 : i === 2 ? 0.6 : i === 5 || i === 7 ? -0.4 : i === 6 ? -0.6 : 0;
 }

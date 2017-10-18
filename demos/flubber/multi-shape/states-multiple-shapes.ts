@@ -2,8 +2,8 @@ import * as d3 from 'lib/d3';
 import * as topojson from 'topojson-client';
 
 import { Point, Ring, Triangle, distance, lerp } from 'scripts/math';
-import { Topology, createTopology } from './util/triangulate';
-import { align, closestCentroids } from './util/common';
+import { Topology, createTopology } from '../util/triangulate';
+import { align, closestCentroids } from '../util/common';
 
 import { DataSelection } from 'scripts/types';
 import earcut from 'earcut';
@@ -16,7 +16,7 @@ export function run() {
     .append('svg')
     .attrs({ width, height });
 
-  d3.json('../../assets/us.topo.json', (err, us) => {
+  d3.json('../../../assets/us.topo.json', (err, us) => {
     const states = topojson
       .feature(us, (us as any).objects.states)
       .features.map(d => d.geometry.coordinates[0]);
@@ -157,9 +157,9 @@ function collapse(topology: Topology, numPieces: number) {
 function getTweenablePairs(start: Ring[], end: Ring[], out = false) {
   // Rearrange order of polygons for least movement.
   if (out) {
-    start = closestCentroids(start, end);
+    start = closestCentroids(start, end).map(i => start[i]);
   } else {
-    end = closestCentroids(end, start);
+    end = closestCentroids(end, start).map(i => end[i]);
   }
   return start.map((a, i) => align([...a], end[i].slice(0)));
 }
