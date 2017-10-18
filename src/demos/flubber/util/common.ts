@@ -109,33 +109,6 @@ function bestOrder(start: Ring[], end: Ring[]) {
   return best;
 }
 
-/** Find ordering of first set that minimizes squared distance between centroid pairs. */
-// export function closestCentroids1(start: Ring[], end: Ring[]) {
-//   console.log(start, end);
-//   let min = Infinity;
-//   let best: number[];
-//   const distances = start.map(p1 =>
-//     end.map(p2 => Math.pow(distance(d3.polygonCentroid(p1), d3.polygonCentroid(p2)), 2)),
-//   );
-//   (function permute(arr: number[], order: number[] = [], sum = 0) {
-//     let cur: number[];
-//     let dist: number;
-//     for (let i = 0; i < arr.length; i++) {
-//       cur = arr.splice(i, 1);
-//       dist = distances[cur[0]][order.length];
-//       if (arr.length) {
-//         permute(arr.slice(), order.concat(cur), sum + dist);
-//         arr.splice(i, 0, cur[0]);
-//       } else if (sum + dist < min) {
-//         min = sum + dist;
-//         best = order.concat(cur);
-//       }
-//     }
-//   })(d3.range(start.length));
-//   console.log(best);
-//   return best.map(i => start[i]);
-// }
-
 function squaredDistance(p1: Ring, p2: Ring) {
   const d = distance(d3.polygonCentroid(p1), d3.polygonCentroid(p2));
   return d * d;
