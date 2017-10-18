@@ -75,30 +75,70 @@ export function wind(ring: Ring, vs: Ring) {
   return ring.slice(bestOffset).concat(ring.slice(0, bestOffset));
 }
 
-/** Find ordering of first set that minimizes squared distance between centroid pairs. */
 export function closestCentroids(start: Ring[], end: Ring[]) {
+  const distances = start.map(p1 => end.map(p2 => squaredDistance(p1, p2)));
+  if (start.length > 8) {
+    return start.map((d, i) => i);
+  }
+  return bestOrder(start, end);
+}
+
+/** Find ordering of first set that minimizes squared distance between centroid pairs. */
+function bestOrder(start: Ring[], end: Ring[]) {
+  const distances = start.map(p1 => end.map(p2 => squaredDistance(p1, p2));
   let min = Infinity;
-  let best: number[];
-  const distances = start.map(p1 =>
-    end.map(p2 => Math.pow(distance(d3.polygonCentroid(p1), d3.polygonCentroid(p2)), 2)),
-  );
-  function permute(arr: number[], order: number[] = [], sum = 0) {
-    let cur: number[];
-    let dist: number;
+  let best = start.map((d, i) => i);
+  function permute(arr, order = [], sum = 0) {
     for (let i = 0; i < arr.length; i++) {
-      cur = arr.splice(i, 1);
-      dist = distances[cur[0]][order.length];
+      const cur = arr.splice(i, 1);
+      const dist = distances[cur[0]][order.length];
+      if (sum + dist < min) {
+        if (arr.length) {
+          permute(arr.slice(), order.concat(cur), sum + dist);
+        } else {
+          min = sum + dist;
+          best = order.concat(cur);
+        }
+      }
       if (arr.length) {
-        permute(arr.slice(), order.concat(cur), sum + dist);
         arr.splice(i, 0, cur[0]);
-      } else if (sum + dist < min) {
-        min = sum + dist;
-        best = order.concat(cur);
       }
     }
   }
-  permute(d3.range(start.length));
-  return best.map(i => start[i]);
+  permute(best);
+  return best;
+}
+
+/** Find ordering of first set that minimizes squared distance between centroid pairs. */
+// export function closestCentroids1(start: Ring[], end: Ring[]) {
+//   console.log(start, end);
+//   let min = Infinity;
+//   let best: number[];
+//   const distances = start.map(p1 =>
+//     end.map(p2 => Math.pow(distance(d3.polygonCentroid(p1), d3.polygonCentroid(p2)), 2)),
+//   );
+//   (function permute(arr: number[], order: number[] = [], sum = 0) {
+//     let cur: number[];
+//     let dist: number;
+//     for (let i = 0; i < arr.length; i++) {
+//       cur = arr.splice(i, 1);
+//       dist = distances[cur[0]][order.length];
+//       if (arr.length) {
+//         permute(arr.slice(), order.concat(cur), sum + dist);
+//         arr.splice(i, 0, cur[0]);
+//       } else if (sum + dist < min) {
+//         min = sum + dist;
+//         best = order.concat(cur);
+//       }
+//     }
+//   })(d3.range(start.length));
+//   console.log(best);
+//   return best.map(i => start[i]);
+// }
+
+function squaredDistance(p1: Ring, p2: Ring) {
+  const d = distance(d3.polygonCentroid(p1), d3.polygonCentroid(p2));
+  return d * d;
 }
 
 export function join(d: Ring) {

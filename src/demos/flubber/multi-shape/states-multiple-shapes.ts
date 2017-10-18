@@ -157,9 +157,9 @@ function collapse(topology: Topology, numPieces: number) {
 function getTweenablePairs(start: Ring[], end: Ring[], out = false) {
   // Rearrange order of polygons for least movement.
   if (out) {
-    start = closestCentroids(start, end);
+    start = closestCentroids(start, end).map(i => start[i]);
   } else {
-    end = closestCentroids(end, start);
+    end = closestCentroids(end, start).map(i => end[i]);
   }
   return start.map((a, i) => align([...a], end[i].slice(0)));
 }

@@ -38,10 +38,13 @@ import {
 } from './demos/intro-to-path-morphing';
 import {
   runFlubberAnimalsSingleShape,
-  runFlubberStatesMultipleShapes,
   runFlubberStatesSingleShape,
+} from './demos/flubber/single-shape';
+import {
+  runFlubberStatesMultipleShapes,
+  runTexasToHawaiiFade,
   runTexasToHawaiiTriangulate,
-} from './demos/flubber/examples';
+} from './demos/flubber/multi-shape';
 
 const introToPathMorphingMap = new Map<string, () => void>([
   ['?sq-to-sq', runSqToSq],
@@ -78,11 +81,15 @@ const flubberStrategyMap = new Map<string, () => void>([
   ['?circle-to-star-morph', runCircleToStarMorph],
 ]);
 
-const flubberExamplesMap = new Map<string, () => void>([
+const flubberSingleShapeMap = new Map<string, () => void>([
   ['?states-single-shape', runFlubberStatesSingleShape],
-  ['?states-multiple-shapes', runFlubberStatesMultipleShapes],
-  ['?texas-to-hawaii-triangulate', runTexasToHawaiiTriangulate],
   ['?animals-single-shape', runFlubberAnimalsSingleShape],
+]);
+
+const flubberMultiShapeMap = new Map<string, () => void>([
+  ['?texas-to-hawaii-fade', runTexasToHawaiiFade],
+  ['?texas-to-hawaii-triangulate', runTexasToHawaiiTriangulate],
+  ['?states-multiple-shapes', runFlubberStatesMultipleShapes],
 ]);
 
 const needlemanWunschMap = new Map<string, () => void>([
@@ -93,7 +100,8 @@ const needlemanWunschMap = new Map<string, () => void>([
 const sectionMap = new Map<string, Map<string, () => void>>([
   ['/demos/intro-to-path-morphing/index.html', introToPathMorphingMap],
   ['/demos/flubber/strategy/index.html', flubberStrategyMap],
-  ['/demos/flubber/examples/index.html', flubberExamplesMap],
+  ['/demos/flubber/multi-shape/index.html', flubberMultiShapeMap],
+  ['/demos/flubber/single-shape/index.html', flubberSingleShapeMap],
   ['/demos/needleman-wunsch/index.html', needlemanWunschMap],
 ]);
 
