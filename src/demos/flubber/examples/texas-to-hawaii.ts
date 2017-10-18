@@ -2,9 +2,9 @@ import * as d3 from 'lib/d3';
 import * as topojson from 'topojson-client';
 
 import { Point, Ring, Triangle, distance, lerp } from 'scripts/math';
-import { addPoints, align, closestCentroids, join, wind } from './util/common';
+import { addPoints, align, closestCentroids, join, wind } from '../util/common';
 
-import { Topology } from './util/triangulate';
+import { Topology } from '../util/triangulate';
 import earcut from 'earcut';
 
 export function run() {
@@ -16,8 +16,8 @@ export function run() {
 
   d3
     .queue()
-    .defer(d3.json, '../../assets/TX.json')
-    .defer(d3.json, '../../assets/HI.json')
+    .defer(d3.json, '../../../assets/TX.json')
+    .defer(d3.json, '../../../assets/HI.json')
     .await(ready);
 
   function ready(err, tx, hi) {

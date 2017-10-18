@@ -1,10 +1,10 @@
 import * as d3 from 'lib/d3';
 
 import { Point, Ring } from 'scripts/math';
-import { addPoints, join, wind } from './util/common';
+import { addPoints, join, wind } from '../util/common';
 
 import { DataSelection } from 'scripts/types';
-import { pathStringToRing } from './util/svg';
+import { pathStringToRing } from '../util/svg';
 
 const hippo = `
 M13.833,231.876c4.154-55.746,24.442-104.83,60.85-147.292

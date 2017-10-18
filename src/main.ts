@@ -7,6 +7,11 @@ import {
   runNeedlemanWunschAnimalsSingleShape,
 } from './demos/needleman-wunsch';
 import {
+  runCircleToStarAddDummyPoints,
+  runCircleToStarMorph,
+  runCircleToStarPickStartingPoint,
+} from './demos/flubber/strategy';
+import {
   runCurveToCurve,
   runCurveWithHandlesToCurveWithHandles,
   runCurveWithHandlesToCurveWithHandlesMorph,
@@ -17,6 +22,9 @@ import {
   runOctToCircleWithDummyPoints,
   runOctWithHandlesToCircleWithDummyPoints,
   runOctWithHandlesToCircleWithDummyPointsMorph,
+  runPlusToLargeShiftMinusMorph,
+  runPlusToMinusMorph,
+  runPlusToSmallShiftMinusMorph,
   runSqToOct,
   runSqToOctMorph,
   runSqToSq,
@@ -33,7 +41,7 @@ import {
   runFlubberStatesMultipleShapes,
   runFlubberStatesSingleShape,
   runFlubberTexasToHawaii,
-} from './demos/flubber';
+} from './demos/flubber/examples';
 
 const introToPathMorphingMap = new Map<string, () => void>([
   ['?sq-to-sq', runSqToSq],
@@ -59,9 +67,18 @@ const introToPathMorphingMap = new Map<string, () => void>([
     '?oct-with-handles-to-circle-with-dummy-points-morph',
     runOctWithHandlesToCircleWithDummyPointsMorph,
   ],
+  ['?plus-to-minus-morph', runPlusToMinusMorph],
+  ['?plus-to-small-shift-minus-morph', runPlusToSmallShiftMinusMorph],
+  ['?plus-to-large-shift-minus-morph', runPlusToLargeShiftMinusMorph],
 ]);
 
-const flubberMap = new Map<string, () => void>([
+const flubberStrategyMap = new Map<string, () => void>([
+  ['?circle-to-star-add-dummy-points', runCircleToStarAddDummyPoints],
+  ['?circle-to-star-pick-starting-point', runCircleToStarPickStartingPoint],
+  ['?circle-to-star-morph', runCircleToStarMorph],
+]);
+
+const flubberExamplesMap = new Map<string, () => void>([
   ['?states-single-shape', runFlubberStatesSingleShape],
   ['?states-multiple-shapes', runFlubberStatesMultipleShapes],
   ['?texas-to-hawaii', runFlubberTexasToHawaii],
@@ -75,7 +92,8 @@ const needlemanWunschMap = new Map<string, () => void>([
 
 const sectionMap = new Map<string, Map<string, () => void>>([
   ['/demos/intro-to-path-morphing/index.html', introToPathMorphingMap],
-  ['/demos/flubber/index.html', flubberMap],
+  ['/demos/flubber/strategy/index.html', flubberStrategyMap],
+  ['/demos/flubber/examples/index.html', flubberExamplesMap],
   ['/demos/needleman-wunsch/index.html', needlemanWunschMap],
 ]);
 

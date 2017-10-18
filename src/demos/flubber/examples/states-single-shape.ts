@@ -3,7 +3,7 @@ import * as d3 from 'lib/d3';
 import * as topojson from 'topojson-client';
 
 import { Point, Ring, distance } from 'scripts/math';
-import { addPoints, join, wind } from './util/common';
+import { addPoints, join, wind } from '../util/common';
 
 import { DataSelection } from 'scripts/types';
 
@@ -15,7 +15,7 @@ export function run() {
   const path = svg.append('path');
   const circles = svg.append('g');
 
-  d3.json('../../assets/us.topo.json', (err, topo) => {
+  d3.json('../../../assets/us.topo.json', (err, topo) => {
     const states = topojson
       .feature(topo, (topo as any).objects.states)
       .features.map((d: any) => d.geometry.coordinates[0]);

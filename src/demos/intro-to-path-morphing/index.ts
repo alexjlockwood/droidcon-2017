@@ -25,3 +25,8 @@ export {
   runOctWithHandlesToCircleWithDummyPoints,
   runOctWithHandlesToCircleWithDummyPointsMorph,
 } from './oct-to-circle';
+export {
+  runPlusToMinusMorph,
+  runPlusToLargeShiftMinusMorph,
+  runPlusToSmallShiftMinusMorph,
+} from './plus-to-minus';

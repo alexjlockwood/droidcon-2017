@@ -21,6 +21,7 @@ export interface Options {
   readonly from: ShapeOptions;
   readonly to: ShapeOptions;
   readonly shouldMorph: boolean;
+  readonly morphInPlace?: boolean;
 }
 
 export interface ShapeOptions {
@@ -39,13 +40,17 @@ export function runShapeToShape(options: Options) {
 
   const viewport = createViewport(vpOpts);
   const toContainer = viewport.append('g.to');
-  toContainer.append('path.shape').call(pathAttrs, to);
+  if (!options.morphInPlace) {
+    toContainer.append('path.shape').call(pathAttrs, to);
+  }
   const fromContainer = viewport.append('g.from');
   fromContainer.append('path.shape').call(pathAttrs, from);
 
   // The initial display.
   update(fromContainer, options, from);
-  update(toContainer, options, to);
+  if (!options.morphInPlace) {
+    update(toContainer, options, to);
+  }
 
   if (options.shouldMorph) {
     // Morph the shapes.
