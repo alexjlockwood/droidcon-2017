@@ -85,7 +85,7 @@ export function closestCentroids(start: Ring[], end: Ring[]) {
 
 /** Find ordering of first set that minimizes squared distance between centroid pairs. */
 function bestOrder(start: Ring[], end: Ring[]) {
-  const distances = start.map(p1 => end.map(p2 => squaredDistance(p1, p2));
+  const distances = start.map(p1 => end.map(p2 => squaredDistance(p1, p2)));
   let min = Infinity;
   let best = start.map((d, i) => i);
   function permute(arr, order = [], sum = 0) {

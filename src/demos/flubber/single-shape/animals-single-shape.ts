@@ -4,6 +4,7 @@ import { Point, Ring } from 'scripts/math';
 import { addPoints, join, wind } from '../util/common';
 
 import { DataSelection } from 'scripts/types';
+import { create as createViewport } from 'scripts/viewport';
 import { pathStringToRing } from '../util/svg';
 
 const hippo = `
@@ -95,20 +96,21 @@ l-53.666,28.214l10.249-59.758l-43.417-42.321l60-8.719L409.6,198.066z
 `;
 
 export function run() {
-  const svg = d3
-    .select('body')
-    .append('svg')
-    .attrs({ width: 820, height: 600 });
-  const path = svg.append('path');
-  const circles = svg.append('g');
+  const viewport = createViewport({
+    size: 1440,
+    viewportWidth: 820,
+    viewportHeight: 570,
+  });
+  const path = viewport.append('path');
+  const circles = viewport.append('g');
 
-  const shapes = [hippo, elephant, buffalo, circle, star].map(d => pathStringToRing(d).ring);
-
-  d3.shuffle(shapes);
+  const shapes = [elephant, hippo, buffalo, circle, hippo, star, circle].map(
+    d => pathStringToRing(d).ring,
+  );
 
   (function draw() {
-    let a = shapes[0].slice(0);
-    const b = shapes[1].slice(0);
+    let a = [...shapes[0]];
+    const b = [...shapes[1]];
 
     // Same number of points on each ring.
     if (a.length < b.length) {
@@ -132,7 +134,7 @@ export function run() {
       .transition(t)
       .on('end', () => {
         shapes.push(shapes.shift());
-        setTimeout(draw, 100);
+        setTimeout(draw, 200);
       })
       .attrs({ d: join(b) });
 
