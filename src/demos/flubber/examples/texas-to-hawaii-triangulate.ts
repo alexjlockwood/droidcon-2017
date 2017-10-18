@@ -5,13 +5,15 @@ import { Point, Ring, Triangle, distance, lerp } from 'scripts/math';
 import { addPoints, align, closestCentroids, join, wind } from '../util/common';
 
 import { Topology } from '../util/triangulate';
+import { create as createViewport } from 'scripts/viewport';
 import earcut from 'earcut';
 
 export function run() {
-  const svg = d3
-    .select('body')
-    .append('svg')
-    .attrs({ width: 960, height: 500 });
+  const svg = createViewport({
+    size: 960,
+    viewportWidth: 960,
+    viewportHeight: 500,
+  }).append('g');
   const path = d3.geoPath();
 
   d3
@@ -36,7 +38,7 @@ export function run() {
     svg
       .append('path')
       .datum(tx)
-      .attr('class', 'background')
+      .attr('class', 'path-background')
       .attr('d', path);
 
     svg.append('path').attr('class', 'mesh');
@@ -121,7 +123,7 @@ export function run() {
         // Merged down to numPieces
         features = topojson.feature(topology, topology.objects.triangles).features;
 
-        d3.selectAll('.background, .merging').remove();
+        d3.selectAll('.path-background, .merging').remove();
 
         cb(features.map(f => f.geometry.coordinates[0]));
       }

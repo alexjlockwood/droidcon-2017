@@ -40,7 +40,7 @@ import {
   runFlubberAnimalsSingleShape,
   runFlubberStatesMultipleShapes,
   runFlubberStatesSingleShape,
-  runFlubberTexasToHawaii,
+  runTexasToHawaiiTriangulate,
 } from './demos/flubber/examples';
 
 const introToPathMorphingMap = new Map<string, () => void>([
@@ -81,7 +81,7 @@ const flubberStrategyMap = new Map<string, () => void>([
 const flubberExamplesMap = new Map<string, () => void>([
   ['?states-single-shape', runFlubberStatesSingleShape],
   ['?states-multiple-shapes', runFlubberStatesMultipleShapes],
-  ['?texas-to-hawaii', runFlubberTexasToHawaii],
+  ['?texas-to-hawaii-triangulate', runTexasToHawaiiTriangulate],
   ['?animals-single-shape', runFlubberAnimalsSingleShape],
 ]);
 
