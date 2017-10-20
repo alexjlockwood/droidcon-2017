@@ -1,10 +1,10 @@
 import * as d3 from 'lib/d3';
 
-import { Point, Ring } from 'scripts/math';
-import { addPoints, join, wind } from '../util/common';
+import { addPoints, join } from '../util/common';
 
 import { Command } from 'scripts/paths';
 import { DataSelection } from 'scripts/types';
+import { Point } from 'scripts/math';
 import { create as createViewport } from 'scripts/viewport';
 import { pathStringToRing } from '../util/svg';
 
@@ -150,9 +150,4 @@ function updateCircles(selection: DataSelection<Datum[]>, enterColor: string, up
     .transition()
     .delay((d, i) => i * 20)
     .attrs({ opacity: 1 });
-}
-
-function interpolateColor(index: number, length: number) {
-  index = (index + length) % length;
-  return d3.interpolateCool(index / length * 0.7 + 0.15);
 }

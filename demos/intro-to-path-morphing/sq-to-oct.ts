@@ -1,6 +1,5 @@
 import * as d3 from 'lib/d3';
 
-import { ShapeOptions, runShapeToShape } from './util/shape-to-shape';
 import {
   newOctagonData,
   newSquareData,
@@ -10,6 +9,7 @@ import {
 } from './util/data';
 
 import { floorMod } from 'scripts/math';
+import { runShapeToShape } from './util/shape-to-shape';
 
 const viewportOptions = { size: 1440, viewportWidth: 24, viewportHeight: 12 };
 

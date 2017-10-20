@@ -1,12 +1,9 @@
 import * as d3 from 'lib/d3';
-import * as topojson from 'topojson-client';
 
-import { Point, Ring, Triangle, distance, lerp } from 'scripts/math';
-import { addPoints, align, closestCentroids, join, wind } from '../util/common';
+import { align, closestCentroids, join } from '../util/common';
 
-import { Topology } from '../util/triangulate';
+import { Ring } from 'scripts/math';
 import { create as createViewport } from 'scripts/viewport';
-import earcut from 'earcut';
 
 export function run() {
   const svg = createViewport({
@@ -24,16 +21,6 @@ export function run() {
 
   function ready(err, tx, hi) {
     const points = tx.coordinates[0];
-    const vertices = points.reduce((arr, point) => arr.concat(point), []);
-    const cuts = earcut(vertices);
-    const triangles: Triangle[] = [];
-
-    for (let i = 0, l = cuts.length; i < l; i += 3) {
-      // Save each triangle as segments [a, b], [b, c], [c, a]
-      triangles.push([[cuts[i], cuts[i + 1]], [cuts[i + 1], cuts[i + 2]], [cuts[i + 2], cuts[i]]]);
-    }
-
-    const topology = createTopology(triangles, points);
 
     svg
       .append('path')
@@ -97,46 +84,5 @@ export function run() {
         }
         p.each(morph);
       });
-  }
-
-  function createTopology(triangles: Triangle[], points: Point[]) {
-    const arcIndices: { [index: string]: number } = {};
-    const topology: Topology = {
-      type: 'Topology',
-      objects: {
-        triangles: {
-          type: 'GeometryCollection',
-          geometries: [],
-        },
-      },
-      arcs: [],
-    };
-
-    triangles.forEach(triangle => {
-      const geometry: number[] = [];
-
-      triangle.forEach((arc, i) => {
-        const slug = arc[0] < arc[1] ? arc.join(',') : arc[1] + ',' + arc[0];
-        const coordinates = arc.map(pointIndex => points[pointIndex]);
-
-        if (slug in arcIndices) {
-          // tslint:disable-next-line no-bitwise
-          geometry.push(~arcIndices[slug]);
-        } else {
-          geometry.push((arcIndices[slug] = topology.arcs.length));
-          topology.arcs.push(coordinates);
-        }
-      });
-
-      topology.objects.triangles.geometries.push({
-        type: 'Polygon',
-        area: Math.abs(d3.polygonArea(triangle.map(d => points[d[0]]))),
-        arcs: [geometry],
-      });
-    });
-
-    // Sort smallest first
-    topology.objects.triangles.geometries.sort((a, b) => a.area - b.area);
-    return topology;
   }
 }

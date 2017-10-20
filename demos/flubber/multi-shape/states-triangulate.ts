@@ -1,20 +1,23 @@
 import * as d3 from 'lib/d3';
 import * as topojson from 'topojson-client';
 
-import { Point, Ring, Triangle, distance, lerp } from 'scripts/math';
+import { Point, Ring, Triangle } from 'scripts/math';
 import { Topology, createTopology } from '../util/triangulate';
 import { align, closestCentroids } from '../util/common';
+import { buffalo, circle, elephant, hippo, star } from 'scripts/shapes';
 
 import { DataSelection } from 'scripts/types';
+import { create as createViewport } from 'scripts/viewport';
 import earcut from 'earcut';
 
 export function run() {
   const width = 960;
   const height = 500;
-  const svg = d3
-    .select('body')
-    .append('svg')
-    .attrs({ width, height });
+  const svg = createViewport({
+    size: 1440,
+    viewportWidth: 960,
+    viewportHeight: 500,
+  });
 
   d3.json('../../../assets/us.topo.json', (err, us) => {
     const states = topojson

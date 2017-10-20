@@ -1,2 +1,1 @@
-export { run as runFlubberStatesSingleShape } from './states-single-shape';
-export { run as runFlubberAnimalsSingleShape } from './animals-single-shape';
+export { run as runFlubberSingleShapeAnimalsMorph } from './animals-morph';

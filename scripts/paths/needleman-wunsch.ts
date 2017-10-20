@@ -62,7 +62,6 @@ export function align<T>(
       alignedListB.unshift(listB[j--]);
     }
   }
-  const a = _.last(matrix);
   return {
     from: alignedListA,
     to: alignedListB,

@@ -1,6 +1,5 @@
 import * as d3 from 'lib/d3';
 
-import { Datum, newOctagonData, newSquareData } from './data';
 import { Options as ViewportOptions, create as createViewport } from 'scripts/viewport';
 import {
   circleHandleInAttrs,
@@ -14,7 +13,7 @@ import {
 } from './dom';
 
 import { DataSelection } from 'scripts/types';
-import { Point } from 'scripts/math';
+import { Datum } from './data';
 
 export interface Options {
   readonly viewportOptions: ViewportOptions;

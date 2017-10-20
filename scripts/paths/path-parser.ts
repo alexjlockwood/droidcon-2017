@@ -1,6 +1,5 @@
 import { Command } from './command';
 import { Point } from 'scripts/math';
-import { SvgChar } from './svgchar';
 
 /**
  * Takes an SVG path string (i.e. the text specified in the path's 'd' attribute) and returns

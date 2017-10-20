@@ -1,12 +1,4 @@
-import * as d3 from 'lib/d3';
-
-import { AutoAwesome, Command } from 'scripts/paths';
-
-import { DataSelection } from 'scripts/types';
-import { Point } from 'scripts/math';
-import { create as createViewport } from 'scripts/viewport';
-
-const hippo = `
+export const hippo = `
 M13.833,231.876c4.154-55.746,24.442-104.83,60.85-147.292
 c41.031-47.948,92.453-71.909,154.224-71.909c23.493,0,58.398,3.714,104.745,11.058C380,31.148,414.891,34.778,438.411,34.778
 c35.955,0,87.816,13.426,155.586,40.18c12.009,4.566,26.513,17.056,43.554,37.315c9.683,11.967,24.669,30,44.943,53.975
@@ -34,7 +26,7 @@ c-10.123-4.139-18.658-13.865-25.576-29.036c-11.527-25.406-17.978-39.696-19.367-4
 c-1.871-9.188-4.65-23.294-8.323-42.193c-3.219-15.624-8.28-27.858-15.197-36.621C23.743,284.206,11.977,255.836,13.833,231.876z
 `;
 
-const elephant = `
+export const elephant = `
 M450.43,65.291c13.394,0,26.387,7.755,39.017,23.247c12.6,15.491,19.9,23.247,21.876,23.247
 h18.954c40.969,0,72.705,20.505,95.187,61.512c5.924,11.478,14.977,28.333,27.224,50.604c12.193,22.307,26.418,38.768,42.595,49.421
 c18.123,11.843,36.452,18.372,54.975,19.524c8.659,0.4,18.154-1.188,28.413-4.76c9.065-3.965,18.117-7.942,27.176-11.908
@@ -55,7 +47,7 @@ c20.506,0,40.037,1.371,58.554,4.116c8.67,2.377,22.488,5.161,41.406,8.295c1.588-1
 C422.642,72.367,435.454,65.291,450.43,65.291z
 `;
 
-const buffalo = `
+export const buffalo = `
 M526.991,49.247c17.28,0,39.159,1.076,65.703,3.161c37.488,2.966,61.505,9.949,72.025,20.933
 c5.478,5.518,12.228,16.322,20.221,32.36c8.019,17.345,14.755,29.185,20.234,35.506c4.624-5.894,8.394-9.909,11.373-11.982
 c8.848-6.761,15.35-11.192,19.547-13.265c0,10.946,0.752,17.152,2.242,18.628c1.45,1.451,7.487,2.617,18.006,3.459
@@ -84,57 +76,12 @@ c38.332-27.009,78.54-46.712,120.642-59.16c42.113-12.449,73.734-21.634,94.796-27.
 C410.948,61.501,473.076,49.247,526.991,49.247z
 `;
 
-export function run() {
-  const viewport = createViewport({
-    size: 720,
-    viewportWidth: 820,
-    viewportHeight: 600,
-  });
-  const path = viewport.append('path');
-  const circles = viewport.append('g');
-  const shapes = [hippo, elephant, buffalo].map(d => Command.fromPathData(d));
+export const circle = `
+M490.1,280.649c0,44.459-36.041,80.5-80.5,80.5s-80.5-36.041-80.5-80.5s36.041-80.5,80.5-80.5
+S490.1,236.19,490.1,280.649z
+`;
 
-  (function draw() {
-    let a = [...shapes[0]];
-    let b = [...shapes[1]];
-    const fixResult = AutoAwesome.fix({ from: a, to: b });
-    a = fixResult.from;
-    b = fixResult.to;
-
-    path.attrs({ d: Command.toPathData(a) });
-    circles.datum(a).call(updateCircles);
-
-    const t = d3.transition(undefined).duration(800);
-    path
-      .transition(t)
-      .on('end', () => {
-        shapes.push(shapes.shift());
-        setTimeout(draw, 200);
-      })
-      .attrs({ d: Command.toPathData(fixResult.to) });
-
-    circles
-      .selectAll('circle')
-      .data(b)
-      .transition(t)
-      .attrs({
-        cx: d => d.end[0],
-        cy: d => d.end[1],
-      });
-  })();
-}
-
-function updateCircles(sel: DataSelection<Command[]>) {
-  const circles = sel.selectAll('circle').data(d => d);
-  const merged = circles
-    .enter()
-    .append('circle')
-    .attrs({ r: 4 })
-    .merge(circles)
-    .attrs({
-      cx: d => d.end[0],
-      cy: d => d.end[1],
-      fill: d => (d.isSplit ? '#F44336' : '#FFEB3B'),
-    });
-  circles.exit().remove();
-}
+export const star = `
+M409.6,198.066l26.833,54.369l60,8.719l-43.417,42.321l10.249,59.758L409.6,335.019
+l-53.666,28.214l10.249-59.758l-43.417-42.321l60-8.719L409.6,198.066z
+`;

@@ -1,7 +1,7 @@
-import { ShapeOptions, runShapeToShape } from './util/shape-to-shape';
-import { newMinusData, newPlusData, reverseData, shiftData } from './util/data';
+import { newMinusData, newPlusData, shiftData } from './util/data';
 
 import { floorMod } from 'scripts/math';
+import { runShapeToShape } from './util/shape-to-shape';
 
 export function runPlusToMinusMorph() {
   runShapeToShape({
@@ -27,7 +27,6 @@ export function runPlusToMinusMorph() {
 
 export function runPlusToSmallShiftMinusMorph() {
   const numShifts = -1;
-  const shouldMorph = false;
   const origToData = newMinusData();
   const shiftedToData = shiftData(origToData, numShifts).map(d => {
     return Object.assign({}, d, {
@@ -58,7 +57,6 @@ export function runPlusToSmallShiftMinusMorph() {
 
 export function runPlusToLargeShiftMinusMorph() {
   const numShifts = 6;
-  const shouldMorph = false;
   const origToData = newMinusData();
   const shiftedToData = shiftData(origToData, numShifts).map(d => {
     return Object.assign({}, d, {

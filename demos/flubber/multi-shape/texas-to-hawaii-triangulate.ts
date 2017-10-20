@@ -1,8 +1,8 @@
 import * as d3 from 'lib/d3';
 import * as topojson from 'topojson-client';
 
-import { Point, Ring, Triangle, distance, lerp } from 'scripts/math';
-import { addPoints, align, closestCentroids, join, wind } from '../util/common';
+import { Point, Ring, Triangle } from 'scripts/math';
+import { align, closestCentroids, join } from '../util/common';
 
 import { Topology } from '../util/triangulate';
 import { create as createViewport } from 'scripts/viewport';
