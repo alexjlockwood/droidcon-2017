@@ -3,10 +3,6 @@ import 'd3-jetpack';
 import 'd3-selection-multi';
 
 import {
-  runAddPointsToAnimals,
-  runNeedlemanWunschAnimalsSingleShape,
-} from './demos/needleman-wunsch';
-import {
   runCircleToStarAddDummyPoints,
   runCircleToStarMorph,
   runCircleToStarPickStartingPoint,
@@ -37,14 +33,13 @@ import {
   runSqWithDummyPointsToShiftedOctMorph,
 } from './demos/intro-to-path-morphing';
 import {
-  runFlubberAnimalsSingleShape,
-  runFlubberStatesSingleShape,
-} from './demos/flubber/single-shape';
-import {
-  runFlubberStatesMultipleShapes,
+  runStatesTriangulate,
   runTexasToHawaiiFade,
   runTexasToHawaiiTriangulate,
 } from './demos/flubber/multi-shape';
+
+import { runFlubberSingleShapeAnimalsMorph } from './demos/flubber/single-shape';
+import { runNeedlemanWunschSingleShapeAnimalsMorph } from './demos/needleman-wunsch';
 
 const introToPathMorphingMap = new Map<string, () => void>([
   ['?sq-to-sq', runSqToSq],
@@ -82,19 +77,19 @@ const flubberStrategyMap = new Map<string, () => void>([
 ]);
 
 const flubberSingleShapeMap = new Map<string, () => void>([
-  ['?states-single-shape', runFlubberStatesSingleShape],
-  ['?animals-single-shape', runFlubberAnimalsSingleShape],
+  ['?single-shape-animals-morph', runFlubberSingleShapeAnimalsMorph],
+  // ['?states-single-shape', runFlubberStatesSingleShape],
 ]);
 
 const flubberMultiShapeMap = new Map<string, () => void>([
   ['?texas-to-hawaii-fade', runTexasToHawaiiFade],
   ['?texas-to-hawaii-triangulate', runTexasToHawaiiTriangulate],
-  ['?states-multiple-shapes', runFlubberStatesMultipleShapes],
+  ['?states-triangulate', runStatesTriangulate],
 ]);
 
 const needlemanWunschMap = new Map<string, () => void>([
-  ['?animals-single-shape', runNeedlemanWunschAnimalsSingleShape],
-  ['?add-points-to-animals', runAddPointsToAnimals],
+  ['?single-shape-animals-morph', runNeedlemanWunschSingleShapeAnimalsMorph],
+  // ['?add-points-to-animals', runAddPointsToAnimals],
 ]);
 
 const sectionMap = new Map<string, Map<string, () => void>>([

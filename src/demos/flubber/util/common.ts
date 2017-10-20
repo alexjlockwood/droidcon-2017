@@ -76,7 +76,6 @@ export function wind(ring: Ring, vs: Ring) {
 }
 
 export function closestCentroids(start: Ring[], end: Ring[]) {
-  const distances = start.map(p1 => end.map(p2 => squaredDistance(p1, p2)));
   if (start.length > 8) {
     return start.map((d, i) => i);
   }

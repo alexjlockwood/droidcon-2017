@@ -2,8 +2,6 @@ import * as SvgPath from 'svgpath';
 
 import { Ring, isFiniteNumber } from 'scripts/math';
 
-import normalizeRing from './normalize';
-
 type SvgPath = typeof SvgPath;
 
 export function toPathString(ring: Ring) {

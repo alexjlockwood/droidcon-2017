@@ -4,7 +4,6 @@ import * as d3 from 'lib/d3';
 import { AutoAwesome, Command } from 'scripts/paths';
 
 import { DataSelection } from 'scripts/types';
-import { Point } from 'scripts/math';
 
 const options = { size: 1440, viewportWidth: 1600, viewportHeight: 800 };
 
@@ -65,18 +64,6 @@ function showSegments(
       .attrs({ r: (d, i) => 5 });
   }
 }
-
-// function morph(from: DataSelection, to: DataSelection) {
-//   const fromPath = from.append('path.from').attrs({ d: fixedHippo });
-//   const toPath = to.append('path.to').attrs({ d: fixedElephant });
-
-//   fromPath
-//     .transition()
-//     .duration(2000)
-//     .attr('d', fixedElephant);
-// .attrTween('d', d => d3.interpolatePath(hippo, elephant));
-// }
-// morph(fromContainer, toContainer);
 
 const hippo = `
 M 139.8 164.88 C 142.54 128.14 155.9 95.8 179.9 67.82 C 206.94 36.22 240.82 20.42 281.53 20.42

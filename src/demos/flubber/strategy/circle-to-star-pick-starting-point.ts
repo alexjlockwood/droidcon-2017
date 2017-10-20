@@ -1,10 +1,9 @@
 import * as d3 from 'lib/d3';
 
-import { Point, Ring } from 'scripts/math';
-import { addPoints, join, wind } from '../util/common';
+import { addPoints, join } from '../util/common';
 
-import { Command } from 'scripts/paths';
 import { DataSelection } from 'scripts/types';
+import { Point } from 'scripts/math';
 import { create as createViewport } from 'scripts/viewport';
 import { pathStringToRing } from '../util/svg';
 
@@ -45,22 +44,6 @@ export function run() {
   const toPathData =
     'M 18 3 L 18.882 4.788 L 20.856 5.07 L 19.428 6.462 L 19.764 8.43 L 18 7.5 L 16.236 8.43 L 16.572 6.462 L 15.144 5.07 L 17.118 4.788 Z';
 
-  // const origFromSegments: Datum[] = Command.fromPathData(fromPathData).map((c, i) => {
-  //   return {
-  //     point: c.end,
-  //     position: i,
-  //   };
-  // });
-  // const origToSegments = Command.fromPathData(toPathData).map((c, i) => {
-  //   return {
-  //     point: c.end,
-  //     position: i,
-  //   };
-  // });
-
-  // fromSegments.datum(origFromSegments).call(updateCircles);
-  // toSegments.datum(origToSegments).call(updateCircles);
-
   const fromRing = [...pathStringToRing(fromPathData, 0.4).ring];
   const toRing = [...pathStringToRing(toPathData, 0.4).ring];
 
@@ -84,9 +67,6 @@ export function run() {
     };
   });
 
-  // Pick optimal winding.
-  // fromRing = wind(fromRing, toRing);
-
   fromPath.attrs({ d: join(fromRing) });
   toPath.attrs({ d: join(toRing) });
 
@@ -108,57 +88,8 @@ export function run() {
     toSegments.call(updateCircles, data);
     if (shiftOffset !== 0) {
       d3.timeout(recurseFn, 50);
-    } else {
-      // d3.timeout(morph, 1000);
     }
   }, 500);
-
-  function morph() {
-    const t = d3.transition(undefined).duration(800);
-    fromPath.transition(t).attrs({ d: join(toRing) });
-    toPath.transition(t).attrs({ d: join(fromRing) });
-    linesContainer.remove();
-    function updateCirclesFn(selection: DataSelection, data: Datum[]) {
-      // JOIN new data with old elements.
-      const segments = selection
-        .datum(data)
-        .selectAll('circle')
-        .data(d => d, (d: Datum) => d.position.toString());
-
-      // EXIT old elements not present in new data.
-      segments.exit().remove();
-
-      // UPDATE old elements present in new data.
-      segments
-        .transition()
-        .duration(800)
-        .attrs({
-          cx: d => d.point[0],
-          cy: d => d.point[1],
-          r: 0.075,
-          fill: (d, i) => interpolateColor(i, data.length),
-          stroke: '#000',
-          'stroke-width': 0.01,
-          // opacity: 1,
-        });
-
-      // ENTER new elements present in new data.
-      segments
-        .enter()
-        .append('circle')
-        .attrs({
-          cx: d => d.point[0],
-          cy: d => d.point[1],
-          r: 0.075,
-          fill: (d, i) => interpolateColor(i, data.length),
-          stroke: '#000',
-          'stroke-width': 0.01,
-          // opacity: 0,
-        });
-    }
-    fromSegments.call(updateCirclesFn, newToSegments);
-    toSegments.call(updateCirclesFn, newFromSegments);
-  }
 }
 
 function updateCircles(selection: DataSelection, data: Datum[]) {
