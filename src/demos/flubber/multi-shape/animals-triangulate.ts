@@ -9,38 +9,42 @@ import { buffalo, circle, elephant, hippo, star } from 'scripts/shapes';
 import { DataSelection } from 'scripts/types';
 import { create as createViewport } from 'scripts/viewport';
 import earcut from 'earcut';
+import { pathStringToRing } from '../util/svg';
 
 export function run() {
-  const width = 960;
-  const height = 500;
+  const width = 820;
+  const height = 570;
   const svg = createViewport({
     size: 1440,
-    viewportWidth: 960,
-    viewportHeight: 500,
+    viewportWidth: width,
+    viewportHeight: height,
   });
+  const pathDatasAndSubdivides: [string, number][] = [
+    [elephant, 4],
+    [circle, 3],
+    [hippo, 6],
+    [star, 4],
+    [buffalo, 2],
+  ];
+  const ringsAndSubdivides = pathDatasAndSubdivides.map(
+    d => [pathStringToRing(d[0]).ring, d[1]] as [Ring, number],
+  );
+  morph(ringsAndSubdivides);
 
-  d3.json('../../../assets/us.topo.json', (err, us) => {
-    const states = topojson
-      .feature(us, (us as any).objects.states)
-      .features.map(d => d.geometry.coordinates[0]);
-    d3.shuffle(states);
-    morph(states);
-  });
-
-  function morph(states) {
-    const source = states.shift();
-    const destination = states[0];
-    const multi = subdivide(source);
-    states.push(source);
+  function morph(shapes: [Ring, number][]) {
+    const source = shapes.shift();
+    const destination = shapes[0];
+    const multi = subdivide(source[0], source[1]);
+    shapes.push(source);
     d3
       .queue(1)
-      .defer(tween, [source], multi)
-      .defer(tween, multi, [destination])
+      .defer(tween, [source[0]], multi)
+      .defer(tween, multi, [destination[0]])
       .await(err => {
         if (err) {
           throw err;
         }
-        morph(states);
+        morph(shapes);
       });
   }
 
@@ -56,8 +60,11 @@ export function run() {
       .selectAll('path.state')
       .transition()
       .delay(from.length > 1 ? 0 : 400)
-      .duration(2500)
-      .styles({ fill: (d, i) => (from.length > 1 ? '#ccc' : d3.interpolateCool(i / pairs.length)) })
+      .duration(1500)
+      .styles({
+        fill: (d, i) => (from.length > 1 ? '#d8d8d8' : d3.interpolateCool(i / pairs.length)),
+        stroke: '#333',
+      })
       .attrTween('d', (d, i) => d3.interpolateString(join(d[0]), join(d[1])))
       .on('end', () => {
         if (to.length === 1) {
@@ -71,8 +78,7 @@ export function run() {
   }
 
   // Given a full-sized ring, return 2 - 6 smaller clones in a dice pattern.
-  function subdivide(ring: Ring) {
-    const numClones = 2 + Math.floor(Math.random() * 5);
+  function subdivide(ring: Ring, numClones = 2 + Math.floor(Math.random() * 5)) {
     const bounds = getBounds(ring);
     return d3.range(numClones).map(d => {
       let x0: number;
