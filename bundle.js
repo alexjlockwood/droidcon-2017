@@ -13429,7 +13429,7 @@ function updateCircles(selection, enterColor, updateColor) {
     segments.attrs({
         cx: function (d) { return d.point[0]; },
         cy: function (d) { return d.point[1]; },
-        r: 0.075,
+        r: 0.1,
         fill: updateColor,
         stroke: '#000',
         'stroke-width': 0.01,
@@ -13442,7 +13442,7 @@ function updateCircles(selection, enterColor, updateColor) {
         .attrs({
         cx: function (d) { return d.point[0]; },
         cy: function (d) { return d.point[1]; },
-        r: 0.075,
+        r: 0.1,
         fill: enterColor,
         stroke: '#000',
         'stroke-width': 0.01,
@@ -13534,7 +13534,7 @@ function updateCircles$1(selection, data) {
     segments.attrs({
         cx: function (d) { return d.point[0]; },
         cy: function (d) { return d.point[1]; },
-        r: 0.075,
+        r: 0.1,
         fill: function (d, i) { return interpolateColor(i, data.length); },
         stroke: '#000',
         'stroke-width': 0.01,
@@ -13546,7 +13546,7 @@ function updateCircles$1(selection, data) {
         .attrs({
         cx: function (d) { return d.point[0]; },
         cy: function (d) { return d.point[1]; },
-        r: 0.075,
+        r: 0.1,
         fill: function (d, i) { return interpolateColor(i, data.length); },
         stroke: '#000',
         'stroke-width': 0.01,
@@ -13599,15 +13599,15 @@ function run$5() {
         viewportWidth: 24,
         viewportHeight: 12,
     });
-    var fromContainer = viewport.append('g.from');
-    var fromPath = fromContainer.append('path').attrs({
+    var toContainer = viewport.append('g.to');
+    var toPath = toContainer.append('path').attrs({
         fill: '#d8d8d8',
         stroke: '#000',
         'stroke-width': 2,
         'vector-effect': 'non-scaling-stroke',
     });
-    var toContainer = viewport.append('g.to');
-    var toPath = toContainer.append('path').attrs({
+    var fromContainer = viewport.append('g.from');
+    var fromPath = fromContainer.append('path').attrs({
         fill: '#d8d8d8',
         stroke: '#000',
         'stroke-width': 2,
@@ -13648,7 +13648,7 @@ function run$5() {
     function morph() {
         var t = transition(undefined).duration(2000);
         fromPath.transition(t).attrs({ d: join(toRing) });
-        toPath.transition(t).attrs({ d: join(fromRing) });
+        // toPath.transition(t).attrs({ d: join(fromRing) });
         function updateCirclesFn(selection, data) {
             // JOIN new data with old elements.
             var segments = selection
@@ -13664,7 +13664,7 @@ function run$5() {
                 .attrs({
                 cx: function (d) { return d.point[0]; },
                 cy: function (d) { return d.point[1]; },
-                r: 0.075,
+                r: 0.1,
                 fill: function (d, i) { return interpolateColor$1(i, data.length); },
                 stroke: '#000',
                 'stroke-width': 0.01,
@@ -13676,14 +13676,14 @@ function run$5() {
                 .attrs({
                 cx: function (d) { return d.point[0]; },
                 cy: function (d) { return d.point[1]; },
-                r: 0.075,
+                r: 0.1,
                 fill: function (d, i) { return interpolateColor$1(i, data.length); },
                 stroke: '#000',
                 'stroke-width': 0.01,
             });
         }
         fromSegments.call(updateCirclesFn, newToSegments);
-        toSegments.call(updateCirclesFn, newFromSegments);
+        // toSegments.call(updateCirclesFn, newFromSegments);
     }
 }
 function updateCircles$2(selection, data) {
@@ -13698,7 +13698,7 @@ function updateCircles$2(selection, data) {
     segments.attrs({
         cx: function (d) { return d.point[0]; },
         cy: function (d) { return d.point[1]; },
-        r: 0.075,
+        r: 0.1,
         fill: function (d, i) { return interpolateColor$1(i, data.length); },
         stroke: '#000',
         'stroke-width': 0.01,
@@ -13710,7 +13710,7 @@ function updateCircles$2(selection, data) {
         .attrs({
         cx: function (d) { return d.point[0]; },
         cy: function (d) { return d.point[1]; },
-        r: 0.075,
+        r: 0.1,
         fill: function (d, i) { return interpolateColor$1(i, data.length); },
         stroke: '#000',
         'stroke-width': 0.01,
@@ -13721,6 +13721,181 @@ function interpolateColor$1(index, length) {
     return cool(index / length * 0.7 + 0.15);
 }
 //# sourceMappingURL=circle-to-star-morph.js.map
+
+function run$6() {
+    var viewport = create$1({
+        size: 1440,
+        viewportWidth: 24,
+        viewportHeight: 12,
+    });
+    var toContainer = viewport.append('g.to');
+    var toPath = toContainer.append('path').attrs({
+        fill: '#d8d8d8',
+        stroke: '#000',
+        'stroke-width': 2,
+        'vector-effect': 'non-scaling-stroke',
+        'fill-rule': 'evenodd',
+    });
+    var toInnerPath = toContainer.append('path').attrs({
+        fill: 'none',
+        stroke: '#000',
+        'stroke-width': 2,
+        'vector-effect': 'non-scaling-stroke',
+        'fill-rule': 'evenodd',
+    });
+    var fromContainer = viewport.append('g.from');
+    var fromPath = fromContainer.append('path').attrs({
+        fill: '#d8d8d8',
+        stroke: '#000',
+        'stroke-width': 2,
+        'vector-effect': 'non-scaling-stroke',
+        'fill-rule': 'evenodd',
+    });
+    var fromInnerPath = fromContainer.append('path').attrs({
+        fill: 'none',
+        stroke: '#000',
+        'stroke-width': 2,
+        'vector-effect': 'non-scaling-stroke',
+        'fill-rule': 'evenodd',
+    });
+    var fromSegments = fromContainer.append('g');
+    var toSegments = toContainer.append('g');
+    var fromInnerSegments = fromContainer.append('g');
+    var toInnerSegments = toContainer.append('g');
+    var fromPathData = "\n    M 6 3 C 7.656 3 9 4.344 9 6 C 9 7.656 7.656 9 6 9 C 4.344 9 3 7.656 3 6 C 3 4.344 4.344 3 6 3 Z\n  ";
+    var fromInnerPathData = 'M 6 5 C 6.552 5 7 5.448 7 6 C 7 6.552 6.552 7 6 7 C 5.448 7 5 6.552 5 6 C 5 5.448 5.448 5 6 5 Z';
+    var toPathData = "\n    M 18 3 L 18.882 4.788 L 20.856 5.07 L 19.428 6.462 L 19.764 8.43 L 18 7.5 L 16.236 8.43 L 16.572 6.462 L 15.144 5.07 L 17.118 4.788 Z\n  ";
+    var toInnerPathData = 'M 18 6 C 18 6 18 6 18 6 C 18 6 18 6 18 6 C 18 6 18 6 18 6 C 18 6 18 6 18 6 Z';
+    var fromRing = pathStringToRing(fromPathData, 0.4).ring.slice();
+    var fromInnerRing = pathStringToRing(fromInnerPathData, 0.4).ring.slice();
+    var toRing = pathStringToRing(toPathData, 0.4).ring.slice();
+    var toInnerRing = pathStringToRing(toInnerPathData, 0.4).ring.slice();
+    console.log(toInnerRing);
+    // Same number of points on each ring.
+    if (fromRing.length < toRing.length) {
+        addPoints(fromRing, toRing.length - fromRing.length);
+    }
+    else if (toRing.length < fromRing.length) {
+        addPoints(toRing, fromRing.length - toRing.length);
+    }
+    for (var i = toInnerRing.length; i < fromInnerRing.length; i++) {
+        toInnerRing.push([18, 6]);
+    }
+    console.log(fromInnerRing, toInnerRing);
+    var newFromSegments = fromRing.slice().map(function (p, i) {
+        return {
+            point: p,
+            position: i,
+        };
+    });
+    var newFromInnerSegments = fromInnerRing.slice().map(function (p, i) {
+        return {
+            point: p,
+            position: i,
+        };
+    });
+    var newToSegments = toRing.slice().map(function (p, i) {
+        return {
+            point: p,
+            position: i,
+        };
+    });
+    var newToInnerSegments = toInnerRing.slice().map(function (p, i) {
+        return {
+            point: p,
+            position: i,
+        };
+    });
+    fromPath.attrs({ d: join(fromRing) + fromInnerPathData });
+    toPath.attrs({ d: join(toRing) + toInnerPathData });
+    fromSegments.call(updateCircles$3, newFromSegments);
+    toSegments.call(updateCircles$3, newToSegments);
+    fromInnerPath.attrs({ d: join(fromInnerRing) });
+    toInnerPath.attrs({ d: join(toInnerRing) });
+    fromInnerSegments.call(updateCircles$3, newFromInnerSegments);
+    toInnerSegments.call(updateCircles$3, newToInnerSegments);
+    timeout$1(function recurseFn() {
+        timeout$1(function () {
+            morph(fromPath, fromSegments, newToSegments, join(toRing) + toInnerPathData);
+            morph(fromInnerPath, fromInnerSegments, newToInnerSegments, join(toInnerRing));
+        }, 1000);
+    }, 500);
+}
+function morph(fromPath, fromSegments, newToSegments, toPathData) {
+    var t = transition(undefined).duration(2000);
+    fromPath.transition(t).attrs({ d: toPathData });
+    // toPath.transition(t).attrs({ d: join(fromRing) });
+    function updateCirclesFn(selection, data) {
+        // JOIN new data with old elements.
+        var segments = selection
+            .datum(data)
+            .selectAll('circle')
+            .data(function (d) { return d; }, function (d) { return d.position.toString(); });
+        // EXIT old elements not present in new data.
+        segments.exit().remove();
+        // UPDATE old elements present in new data.
+        segments
+            .transition()
+            .duration(2000)
+            .attrs({
+            cx: function (d) { return d.point[0]; },
+            cy: function (d) { return d.point[1]; },
+            r: 0.1,
+            fill: function (d, i) { return interpolateColor$2(i, data.length); },
+            stroke: '#000',
+            'stroke-width': 0.01,
+        });
+        // ENTER new elements present in new data.
+        segments
+            .enter()
+            .append('circle')
+            .attrs({
+            cx: function (d) { return d.point[0]; },
+            cy: function (d) { return d.point[1]; },
+            r: 0.1,
+            fill: function (d, i) { return interpolateColor$2(i, data.length); },
+            stroke: '#000',
+            'stroke-width': 0.01,
+        });
+    }
+    fromSegments.call(updateCirclesFn, newToSegments);
+    // toSegments.call(updateCirclesFn, newFromSegments);
+}
+function updateCircles$3(selection, data) {
+    // JOIN new data with old elements.
+    var segments = selection
+        .datum(data)
+        .selectAll('circle')
+        .data(function (d) { return d; }, function (d) { return d.position.toString(); });
+    // EXIT old elements not present in new data.
+    segments.exit().remove();
+    // UPDATE old elements present in new data.
+    segments.attrs({
+        cx: function (d) { return d.point[0]; },
+        cy: function (d) { return d.point[1]; },
+        r: 0.1,
+        fill: function (d, i) { return interpolateColor$2(i, data.length); },
+        stroke: '#000',
+        'stroke-width': 0.01,
+    });
+    // ENTER new elements present in new data.
+    segments
+        .enter()
+        .append('circle')
+        .attrs({
+        cx: function (d) { return d.point[0]; },
+        cy: function (d) { return d.point[1]; },
+        r: 0.1,
+        fill: function (d, i) { return interpolateColor$2(i, data.length); },
+        stroke: '#000',
+        'stroke-width': 0.01,
+    });
+}
+function interpolateColor$2(index, length) {
+    index = (index + length) % length;
+    return cool(index / length * 0.7 + 0.15);
+}
+//# sourceMappingURL=donut-to-star-morph.js.map
 
 //# sourceMappingURL=index.js.map
 
@@ -13745,7 +13920,7 @@ function lineHandleOutAttrs(selection, colorAttrs) {
     lineHandleAttrs(selection, colorAttrs, 'handleOut');
 }
 function lineHandleAttrs(selection, colorAttrs, type) {
-    var interpolateColorFn = 'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor$2;
+    var interpolateColorFn = 'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor$3;
     var dataSelection = isDataTransition(selection)
         ? selection.selection()
         : selection;
@@ -13770,7 +13945,7 @@ function circleHandleOutAttrs(selection, colorAttrs) {
     circleHandleAttrs(selection, colorAttrs, 'handleOut');
 }
 function circleHandleAttrs(selection, colorAttrs, type) {
-    var interpolateColorFn = 'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor$2;
+    var interpolateColorFn = 'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor$3;
     var dataSelection = isDataTransition(selection)
         ? selection.selection()
         : selection;
@@ -13785,7 +13960,7 @@ function circleHandleAttrs(selection, colorAttrs, type) {
     });
 }
 function circleSegmentAttrs(selection, colorAttrs) {
-    var interpolateColorFn = 'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor$2;
+    var interpolateColorFn = 'interpolateColor' in colorAttrs ? colorAttrs.interpolateColor : interpolateColor$3;
     var dataSelection = isDataTransition(selection)
         ? selection.selection()
         : selection;
@@ -13832,7 +14007,7 @@ function toPathDataAttr(selection) {
 function isDataTransition(s) {
     return 'selection' in s;
 }
-function interpolateColor$2(index, length) {
+function interpolateColor$3(index, length) {
     index = (index + length) % length;
     return cool(index / length * 0.7 + 0.15);
 }
@@ -14689,7 +14864,7 @@ function runPlusToLargeShiftMinusMorph() {
 
 //# sourceMappingURL=index.js.map
 
-function run$6() {
+function run$7() {
     var viewport = create$1({
         size: 1440,
         viewportWidth: 820,
@@ -14712,14 +14887,14 @@ function run$6() {
         a = wind(a, b);
         path.attrs({ d: join(a) });
         // Redraw points.
-        circles.datum(a).call(updateCircles$3);
+        circles.datum(a).call(updateCircles$4);
         // Morph.
-        var t = transition(undefined).duration(800);
+        var t = transition(undefined).duration(1600);
         path
             .transition(t)
             .on('end', function () {
             shapes.push(shapes.shift());
-            setTimeout(draw, 200);
+            setTimeout(draw, 400);
         })
             .attrs({ d: join(b) });
         circles
@@ -14729,12 +14904,12 @@ function run$6() {
             .attrs({ cx: function (d) { return d[0]; }, cy: function (d) { return d[1]; } });
     })();
 }
-function updateCircles$3(sel) {
+function updateCircles$4(sel) {
     var circles = sel.selectAll('circle').data(function (d) { return d; });
     var merged = circles
         .enter()
         .append('circle')
-        .attr('r', 2)
+        .attr('r', 3)
         .merge(circles);
     merged.classed('added', function (d) { return d.added; }).attrs({
         cx: function (d) { return d[0]; },
@@ -14746,7 +14921,7 @@ function updateCircles$3(sel) {
 
 //# sourceMappingURL=index.js.map
 
-function run$7() {
+function run$8() {
     var viewport = create$1({
         size: 1440,
         viewportWidth: 820,
@@ -14760,13 +14935,13 @@ function run$7() {
         var b = fixResult.to.map(function (cmd) { return ({ point: cmd.end, isSplit: cmd.isSplit }); });
         var a = fixResult.from.map(function (cmd, i) { return ({ point: cmd.end, isSplit: b[i].isSplit }); });
         path.attrs({ d: Command.toPathData(fixResult.from) });
-        circles.datum(a).call(updateCircles$4);
-        var t = transition(undefined).duration(800);
+        circles.datum(a).call(updateCircles$5);
+        var t = transition(undefined).duration(1600);
         path
             .transition(t)
             .on('end', function () {
             shapes.push(shapes.shift());
-            setTimeout(draw, 200);
+            setTimeout(draw, 400);
         })
             .attrs({ d: Command.toPathData(fixResult.to) });
         circles
@@ -14779,7 +14954,7 @@ function run$7() {
         });
     })();
 }
-function updateCircles$4(sel) {
+function updateCircles$5(sel) {
     var circles = sel.selectAll('circle').data(function (d) { return d; });
     circles
         .enter()
@@ -14793,9 +14968,6 @@ function updateCircles$4(sel) {
     });
     circles.exit().remove();
 }
-//# sourceMappingURL=animals-morph.js.map
-
-// export { run as runAddPointsToAnimals } from './add-points-to-animals';
 
 //# sourceMappingURL=index.js.map
 
@@ -14832,9 +15004,10 @@ var flubberStrategyMap = new Map([
     ['?circle-to-star-add-dummy-points', run$3],
     ['?circle-to-star-pick-starting-point', run$4],
     ['?circle-to-star-morph', run$5],
+    ['?donut-to-star-morph', run$6],
 ]);
 var flubberSingleShapeMap = new Map([
-    ['?single-shape-animals-morph', run$6],
+    ['?single-shape-animals-morph', run$7],
 ]);
 var flubberMultiShapeMap = new Map([
     ['?texas-to-hawaii-fade', run$1],
@@ -14842,7 +15015,7 @@ var flubberMultiShapeMap = new Map([
     ['?animals-triangulate', run$2],
 ]);
 var needlemanWunschMap = new Map([
-    ['?single-shape-animals-morph', run$7],
+    ['?single-shape-animals-morph', run$8],
 ]);
 var sectionMap = new Map([
     ['/demos/intro-to-path-morphing/index.html', introToPathMorphingMap],

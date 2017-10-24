@@ -41,13 +41,13 @@ export function run() {
     circles.datum(a).call(updateCircles);
 
     // Morph.
-    const t = d3.transition(undefined).duration(800);
+    const t = d3.transition(undefined).duration(1600);
 
     path
       .transition(t)
       .on('end', () => {
         shapes.push(shapes.shift());
-        setTimeout(draw, 200);
+        setTimeout(draw, 400);
       })
       .attrs({ d: join(b) });
 
@@ -65,7 +65,7 @@ function updateCircles(sel: DataSelection<Point[]>) {
   const merged = circles
     .enter()
     .append('circle')
-    .attr('r', 2)
+    .attr('r', 3)
     .merge(circles);
 
   merged.classed('added', (d: Point & { added: boolean }) => d.added).attrs({
