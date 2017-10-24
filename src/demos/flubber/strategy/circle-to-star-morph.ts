@@ -19,16 +19,16 @@ export function run() {
     viewportHeight: 12,
   });
 
-  const fromContainer = viewport.append('g.from');
-  const fromPath = fromContainer.append('path').attrs({
+  const toContainer = viewport.append('g.to');
+  const toPath = toContainer.append('path').attrs({
     fill: '#d8d8d8',
     stroke: '#000',
     'stroke-width': 2,
     'vector-effect': 'non-scaling-stroke',
   });
 
-  const toContainer = viewport.append('g.to');
-  const toPath = toContainer.append('path').attrs({
+  const fromContainer = viewport.append('g.from');
+  const fromPath = fromContainer.append('path').attrs({
     fill: '#d8d8d8',
     stroke: '#000',
     'stroke-width': 2,
@@ -79,7 +79,7 @@ export function run() {
   function morph() {
     const t = d3.transition(undefined).duration(2000);
     fromPath.transition(t).attrs({ d: join(toRing) });
-    toPath.transition(t).attrs({ d: join(fromRing) });
+    // toPath.transition(t).attrs({ d: join(fromRing) });
     function updateCirclesFn(selection: DataSelection, data: Datum[]) {
       // JOIN new data with old elements.
       const segments = selection
@@ -97,7 +97,7 @@ export function run() {
         .attrs({
           cx: d => d.point[0],
           cy: d => d.point[1],
-          r: 0.075,
+          r: 0.1,
           fill: (d, i) => interpolateColor(i, data.length),
           stroke: '#000',
           'stroke-width': 0.01,
@@ -110,14 +110,14 @@ export function run() {
         .attrs({
           cx: d => d.point[0],
           cy: d => d.point[1],
-          r: 0.075,
+          r: 0.1,
           fill: (d, i) => interpolateColor(i, data.length),
           stroke: '#000',
           'stroke-width': 0.01,
         });
     }
     fromSegments.call(updateCirclesFn, newToSegments);
-    toSegments.call(updateCirclesFn, newFromSegments);
+    // toSegments.call(updateCirclesFn, newFromSegments);
   }
 }
 
@@ -135,7 +135,7 @@ function updateCircles(selection: DataSelection, data: Datum[]) {
   segments.attrs({
     cx: d => d.point[0],
     cy: d => d.point[1],
-    r: 0.075,
+    r: 0.1,
     fill: (d, i) => interpolateColor(i, data.length),
     stroke: '#000',
     'stroke-width': 0.01,
@@ -149,7 +149,7 @@ function updateCircles(selection: DataSelection, data: Datum[]) {
     .attrs({
       cx: d => d.point[0],
       cy: d => d.point[1],
-      r: 0.075,
+      r: 0.1,
       fill: (d, i) => interpolateColor(i, data.length),
       stroke: '#000',
       'stroke-width': 0.01,

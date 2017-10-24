@@ -106,7 +106,7 @@ function updateCircles(selection: DataSelection, data: Datum[]) {
   segments.attrs({
     cx: d => d.point[0],
     cy: d => d.point[1],
-    r: 0.075,
+    r: 0.1,
     fill: (d, i) => interpolateColor(i, data.length),
     stroke: '#000',
     'stroke-width': 0.01,
@@ -120,7 +120,7 @@ function updateCircles(selection: DataSelection, data: Datum[]) {
     .attrs({
       cx: d => d.point[0],
       cy: d => d.point[1],
-      r: 0.075,
+      r: 0.1,
       fill: (d, i) => interpolateColor(i, data.length),
       stroke: '#000',
       'stroke-width': 0.01,

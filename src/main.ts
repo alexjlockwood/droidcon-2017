@@ -11,6 +11,7 @@ import {
   runCircleToStarAddDummyPoints,
   runCircleToStarMorph,
   runCircleToStarPickStartingPoint,
+  runDonutToStarMorph,
 } from './demos/flubber/strategy';
 import {
   runCurveToCurve,
@@ -74,6 +75,7 @@ const flubberStrategyMap = new Map<string, () => void>([
   ['?circle-to-star-add-dummy-points', runCircleToStarAddDummyPoints],
   ['?circle-to-star-pick-starting-point', runCircleToStarPickStartingPoint],
   ['?circle-to-star-morph', runCircleToStarMorph],
+  ['?donut-to-star-morph', runDonutToStarMorph],
 ]);
 
 const flubberSingleShapeMap = new Map<string, () => void>([
