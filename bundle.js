@@ -13728,6 +13728,29 @@ function run$6() {
         viewportWidth: 24,
         viewportHeight: 12,
     });
+    var toPath = viewport.append('path').call(setPathAttrs);
+    var fromPath = viewport.append('path').call(setPathAttrs);
+    var fromPathData = "\n    M 6 3 C 7.656 3 9 4.344 9 6 C 9 7.656 7.656 9 6 9 C 4.344 9 3 7.656 3 6 C 3 4.344 4.344 3 6 3 Z\n    M 6 5 C 6.552 5 7 5.448 7 6 C 7 6.552 6.552 7 6 7 C 5.448 7 5 6.552 5 6 C 5 5.448 5.448 5 6 5 Z\n  ";
+    var toPathData = "\n    M 18 3 L 18.882 4.788 L 20.856 5.07 L 19.428 6.462 L 19.764 8.43 L 18 7.5 L 16.236 8.43 L 16.572 6.462 L 15.144 5.07 L 17.118 4.788 Z\n  ";
+    fromPath.attrs({ d: fromPathData });
+    toPath.attrs({ d: toPathData });
+}
+function setPathAttrs(selection) {
+    selection.attrs({
+        fill: '#d8d8d8',
+        stroke: '#000',
+        'stroke-width': 2,
+        'vector-effect': 'non-scaling-stroke',
+        'fill-rule': 'evenodd',
+    });
+}
+
+function run$7() {
+    var viewport = create$1({
+        size: 1440,
+        viewportWidth: 24,
+        viewportHeight: 12,
+    });
     var toContainer = viewport.append('g.to');
     var toPath = toContainer.append('path').attrs({
         fill: '#d8d8d8',
@@ -13770,7 +13793,6 @@ function run$6() {
     var fromInnerRing = pathStringToRing(fromInnerPathData, 0.4).ring.slice();
     var toRing = pathStringToRing(toPathData, 0.4).ring.slice();
     var toInnerRing = pathStringToRing(toInnerPathData, 0.4).ring.slice();
-    console.log(toInnerRing);
     // Same number of points on each ring.
     if (fromRing.length < toRing.length) {
         addPoints(fromRing, toRing.length - fromRing.length);
@@ -13781,7 +13803,6 @@ function run$6() {
     for (var i = toInnerRing.length; i < fromInnerRing.length; i++) {
         toInnerRing.push([18, 6]);
     }
-    console.log(fromInnerRing, toInnerRing);
     var newFromSegments = fromRing.slice().map(function (p, i) {
         return {
             point: p,
@@ -14864,7 +14885,7 @@ function runPlusToLargeShiftMinusMorph() {
 
 //# sourceMappingURL=index.js.map
 
-function run$7() {
+function run$8() {
     var viewport = create$1({
         size: 1440,
         viewportWidth: 820,
@@ -14921,7 +14942,7 @@ function updateCircles$4(sel) {
 
 //# sourceMappingURL=index.js.map
 
-function run$8() {
+function run$9() {
     var viewport = create$1({
         size: 1440,
         viewportWidth: 820,
@@ -14968,6 +14989,7 @@ function updateCircles$5(sel) {
     });
     circles.exit().remove();
 }
+//# sourceMappingURL=animals-morph.js.map
 
 //# sourceMappingURL=index.js.map
 
@@ -15004,10 +15026,11 @@ var flubberStrategyMap = new Map([
     ['?circle-to-star-add-dummy-points', run$3],
     ['?circle-to-star-pick-starting-point', run$4],
     ['?circle-to-star-morph', run$5],
-    ['?donut-to-star-morph', run$6],
+    ['?donut-to-star', run$6],
+    ['?donut-to-star-morph', run$7],
 ]);
 var flubberSingleShapeMap = new Map([
-    ['?single-shape-animals-morph', run$7],
+    ['?single-shape-animals-morph', run$8],
 ]);
 var flubberMultiShapeMap = new Map([
     ['?texas-to-hawaii-fade', run$1],
@@ -15015,7 +15038,7 @@ var flubberMultiShapeMap = new Map([
     ['?animals-triangulate', run$2],
 ]);
 var needlemanWunschMap = new Map([
-    ['?single-shape-animals-morph', run$8],
+    ['?single-shape-animals-morph', run$9],
 ]);
 var sectionMap = new Map([
     ['/demos/intro-to-path-morphing/index.html', introToPathMorphingMap],
