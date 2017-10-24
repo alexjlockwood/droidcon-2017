@@ -3,6 +3,11 @@ import 'd3-jetpack';
 import 'd3-selection-multi';
 
 import {
+  runAnimalsTriangulate,
+  runTexasToHawaiiFade,
+  runTexasToHawaiiTriangulate,
+} from './demos/flubber/multi-shape';
+import {
   runCircleToStarAddDummyPoints,
   runCircleToStarMorph,
   runCircleToStarPickStartingPoint,
@@ -32,11 +37,6 @@ import {
   runSqWithDummyPointsToShiftedOct,
   runSqWithDummyPointsToShiftedOctMorph,
 } from './demos/intro-to-path-morphing';
-import {
-  runStatesTriangulate,
-  runTexasToHawaiiFade,
-  runTexasToHawaiiTriangulate,
-} from './demos/flubber/multi-shape';
 
 import { runFlubberSingleShapeAnimalsMorph } from './demos/flubber/single-shape';
 import { runNeedlemanWunschSingleShapeAnimalsMorph } from './demos/needleman-wunsch';
@@ -84,7 +84,7 @@ const flubberSingleShapeMap = new Map<string, () => void>([
 const flubberMultiShapeMap = new Map<string, () => void>([
   ['?texas-to-hawaii-fade', runTexasToHawaiiFade],
   ['?texas-to-hawaii-triangulate', runTexasToHawaiiTriangulate],
-  ['?states-triangulate', runStatesTriangulate],
+  ['?animals-triangulate', runAnimalsTriangulate],
 ]);
 
 const needlemanWunschMap = new Map<string, () => void>([
