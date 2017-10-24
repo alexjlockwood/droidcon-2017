@@ -71,7 +71,6 @@ export function run() {
   const fromInnerRing = [...pathStringToRing(fromInnerPathData, 0.4).ring];
   const toRing = [...pathStringToRing(toPathData, 0.4).ring];
   const toInnerRing = [...pathStringToRing(toInnerPathData, 0.4).ring];
-  console.log(toInnerRing);
 
   // Same number of points on each ring.
   if (fromRing.length < toRing.length) {
@@ -83,8 +82,6 @@ export function run() {
   for (let i = toInnerRing.length; i < fromInnerRing.length; i++) {
     toInnerRing.push([18, 6]);
   }
-
-  console.log(fromInnerRing, toInnerRing);
 
   const newFromSegments = [...fromRing].map((p, i) => {
     return {

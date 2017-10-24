@@ -11,6 +11,7 @@ import {
   runCircleToStarAddDummyPoints,
   runCircleToStarMorph,
   runCircleToStarPickStartingPoint,
+  runDonutToStar,
   runDonutToStarMorph,
 } from './demos/flubber/strategy';
 import {
@@ -75,12 +76,12 @@ const flubberStrategyMap = new Map<string, () => void>([
   ['?circle-to-star-add-dummy-points', runCircleToStarAddDummyPoints],
   ['?circle-to-star-pick-starting-point', runCircleToStarPickStartingPoint],
   ['?circle-to-star-morph', runCircleToStarMorph],
+  ['?donut-to-star', runDonutToStar],
   ['?donut-to-star-morph', runDonutToStarMorph],
 ]);
 
 const flubberSingleShapeMap = new Map<string, () => void>([
   ['?single-shape-animals-morph', runFlubberSingleShapeAnimalsMorph],
-  // ['?states-single-shape', runFlubberStatesSingleShape],
 ]);
 
 const flubberMultiShapeMap = new Map<string, () => void>([
@@ -91,7 +92,6 @@ const flubberMultiShapeMap = new Map<string, () => void>([
 
 const needlemanWunschMap = new Map<string, () => void>([
   ['?single-shape-animals-morph', runNeedlemanWunschSingleShapeAnimalsMorph],
-  // ['?add-points-to-animals', runAddPointsToAnimals],
 ]);
 
 const sectionMap = new Map<string, Map<string, () => void>>([
